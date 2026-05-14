@@ -2,6 +2,17 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.5 — 2026-05-14
+
+Wireless ADB pairing.
+
+### Added
+- `AdbPairingService` (Core) — CliWrap-driven `adb pair host:port code`, `adb connect`, `adb disconnect`. AdvancedSharpAdbClient doesn't expose the TLS pairing handshake; we shell out for this one path only. Includes a `ParsePairingQr` helper for `WIFI:T:ADB;S:<svc>;P:<code>;;` strings (Android Studio QR format).
+- CLI: `phonefork pair <ip:port> <code>`, `phonefork connect <ip:port>`, `phonefork disconnect [ip:port]`. `adb disconnect` (no args) confirmed to work cleanly on the existing connected USB devices.
+
+### Notes
+- WPF pair dialog from the DeviceBar deferred to v0.6.5.1 polish.
+
 ## v0.6.0 — 2026-05-14
 
 Roles tab live + roles/perms CLI branches. **All six core migration tabs now live.**
