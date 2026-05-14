@@ -10,7 +10,12 @@
     <DockPanel>
         <!-- Action row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <TextBlock Text="Debloat profile" FontSize="15" FontWeight="SemiBold"/>
+                    <TextBlock Text="Matches the destination against the embedded AppManagerNG dataset and disables selected packages reversibly."
+                               Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan"           Command="{Binding ScanCommand}"          Margin="0,0,8,0"/>
                     <Button Content="Apply Profile"  Command="{Binding ApplyProfileCommand}"  Margin="0,0,4,0"/>
@@ -31,7 +36,7 @@
 
         <!-- Filter chips row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <TextBlock Text="Tier:" Foreground="{StaticResource ForegroundMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
                     <CheckBox Content="Delete"  IsChecked="{Binding ShowDelete}"  VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{StaticResource MochaGreenBrush}"/>
@@ -48,27 +53,45 @@
         </Border>
 
         <!-- Status row -->
-        <Border DockPanel.Dock="Top" Margin="0,0,0,12">
-            <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource SubtleCard}" Margin="0,0,0,12">
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundBrush}" TextWrapping="Wrap" DockPanel.Dock="Left"/>
+                <TextBlock HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Run Text="Selected: " Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <Run Text="{Binding TotalSelected}" FontWeight="SemiBold"/>
+                </TextBlock>
+            </DockPanel>
         </Border>
 
         <!-- Diff table -->
         <Border Style="{StaticResource Card}" Padding="0">
-            <DataGrid ItemsSource="{Binding FilteredRows}"
-                      RowHeight="30"
-                      Background="Transparent"
-                      BorderThickness="0">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Header=" " Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
-                    <DataGridTextColumn Header="Package"  Binding="{Binding PackageId}" Width="2.4*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Label"    Binding="{Binding Label}"     Width="1.6*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Tier"     Binding="{Binding Tier}"      Width="80"   IsReadOnly="True"/>
-                    <DataGridTextColumn Header="List"     Binding="{Binding List}"      Width="80"   IsReadOnly="True"/>
-                    <DataGridTextColumn Header="State"    Binding="{Binding OnDevice}"  Width="80"   IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Status"   Binding="{Binding Status}"    Width="1.2*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Warning"  Binding="{Binding Warning}"   Width="2*"   IsReadOnly="True"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <Grid>
+                <DataGrid ItemsSource="{Binding FilteredRows}"
+                          RowHeight="30"
+                          Background="Transparent"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header=" " Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                        <DataGridTextColumn Header="Package"  Binding="{Binding PackageId}" Width="2.4*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Label"    Binding="{Binding Label}"     Width="1.6*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Tier"     Binding="{Binding Tier}"      Width="80"   IsReadOnly="True"/>
+                        <DataGridTextColumn Header="List"     Binding="{Binding List}"      Width="80"   IsReadOnly="True"/>
+                        <DataGridTextColumn Header="State"    Binding="{Binding OnDevice}"  Width="80"   IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Status"   Binding="{Binding Status}"    Width="1.2*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Warning"  Binding="{Binding Warning}"   Width="2*"   IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Border Style="{StaticResource SubtleCard}" Margin="16"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="{Binding HasRows, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel Width="460">
+                        <TextBlock Text="Scan destination bloatware" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Conservative and Recommended profiles avoid Caution and Unsafe packages unless you explicitly show and select those tiers."
+                                   Foreground="{StaticResource ForegroundMutedBrush}"
+                                   TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </DockPanel>
 </UserControl>

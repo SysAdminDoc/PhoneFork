@@ -10,7 +10,12 @@
     <DockPanel>
         <!-- Action row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <TextBlock Text="Settings diff" FontSize="15" FontWeight="SemiBold"/>
+                    <TextBlock Text="Compares source and destination Android settings, then applies only the checked safe keys."
+                               Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan"        Command="{Binding ScanCommand}"   Margin="0,0,8,0"/>
                     <Button Content="Apply"       Command="{Binding ApplyCommand}"  Style="{StaticResource AccentButton}" Margin="0,0,16,0"/>
@@ -30,9 +35,12 @@
 
         <!-- Status row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
                 <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundBrush}" DockPanel.Dock="Left"/>
                 <TextBlock HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Run Text="Selected: " Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <Run Text="{Binding TotalSelected}" FontWeight="SemiBold"/>
+                    <Run Text="   " />
                     <Run Text="Different: " Foreground="{StaticResource ForegroundMutedBrush}"/>
                     <Run Text="{Binding TotalDifferent}" FontWeight="SemiBold" Foreground="{StaticResource MochaPeachBrush}"/>
                     <Run Text="   " />
@@ -44,19 +52,31 @@
 
         <!-- Diff table -->
         <Border Style="{StaticResource Card}" Padding="0">
-            <DataGrid ItemsSource="{Binding FilteredRows}"
-                      RowHeight="28"
-                      Background="Transparent"
-                      BorderThickness="0">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Header=" "    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
-                    <DataGridTextColumn Header="Ns"      Binding="{Binding NamespaceText}" Width="70"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Key"     Binding="{Binding Key}"           Width="2.5*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Outcome" Binding="{Binding OutcomeText}"   Width="90"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Source value" Binding="{Binding SourceValue}" Width="2*" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Dest value"   Binding="{Binding DestValue}"   Width="2*" IsReadOnly="True"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <Grid>
+                <DataGrid ItemsSource="{Binding FilteredRows}"
+                          RowHeight="28"
+                          Background="Transparent"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header=" "    Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                        <DataGridTextColumn Header="Ns"      Binding="{Binding NamespaceText}" Width="70"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Key"     Binding="{Binding Key}"           Width="2.5*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Outcome" Binding="{Binding OutcomeText}"   Width="90"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Source value" Binding="{Binding SourceValue}" Width="2*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Dest value"   Binding="{Binding DestValue}"   Width="2*" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Border Style="{StaticResource SubtleCard}" Margin="16"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="{Binding HasRows, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel Width="440">
+                        <TextBlock Text="Scan settings before applying" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Dangerous system keys are blocked by the apply service; different rows are selected by default and source-only rows stay opt-in."
+                                   Foreground="{StaticResource ForegroundMutedBrush}"
+                                   TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </DockPanel>
 </UserControl>

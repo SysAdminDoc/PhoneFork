@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.6.5"
+        Title="PhoneFork  &#x00B7;  v0.6.6"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen">
@@ -22,13 +22,16 @@
 
         <!-- App title row -->
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
-            <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
-                       Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text=" v0.6.5" FontSize="20" Margin="6,4,0,0"
-                       Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text="Dual-Samsung migration tool"
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
+                           Foreground="{StaticResource AccentBrush}"/>
+                <TextBlock Text=" v0.6.6" FontSize="20" Margin="6,4,0,0"
+                           Foreground="{StaticResource ForegroundMutedBrush}"/>
+            </StackPanel>
+            <TextBlock Text="Dual-Samsung migration &#x00B7; local-only &#x00B7; no root &#x00B7; no cloud"
                        FontSize="13" Margin="16,8,0,0"
-                       Foreground="{StaticResource ForegroundMutedBrush}"/>
+                       Foreground="{StaticResource ForegroundMutedBrush}"
+                       DockPanel.Dock="Left"/>
         </DockPanel>
 
         <!-- Device bar -->

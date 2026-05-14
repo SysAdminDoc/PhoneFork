@@ -19,6 +19,8 @@ public partial class RolesViewModel : ObservableObject
     [ObservableProperty] private string _status = "Assign Source + Destination, then click Scan.";
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private bool _dryRun;
+    [ObservableProperty] private bool _hasRows;
+    [ObservableProperty] private int _totalSelected;
 
     public RolesViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -58,12 +60,14 @@ public partial class RolesViewModel : ObservableObject
             var dstByRole = dst.Holders.ToDictionary(h => h.Role);
 
             Rows.Clear();
+            HasRows = false;
             foreach (var sh in src.Holders)
             {
                 dstByRole.TryGetValue(sh.Role, out var dh);
-                Rows.Add(new RoleRowViewModel(sh.Role, sh.HolderPackage, dh?.HolderPackage));
+                AddRow(new RoleRowViewModel(sh.Role, sh.HolderPackage, dh?.HolderPackage));
             }
-            Status = $"{Rows.Count} roles inspected; {Rows.Count(r => r.IsSelected)} default-selected for apply.";
+            RefreshSelectionState();
+            Status = $"{Rows.Count} roles inspected; {TotalSelected} default-selected for apply.";
         }
         catch (Exception ex)
         {
@@ -73,6 +77,7 @@ public partial class RolesViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            ScanCommand.NotifyCanExecuteChanged();
             ApplyCommand.NotifyCanExecuteChanged();
         }
     }
@@ -121,11 +126,37 @@ public partial class RolesViewModel : ObservableObject
         foreach (var r in Rows)
             r.IsSelected = !string.IsNullOrEmpty(r.SourceHolder)
                            && !string.Equals(r.SourceHolder, r.DestHolder, StringComparison.Ordinal);
+        RefreshSelectionState();
     }
 
     [RelayCommand]
     private void SelectNone()
     {
         foreach (var r in Rows) r.IsSelected = false;
+        RefreshSelectionState();
+    }
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanCommand.NotifyCanExecuteChanged();
+        ApplyCommand.NotifyCanExecuteChanged();
+    }
+
+    private void AddRow(RoleRowViewModel row)
+    {
+        row.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(RoleRowViewModel.IsSelected))
+                RefreshSelectionState();
+        };
+        Rows.Add(row);
+        HasRows = true;
+    }
+
+    private void RefreshSelectionState()
+    {
+        HasRows = Rows.Count > 0;
+        TotalSelected = Rows.Count(r => r.IsSelected);
+        ApplyCommand.NotifyCanExecuteChanged();
     }
 }

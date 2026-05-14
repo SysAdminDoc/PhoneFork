@@ -10,6 +10,9 @@
             </ResourceDictionary.MergedDictionaries>
             <conv:AuthBrushConverter x:Key="AuthBrushConv"/>
             <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+            <conv:BoolToVisibilityConverter x:Key="InverseBoolToVis" Invert="True"/>
+            <conv:NullToVisibilityConverter x:Key="NullToVis"/>
+            <conv:NullToVisibilityConverter x:Key="InverseNullToVis" Invert="True"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

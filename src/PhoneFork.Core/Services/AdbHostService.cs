@@ -16,6 +16,7 @@ public sealed class AdbHostService : IDisposable
 
     public IAdbClient Client { get; }
     public DeviceMonitor? Monitor { get; private set; }
+    public string AdbPath => _adbPath;
 
     public AdbHostService(string adbExePath, ILogger log)
     {

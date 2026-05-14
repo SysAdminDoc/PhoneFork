@@ -2,6 +2,21 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.6 — 2026-05-14
+
+Premium WPF polish pass.
+
+### Added
+- WPF Wireless ADB panel in the device bar for pairing, connecting, disconnecting, and parsing Android `WIFI:T:ADB` pairing payloads.
+- Empty states for Apps, Settings, Debloat, Wi-Fi, and Roles so first-run tables explain the next action and safety model.
+- Selection counters across actionable tables so apply/migrate readiness is visible.
+
+### Improved
+- Shared Catppuccin theme now covers stronger keyboard focus, hover, pressed, disabled, textbox, combo box, DataGrid row/cell, tab, and progress states.
+- Device cards now show a compact authorization status indicator and clearer no-device guidance.
+- Row checkbox changes now refresh selected counts and command enabled states immediately across Apps, Settings, Debloat, and Roles.
+- The main header now states the core trust posture: local-only, no root, no cloud.
+
 ## v0.6.5 — 2026-05-14
 
 Wireless ADB pairing.
@@ -11,7 +26,7 @@ Wireless ADB pairing.
 - CLI: `phonefork pair <ip:port> <code>`, `phonefork connect <ip:port>`, `phonefork disconnect [ip:port]`. `adb disconnect` (no args) confirmed to work cleanly on the existing connected USB devices.
 
 ### Notes
-- WPF pair dialog from the DeviceBar deferred to v0.6.5.1 polish.
+- WPF wireless pairing surface shipped in v0.6.6.
 
 ## v0.6.0 — 2026-05-14
 

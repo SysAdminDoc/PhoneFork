@@ -159,4 +159,10 @@ public partial class MediaViewModel : ObservableObject
 
     [RelayCommand]
     private void SelectNone() { foreach (var r in Rows) r.IsSelected = false; }
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanCommand.NotifyCanExecuteChanged();
+        ApplyCommand.NotifyCanExecuteChanged();
+    }
 }

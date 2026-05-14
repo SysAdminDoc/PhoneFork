@@ -119,9 +119,18 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [x] **`adb connect` / `adb disconnect`** wrappers in the same service.
 - [x] **`WIFI:T:ADB;S:<svc>;P:<code>;;` QR parser** for Android Studio-style pairing QRs.
 - [x] **CLI**: `phonefork pair <ip:port> <code>`, `phonefork connect <ip:port>`, `phonefork disconnect [ip:port]`.
-- [ ] _WPF pair dialog from DeviceBar_ — deferred to v0.6.5.1 polish; CLI surface is the load-bearing capability.
-- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.5.1 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a UI shim).
+- [x] **WPF Wireless ADB panel from DeviceBar** — shipped in v0.6.6. Pair, connect, disconnect, QR-payload parse, inline status feedback, and device-list refresh.
+- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.7 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a discovery shim).
 - [ ] _Per-install ADB RSA key in `%LOCALAPPDATA%\PhoneFork\adb-keys\`_ — deferred to v1.0.0 trust-hardening (currently inherits the shared `%USERPROFILE%\.android\adbkey`).
+
+### v0.6.6 — Premium WPF polish ✅ _(shipped 2026-05-14)_
+
+**Theme**: Trust + Reach + WCAG groundwork.
+
+- [x] **Shared interaction states** — buttons, accent buttons, text boxes, combo boxes, tabs, progress bars, DataGrid rows, selected rows, focused cells, disabled states, hover states, and pressed states now have a coherent Catppuccin treatment.
+- [x] **First-run empty states** — Apps, Settings, Debloat, Wi-Fi, and Roles tables explain what to scan, what will happen next, and which safety model applies.
+- [x] **Visible command readiness** — selected-row counters and individual checkbox updates now refresh Apply/Migrate command enabled states immediately.
+- [x] **Device trust/readiness polish** — no-device guidance, authorization status dots, and the local-only / no-root / no-cloud header copy reinforce the product's trust posture.
 
 ### v0.7.0 — Helper companion APK + push-and-run JAR ([scrcpy](https://github.com/Genymobile/scrcpy) `app_process` pattern, [gonodono/adbsms](https://github.com/gonodono/adbsms))
 
