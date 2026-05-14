@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PhoneFork.App/PhoneFork.App.csproj" />
+    <Project Path="src/PhoneFork.Cli/PhoneFork.Cli.csproj" />
+    <Project Path="src/PhoneFork.Core/PhoneFork.Core.csproj" />
+  </Folder>
+</Solution>

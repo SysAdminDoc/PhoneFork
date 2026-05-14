@@ -1,0 +1,15 @@
+<Application x:Class="PhoneFork.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PhoneFork.App"
+             xmlns:conv="clr-namespace:PhoneFork.App.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/CatppuccinMocha.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <conv:AuthBrushConverter x:Key="AuthBrushConv"/>
+            <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
