@@ -2,6 +2,22 @@
 
 All notable changes to PhoneFork.
 
+## v0.5.0 — 2026-05-14
+
+Wi-Fi tab live + Wi-Fi/CSC CLI branches.
+
+### Added
+- `WifiNetwork` model + `WifiAuth` enum (`Wpa`/`Wep`/`Nopass`/`WpaEap`).
+- `WifiQrService` — wraps `QRCoder.PayloadGenerator.WiFi` to emit the standard `WIFI:T:...;S:...;P:...;H:...;;` payload, plus PNG and SVG render helpers. QRCoder dependency moved into Core so the CLI can use it too.
+- `WifiSnapshotService` — enumerates SSIDs via `cmd wifi list-networks` with a `dumpsys wifi` regex fallback. Explicitly documents that PSKs are not recoverable through this path; that's gated on the v0.7 helper APK / Shizuku binder.
+- `CscSnapshot` model + `CscDiffService` — reads `persist.sys.sales_code`, `ro.csc.country_code`, `persist.sys.locale`, `persist.sys.timezone`, `gsm.sim.operator.iso-country` via `getprop`. Emits a `CscDiffSummary` with per-property mismatch flags.
+- WPF Wi-Fi tab: CSC pre-flight banner, source-side SSID `DataGrid` with per-row "Enter PSK to build QR" input + "Use" button that fills the manual composer, manual composer (SSID / PSK / Auth / Hidden) with live PNG preview + Save PNG to `%LOCALAPPDATA%\PhoneFork\wifi-qrs\`.
+- CLI: `phonefork wifi list --device <s>`, `phonefork wifi qr --ssid <name> --psk <key> [--auth Wpa|Wep|Nopass|WpaEap] [--hidden] [-o out.png|out.svg]`, `phonefork csc diff --from <s> --to <d>`.
+
+### Notes
+- Hardware-validated S25 vs S22: CSC diff surfaced country-code mismatch (UK & IRE vs USA) and carrier ISO mismatch — exactly the kind of pre-flight signal Smart Switch silently misses. SSID list on S25 returned 2 networks with auth types parsed correctly. QR PNG renders with `WIFI:T:WPA;S:TestNetwork;P:supersecret123;;` payload (479-byte PNG).
+- PSK auto-export deferred to v0.7 (helper APK / Shizuku-bound `WifiManager.getPrivilegedConfiguredNetworks()`).
+
 ## v0.4.0 — 2026-05-14
 
 Debloat tab live + debloat CLI branch. Ships the AppManagerNG / UAD-NG dataset embedded as 5 JSON resources (5,481 entries total).

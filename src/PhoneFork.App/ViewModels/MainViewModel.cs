@@ -11,6 +11,7 @@ public partial class MainViewModel : ObservableObject
     public MediaViewModel Media { get; }
     public SettingsViewModel Settings { get; }
     public DebloatViewModel Debloat { get; }
+    public WifiViewModel Wifi { get; }
 
     public MainViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -19,5 +20,6 @@ public partial class MainViewModel : ObservableObject
         Media = new MediaViewModel(devices, host, log);
         Settings = new SettingsViewModel(devices, host, log);
         Debloat = new DebloatViewModel(devices, host, log);
+        Wifi = new WifiViewModel(devices, host, log);
     }
 }

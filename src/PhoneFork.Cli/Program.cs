@@ -49,6 +49,22 @@ app.Configure(config =>
         debloat.AddCommand<DebloatRollbackCommand>("rollback")
             .WithDescription("Re-enable packages that were disabled by a prior apply, using its snapshot JSON.");
     });
+
+    config.AddBranch("wifi", wifi =>
+    {
+        wifi.SetDescription("Wi-Fi SSID enumeration + QR-bridge generation. PSK export requires v0.7 helper APK / Shizuku.");
+        wifi.AddCommand<WifiListCommand>("list")
+            .WithDescription("List SSIDs on a device (PSKs are not recoverable without Shizuku/helper).");
+        wifi.AddCommand<WifiQrCommand>("qr")
+            .WithDescription("Render a scannable WIFI: QR code (PNG or SVG) from a user-supplied SSID + PSK.");
+    });
+
+    config.AddBranch("csc", csc =>
+    {
+        csc.SetDescription("Region / locale / CSC diff between two devices (pre-flight banner).");
+        csc.AddCommand<CscDiffCommand>("diff")
+            .WithDescription("Capture both devices and print the CSC / country / locale / timezone diff.");
+    });
 });
 
 return await app.RunAsync(args);
