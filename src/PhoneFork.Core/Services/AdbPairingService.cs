@@ -1,6 +1,7 @@
 using CliWrap;
 using CliWrap.Buffered;
 using Serilog;
+using System.Text;
 
 namespace PhoneFork.Core.Services;
 
@@ -67,9 +68,11 @@ public sealed class AdbPairingService
     /// </summary>
     public static (string ServiceName, string Code)? ParsePairingQr(string qrText)
     {
+        if (string.IsNullOrWhiteSpace(qrText)) return null;
+        qrText = qrText.Trim();
         if (!qrText.StartsWith("WIFI:", StringComparison.OrdinalIgnoreCase)) return null;
         string? svc = null, code = null;
-        foreach (var part in qrText["WIFI:".Length..].Split(';', StringSplitOptions.RemoveEmptyEntries))
+        foreach (var part in SplitWifiFields(qrText["WIFI:".Length..]))
         {
             var colon = part.IndexOf(':');
             if (colon <= 0) continue;
@@ -82,5 +85,45 @@ public sealed class AdbPairingService
             }
         }
         return svc is not null && code is not null ? (svc, code) : null;
+    }
+
+    private static IEnumerable<string> SplitWifiFields(string body)
+    {
+        var current = new StringBuilder();
+        var escaped = false;
+
+        foreach (var ch in body)
+        {
+            if (escaped)
+            {
+                current.Append(ch);
+                escaped = false;
+                continue;
+            }
+
+            if (ch == '\\')
+            {
+                escaped = true;
+                continue;
+            }
+
+            if (ch == ';')
+            {
+                if (current.Length > 0)
+                {
+                    yield return current.ToString();
+                    current.Clear();
+                }
+                continue;
+            }
+
+            current.Append(ch);
+        }
+
+        if (escaped)
+            current.Append('\\');
+
+        if (current.Length > 0)
+            yield return current.ToString();
     }
 }

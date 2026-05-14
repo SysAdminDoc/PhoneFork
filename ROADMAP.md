@@ -120,7 +120,7 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [x] **`WIFI:T:ADB;S:<svc>;P:<code>;;` QR parser** for Android Studio-style pairing QRs.
 - [x] **CLI**: `phonefork pair <ip:port> <code>`, `phonefork connect <ip:port>`, `phonefork disconnect [ip:port]`.
 - [x] **WPF Wireless ADB panel from DeviceBar** — shipped in v0.6.6. Pair, connect, disconnect, QR-payload parse, inline status feedback, and device-list refresh.
-- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.8 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a discovery shim).
+- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.9 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a discovery shim).
 - [ ] _Per-install ADB RSA key in `%LOCALAPPDATA%\PhoneFork\adb-keys\`_ — deferred to v1.0.0 trust-hardening (currently inherits the shared `%USERPROFILE%\.android\adbkey`).
 
 ### v0.6.6 — Premium WPF polish ✅ _(shipped 2026-05-14)_
@@ -139,6 +139,17 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [x] **Dark shell ownership** — MainWindow now sets dark background, typography, layout rounding, and OS dark-title-bar preference explicitly so the client chrome does not flash or settle into default Windows light colors.
 - [x] **Native control leak repair** — combo boxes and checkboxes now use app-owned Catppuccin templates with consistent focus, hover, selected, checked, and disabled states.
 - [x] **Navigation and disabled-state contrast** — tab labels and unavailable commands now retain enough contrast to look deliberate while still communicating availability.
+
+### v0.6.8 — ADB shell/path hardening ✅ _(shipped 2026-05-14)_
+
+**Theme**: Trust + Reliability + Developer confidence.
+
+- [x] **Shared shell argument boundary** — all command paths touched by Settings, Roles, Media, Debloat, CSC, Device discovery, and App catalog now use a common Android shell quoting helper, with package IDs validated before command construction.
+- [x] **Windows-safe staging paths** — wireless serials, package IDs, APK split names, media relative paths, and QR export names are sanitized before touching local disk, with media staging guarded against path traversal.
+- [x] **Single APK pull path** — WPF dry-run, CLI dry-run, and real app migration now use the same Core APK pull implementation so preview behavior matches apply behavior.
+- [x] **Malformed snapshot tolerance** — imported Settings and Media snapshots tolerate duplicate namespaces/categories/paths by choosing the last occurrence instead of crashing during diff creation.
+- [x] **Dry-run trust cleanup** — Debloat dry-run still snapshots the device in memory to calculate the plan, but it no longer writes rollback files or implies local state changed.
+- [x] **Regression test bed** — Core now has focused xUnit coverage for shell quoting, local path safety, Wireless ADB QR parsing, and duplicate snapshot inputs.
 
 ### v0.7.0 — Helper companion APK + push-and-run JAR ([scrcpy](https://github.com/Genymobile/scrcpy) `app_process` pattern, [gonodono/adbsms](https://github.com/gonodono/adbsms))
 

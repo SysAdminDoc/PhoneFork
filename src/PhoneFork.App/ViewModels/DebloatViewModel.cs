@@ -137,7 +137,8 @@ public partial class DebloatViewModel : ObservableObject
             var svc = new DebloatService(_host.Client, _log);
             var result = await svc.ApplyAsync(dstData, picked, DryRun,
                 new Progress<string>(_ => { }), ct);
-            LastSnapshotPath = result.SnapshotPath;
+            if (!DryRun)
+                LastSnapshotPath = result.SnapshotPath;
 
             // Reflect new state in the rows.
             foreach (var r in Rows.Where(r => r.IsSelected))
@@ -146,7 +147,7 @@ public partial class DebloatViewModel : ObservableObject
                 r.Status = match?.Success == true ? (DryRun ? "would disable" : "disabled") : $"failed: {match?.Output}";
             }
             Status = DryRun
-                ? $"Dry-run: would disable {result.Disabled}, already disabled {result.AlreadyDisabled}, would fail {result.Failed}. Snapshot at {result.SnapshotPath}."
+                ? $"Dry-run: would disable {result.Disabled}, already disabled {result.AlreadyDisabled}, would fail {result.Failed}. No changes written."
                 : $"Disabled {result.Disabled}, already disabled {result.AlreadyDisabled}, failed {result.Failed} in {result.Elapsed.TotalSeconds:F1}s. Snapshot: {result.SnapshotPath}";
         }
         catch (Exception ex)

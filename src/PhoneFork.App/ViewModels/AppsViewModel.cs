@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -104,15 +103,7 @@ public partial class AppsViewModel : ObservableObject
                 {
                     if (DryRun)
                     {
-                        // Pull-only path: re-use the cache via installer (just don't call install).
-                        var pkgCache = Path.Combine(installer.CacheRoot, srcData.Serial, row.App.PackageName);
-                        Directory.CreateDirectory(pkgCache);
-                        foreach (var remote in row.App.RemoteApkPaths)
-                        {
-                            using var sync = new AdvancedSharpAdbClient.SyncService(_host.Client, srcData);
-                            using var fs = File.Create(Path.Combine(pkgCache, Path.GetFileName(remote)));
-                            await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: ct);
-                        }
+                        await installer.PullApksToCacheAsync(srcData, row.App, progress, ct);
                         row.Status = "Dry-run pulled";
                         ok++;
                     }

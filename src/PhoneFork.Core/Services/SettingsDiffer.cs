@@ -41,8 +41,12 @@ public static class SettingsDiffer
 {
     public static SettingsPlan Build(SettingsSnapshot source, SettingsSnapshot dest)
     {
-        var srcByNs = source.Namespaces.ToDictionary(s => s.Namespace);
-        var dstByNs = dest.Namespaces.ToDictionary(s => s.Namespace);
+        var srcByNs = source.Namespaces
+            .GroupBy(s => s.Namespace)
+            .ToDictionary(g => g.Key, g => g.Last());
+        var dstByNs = dest.Namespaces
+            .GroupBy(s => s.Namespace)
+            .ToDictionary(g => g.Key, g => g.Last());
         var allNs = srcByNs.Keys.Union(dstByNs.Keys).OrderBy(n => (int)n).ToList();
         var nsDiffs = new List<SettingsDiffNamespace>();
 

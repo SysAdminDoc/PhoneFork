@@ -73,9 +73,14 @@ public sealed class DebloatService
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var snapshot = await SnapshotAsync(device, ct);
-        var snapshotPath = Path.Combine(_snapshotDir, $"{device.Serial}-{DateTime.UtcNow:yyyyMMddTHHmmss}.json");
-        await using (var fs = File.Create(snapshotPath))
-            await JsonSerializer.SerializeAsync(fs, snapshot, new JsonSerializerOptions { WriteIndented = true }, ct);
+        var snapshotPath = "";
+        if (!dryRun)
+        {
+            var serialFileName = LocalPathNames.SafeFileName(device.Serial, "device");
+            snapshotPath = Path.Combine(_snapshotDir, $"{serialFileName}-{DateTime.UtcNow:yyyyMMddTHHmmss}.json");
+            await using (var fs = File.Create(snapshotPath))
+                await JsonSerializer.SerializeAsync(fs, snapshot, new JsonSerializerOptions { WriteIndented = true }, ct);
+        }
 
         int disabled = 0, alreadyDisabled = 0, failed = 0;
         var results = new List<DebloatActionResult>();
@@ -84,6 +89,19 @@ public sealed class DebloatService
         foreach (var pkg in packageIds)
         {
             ct.ThrowIfCancellationRequested();
+            string pkgArg;
+            try
+            {
+                pkgArg = AdbShell.PackageArg(pkg);
+            }
+            catch (ArgumentException ex)
+            {
+                failed++;
+                results.Add(new DebloatActionResult(pkg, false, ex.Message));
+                _log.Warning(ex, "Invalid debloat package id {Pkg}", pkg);
+                continue;
+            }
+
             if (!enabledSet.Contains(pkg))
             {
                 alreadyDisabled++;
@@ -99,7 +117,7 @@ public sealed class DebloatService
             }
             try
             {
-                var output = await _client.ShellAsync(device, $"pm disable-user --user 0 {pkg}", ct);
+                var output = await _client.ShellAsync(device, $"pm disable-user --user 0 {pkgArg}", ct);
                 if ((output ?? "").Contains("new state: disabled-user", StringComparison.Ordinal))
                 {
                     disabled++;
@@ -120,8 +138,8 @@ public sealed class DebloatService
             }
         }
         sw.Stop();
-        _log.Information("Debloat apply: disabled={Disabled} already={Already} failed={Failed}; snapshot={Snapshot}",
-            disabled, alreadyDisabled, failed, snapshotPath);
+        _log.Information("Debloat apply: disabled={Disabled} already={Already} failed={Failed}; dryRun={DryRun}; snapshot={Snapshot}",
+            disabled, alreadyDisabled, failed, dryRun, snapshotPath);
         return new DebloatApplyResult(disabled, alreadyDisabled, failed, results, snapshotPath, sw.Elapsed);
     }
 
@@ -146,6 +164,19 @@ public sealed class DebloatService
         {
             ct.ThrowIfCancellationRequested();
             progress?.Report($"cmd package install-existing {pkg}");
+            string pkgArg;
+            try
+            {
+                pkgArg = AdbShell.PackageArg(pkg);
+            }
+            catch (ArgumentException ex)
+            {
+                failed++;
+                results.Add(new DebloatActionResult(pkg, false, ex.Message));
+                _log.Warning(ex, "Invalid rollback package id {Pkg}", pkg);
+                continue;
+            }
+
             if (dryRun)
             {
                 reenabled++;
@@ -155,8 +186,8 @@ public sealed class DebloatService
             try
             {
                 // install-existing first (covers the pm uninstall-with-keep-data case), then enable.
-                var ie = await _client.ShellAsync(device, $"cmd package install-existing {pkg}", ct);
-                var en = await _client.ShellAsync(device, $"pm enable {pkg}", ct);
+                var ie = await _client.ShellAsync(device, $"cmd package install-existing {pkgArg}", ct);
+                var en = await _client.ShellAsync(device, $"pm enable {pkgArg}", ct);
                 if ((en ?? "").Contains("new state: enabled", StringComparison.Ordinal) ||
                     (ie ?? "").Contains("installed for user", StringComparison.Ordinal))
                 {

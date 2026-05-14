@@ -119,7 +119,7 @@ public sealed class DeviceService
     {
         try
         {
-            return _adb.Client.Shell(d, $"getprop {key}").Trim();
+            return _adb.Client.Shell(d, $"getprop {AdbShell.Arg(key)}").Trim();
         }
         catch
         {

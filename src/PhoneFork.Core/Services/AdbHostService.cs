@@ -29,7 +29,7 @@ public sealed class AdbHostService : IDisposable
     {
         if (_started) return true;
 
-        if (!File.Exists(_adbPath))
+        if (RequiresExistingFile(_adbPath) && !File.Exists(_adbPath))
         {
             _log.Error("Bundled adb.exe not found at {Path}", _adbPath);
             return false;
@@ -60,4 +60,9 @@ public sealed class AdbHostService : IDisposable
     {
         try { Monitor?.Dispose(); } catch { }
     }
+
+    private static bool RequiresExistingFile(string adbPath) =>
+        Path.IsPathFullyQualified(adbPath)
+        || adbPath.Contains(Path.DirectorySeparatorChar)
+        || adbPath.Contains(Path.AltDirectorySeparatorChar);
 }

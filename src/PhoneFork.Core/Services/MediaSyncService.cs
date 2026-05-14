@@ -64,7 +64,7 @@ public sealed class MediaSyncService
 
         var stageRoot = options.StageDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "PhoneFork", "stage", source.Serial);
+            "PhoneFork", "stage", LocalPathNames.SafeFileName(source.Serial, "device"));
         Directory.CreateDirectory(stageRoot);
 
         // Pre-compute totals for progress reporting.
@@ -101,7 +101,7 @@ public sealed class MediaSyncService
                             try
                             {
                                 var p = $"{remoteRoot}/{entry.RelPath}";
-                                await _client.ShellAsync(dest, $"rm -f \"{p}\"", ct);
+                                await _client.ShellAsync(dest, $"rm -f {AdbShell.Arg(p)}", ct);
                                 deleted++;
                             }
                             catch (Exception ex)
@@ -123,7 +123,7 @@ public sealed class MediaSyncService
                         }
 
                         var srcRemote = $"{remoteRoot}/{entry.RelPath}";
-                        var local = Path.Combine(stageCatDir, entry.RelPath.Replace('/', Path.DirectorySeparatorChar));
+                        var local = LocalPathNames.CombineSafeRelativePath(stageCatDir, entry.RelPath);
                         Directory.CreateDirectory(Path.GetDirectoryName(local)!);
 
                         if (options.DryRun)
@@ -146,7 +146,7 @@ public sealed class MediaSyncService
                                 var ts = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
                                 var conflictRelPath = AppendBeforeExt(entry.RelPath, $".sync-conflict-{ts}-{sha8}");
                                 var conflictRemote = $"{remoteRoot}/{conflictRelPath}";
-                                await _client.ShellAsync(dest, $"mv \"{remoteRoot}/{entry.RelPath}\" \"{conflictRemote}\"", ct);
+                                await _client.ShellAsync(dest, $"mv {AdbShell.Arg($"{remoteRoot}/{entry.RelPath}")} {AdbShell.Arg(conflictRemote)}", ct);
                                 renamed++;
                             }
 
@@ -190,7 +190,7 @@ public sealed class MediaSyncService
         using var fs = File.OpenRead(local);
         // Ensure remote parent exists.
         var parent = remote[..remote.LastIndexOf('/')];
-        await _client.ShellAsync(device, $"mkdir -p \"{parent}\"", ct);
+        await _client.ShellAsync(device, $"mkdir -p {AdbShell.Arg(parent)}", ct);
         await sync.PushAsync(fs, remote, AdvancedSharpAdbClient.Models.UnixFileStatus.DefaultFileMode, mtimeUtc, callback: null, useV2: false, cancellationToken: ct);
     }
 

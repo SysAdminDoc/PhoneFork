@@ -26,7 +26,7 @@ public sealed class DevicesCommand : Command
                 Markup.Escape(p.Serial),
                 Markup.Escape(p.DisplayName),
                 Markup.Escape(p.AndroidVersion),
-                Markup.Escape(p.OneUiVersion),
+                Markup.Escape(p.FormattedOneUiVersion),
                 p.IsAuthorized ? "[green]ready[/]" : "[red]unauthorized[/]");
         }
 

@@ -28,6 +28,16 @@ public sealed class PermsGrantCommand : AsyncCommand<PermsGrantCommand.Settings>
         var devices = host.GetDevices().ToList();
         var picked = devices.FirstOrDefault(d => d.Serial == s.Serial);
         if (picked is null) { AnsiConsole.MarkupLine($"[red]Device {Markup.Escape(s.Serial)} not connected.[/]"); return 1; }
+        if (!AdbShell.IsPackageName(s.Package))
+        {
+            AnsiConsole.MarkupLine($"[red]Invalid Android package id:[/] {Markup.Escape(s.Package)}");
+            return 1;
+        }
+        if (s.Permissions.Length == 0 && s.AppOps.Length == 0)
+        {
+            AnsiConsole.MarkupLine("[yellow]Nothing to grant. Provide --permission or --appop.[/]");
+            return 1;
+        }
 
         var svc = new RoleService(host.Client, log);
         int ok = 0, fail = 0;

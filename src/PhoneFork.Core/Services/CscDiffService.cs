@@ -23,7 +23,7 @@ public sealed class CscDiffService
 
     public async Task<CscSnapshot> CaptureAsync(DeviceData device, CancellationToken ct = default)
     {
-        async Task<string> Get(string key) => (await _client.ShellAsync(device, $"getprop {key}", ct)).Trim();
+        async Task<string> Get(string key) => (await _client.ShellAsync(device, $"getprop {AdbShell.Arg(key)}", ct)).Trim();
         return new CscSnapshot
         {
             DeviceSerial = device.Serial,

@@ -2,6 +2,30 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.8 — 2026-05-14
+
+ADB shell, local path, and migration reliability hardening.
+
+### Added
+- Core unit tests for ADB shell quoting, Windows-safe local path generation, Wireless ADB QR parsing, and duplicate snapshot diff handling.
+- Shared local-path sanitizer for serials, packages, APK filenames, media paths, and Wi-Fi QR exports.
+- Shared ADB shell argument helper for shell-escaped values and package-name validation.
+
+### Improved
+- Wireless ADB serials, Android filenames, and media paths now stage safely on Windows without leaking path separators or reserved device names into local cache paths.
+- App dry-runs now use the same APK pull path as real migrations, reducing duplicated behavior between WPF, CLI, and Core.
+- Imported Settings and Media snapshots now tolerate duplicate namespaces, categories, and relative paths instead of failing during diff construction.
+- Wi-Fi QR export creates the destination directory before writing PNG or SVG output.
+- ADB host startup now honors the documented PATH fallback when a bundled `adb.exe` is not present.
+- Debloat dry-run no longer writes rollback snapshots and now reports that no changes were written.
+- CLI device listing now formats Samsung One UI versions the same way as the WPF device cards.
+
+### Fixed
+- Shell commands now consistently quote user/device-derived values before passing them through Android shell paths.
+- Debloat apply and rollback reject malformed package IDs before command construction.
+- Short device serials no longer crash `PhoneInfo.ShortLabel`.
+- CLI permission grants now reject malformed package IDs and empty grant requests with clear messages instead of surfacing exceptions.
+
 ## v0.6.7 — 2026-05-14
 
 Screenshot-driven WPF polish repair.

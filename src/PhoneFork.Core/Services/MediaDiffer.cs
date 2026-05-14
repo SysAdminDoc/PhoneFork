@@ -44,8 +44,12 @@ public static class MediaDiffer
 {
     public static MediaPlan Build(MediaManifest source, MediaManifest dest)
     {
-        var bySource = source.Categories.ToDictionary(c => c.Category);
-        var byDest = dest.Categories.ToDictionary(c => c.Category);
+        var bySource = source.Categories
+            .GroupBy(c => c.Category)
+            .ToDictionary(g => g.Key, g => g.Last());
+        var byDest = dest.Categories
+            .GroupBy(c => c.Category)
+            .ToDictionary(g => g.Key, g => g.Last());
         var cats = bySource.Keys.Union(byDest.Keys).Distinct().OrderBy(c => (int)c).ToList();
         var diffs = new List<MediaCategoryDiff>();
 
@@ -54,9 +58,11 @@ public static class MediaDiffer
             bySource.TryGetValue(cat, out var sm);
             byDest.TryGetValue(cat, out var dm);
             var srcMap = (sm?.Files ?? (IReadOnlyList<MediaFile>)Array.Empty<MediaFile>())
-                .ToDictionary(f => f.RelPath, StringComparer.Ordinal);
+                .GroupBy(f => f.RelPath, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.Last(), StringComparer.Ordinal);
             var dstMap = (dm?.Files ?? (IReadOnlyList<MediaFile>)Array.Empty<MediaFile>())
-                .ToDictionary(f => f.RelPath, StringComparer.Ordinal);
+                .GroupBy(f => f.RelPath, StringComparer.Ordinal)
+                .ToDictionary(g => g.Key, g => g.Last(), StringComparer.Ordinal);
 
             var entries = new List<MediaDiffEntry>(srcMap.Count + dstMap.Count);
             foreach (var (path, sf) in srcMap)

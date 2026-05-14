@@ -59,7 +59,10 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
             new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct);
 
         AnsiConsole.MarkupLine($"[green]disabled[/] {result.Disabled}, [grey]already disabled[/] {result.AlreadyDisabled}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
-        AnsiConsole.MarkupLine($"[grey]Snapshot:[/] {Markup.Escape(result.SnapshotPath)}");
+        if (s.DryRun)
+            AnsiConsole.MarkupLine("[grey]No snapshot written during dry-run.[/]");
+        else
+            AnsiConsole.MarkupLine($"[grey]Snapshot:[/] {Markup.Escape(result.SnapshotPath)}");
         return result.Failed == 0 ? 0 : 2;
     }
 
