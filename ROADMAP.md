@@ -99,15 +99,17 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 
 ## Next (v0.6 → v1.0) — _polish, trust, and the helper APK_
 
-### v0.6.0 — Roles tab live ([AOSP `cmd role`](https://source.android.com/docs/core/tests/vts/shell-commands), [Android 14 Restricted Settings](https://www.kaspersky.com/blog/android-restricted-settings/49991/))
+### v0.6.0 — Roles tab live ✅ _(shipped 2026-05-14)_
 
-**Theme**: Coverage + Trust.
+**Theme**: Coverage + Trust. Sources: [AOSP `cmd role`](https://source.android.com/docs/core/tests/vts/shell-commands), [Android 14 Restricted Settings](https://www.kaspersky.com/blog/android-restricted-settings/49991/).
 
-- **`cmd role get-role-holders` snapshot per device** for `DIALER`, `SMS`, `BROWSER`, `HOME`, `ASSISTANT`, `CALL_REDIRECTION`, `CALL_SCREENING`.
-- **Side-by-side picker** — drag default-app holder from source column to destination column. `cmd role add-role-holder <role> <pkg>` to apply.
-- **Per-app runtime permission grants** — `pm grant <pkg> <perm>` for the source's granted set. Also `appops set` for `SYSTEM_ALERT_WINDOW`, `MANAGE_EXTERNAL_STORAGE`, `GET_USAGE_STATS`, `REQUEST_INSTALL_PACKAGES`, `SCHEDULE_EXACT_ALARM`.
-- **Notification listener + Accessibility service enablers** — `cmd notification allow_listener <pkg/cls>` and `settings put secure enabled_accessibility_services <pkg/cls>`. Android 14 Restricted Settings bypass is auto-handled because PhoneFork's Apps-tab install path already attributes installer as `com.android.vending`.
-- **Permission diff report** — granted on source vs. default on dest, color-coded. Source pattern: AppManager.
+- [x] **`cmd role get-role-holders` snapshot** for 8 roles: DIALER, SMS, BROWSER, HOME, ASSISTANT, CALL_REDIRECTION, CALL_SCREENING, EMERGENCY. Handles both `package:<pkg>` and `[<pkg>]` Android-version output formats.
+- [x] **Side-by-side picker** — Source / Dest holder columns + per-row checkbox + default-select Different.
+- [x] **`cmd role add-role-holder --user 0 <role> <pkg>`** apply.
+- [x] **Per-app runtime permission grants** — `pm grant <pkg> <perm>` + `appops set <pkg> <op> <mode>` via `RoleService.GrantAsync` / `SetAppOpAsync`.
+- [x] **CLI**: `phonefork roles get|apply`, `phonefork perms grant`.
+- [ ] _Notification listener + Accessibility service auto-enablers_ — deferred to v0.6.1 (cosmetic; `cmd role` covers the high-value defaults).
+- [ ] _Permission diff report column_ — deferred to v0.6.1 (`pm dump <pkg>` parsing is verbose; v0.6 surfaces the role-holder diff which is the load-bearing signal).
 
 ### v0.6.5 — Wireless ADB mode ([LineageOS adb_wifi.md](https://github.com/LineageOS/android_packages_modules_adb/blob/lineage-23.2/docs/dev/adb_wifi.md), [Shizuku QR pattern](https://github.com/RikkaApps/Shizuku))
 

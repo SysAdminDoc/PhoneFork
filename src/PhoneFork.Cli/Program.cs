@@ -65,6 +65,22 @@ app.Configure(config =>
         csc.AddCommand<CscDiffCommand>("diff")
             .WithDescription("Capture both devices and print the CSC / country / locale / timezone diff.");
     });
+
+    config.AddBranch("roles", roles =>
+    {
+        roles.SetDescription("Default-app role snapshot + apply (cmd role).");
+        roles.AddCommand<RolesGetCommand>("get")
+            .WithDescription("Snapshot current default-app role holders on a device.");
+        roles.AddCommand<RolesApplyCommand>("apply")
+            .WithDescription("Read source role holders and add them as role holders on destination.");
+    });
+
+    config.AddBranch("perms", perms =>
+    {
+        perms.SetDescription("Per-package runtime permission grants + appops.");
+        perms.AddCommand<PermsGrantCommand>("grant")
+            .WithDescription("Grant a runtime permission and/or set an appop mode for a package.");
+    });
 });
 
 return await app.RunAsync(args);
