@@ -9,7 +9,12 @@
     <DockPanel>
         <!-- Action row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
-            <DockPanel>
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <TextBlock Text="Default app roles" FontSize="15" FontWeight="SemiBold"/>
+                    <TextBlock Text="Compares dialer, SMS, browser, launcher, assistant, and call-handling roles before assigning checked differences."
+                               Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan"                Command="{Binding ScanCommand}"             Margin="0,0,8,0"/>
                     <Button Content="Apply Selected"      Command="{Binding ApplyCommand}"            Style="{StaticResource AccentButton}" Margin="0,0,16,0"/>
@@ -23,25 +28,43 @@
         </Border>
 
         <!-- Status row -->
-        <Border DockPanel.Dock="Top" Margin="0,0,0,12">
-            <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource SubtleCard}" Margin="0,0,0,12">
+            <DockPanel LastChildFill="False">
+                <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundBrush}" TextWrapping="Wrap" DockPanel.Dock="Left"/>
+                <TextBlock HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Run Text="Selected: " Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <Run Text="{Binding TotalSelected}" FontWeight="SemiBold"/>
+                </TextBlock>
+            </DockPanel>
         </Border>
 
         <!-- Roles table -->
         <Border Style="{StaticResource Card}" Padding="0">
-            <DataGrid ItemsSource="{Binding Rows}"
-                      RowHeight="30"
-                      Background="Transparent"
-                      BorderThickness="0">
-                <DataGrid.Columns>
-                    <DataGridCheckBoxColumn Header=" " Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
-                    <DataGridTextColumn Header="Role"        Binding="{Binding Label}"        Width="180" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Source holder" Binding="{Binding SourceHolder}" Width="2*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Dest holder"   Binding="{Binding DestHolder}"   Width="2*"  IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Match"       Binding="{Binding MatchText}"    Width="100" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Status"      Binding="{Binding Status}"       Width="1.2*" IsReadOnly="True"/>
-                </DataGrid.Columns>
-            </DataGrid>
+            <Grid>
+                <DataGrid ItemsSource="{Binding Rows}"
+                          RowHeight="30"
+                          Background="Transparent"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header=" " Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                        <DataGridTextColumn Header="Role"        Binding="{Binding Label}"        Width="180" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Source holder" Binding="{Binding SourceHolder}" Width="2*"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Dest holder"   Binding="{Binding DestHolder}"   Width="2*"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Match"       Binding="{Binding MatchText}"    Width="100" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Status"      Binding="{Binding Status}"       Width="1.2*" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Border Style="{StaticResource SubtleCard}" Margin="16"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="{Binding HasRows, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel Width="430">
+                        <TextBlock Text="Scan default app roles" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Only changed roles with a source holder are selected by default, so aligned preferences stay untouched."
+                                   Foreground="{StaticResource ForegroundMutedBrush}"
+                                   TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
         </Border>
     </DockPanel>
 </UserControl>

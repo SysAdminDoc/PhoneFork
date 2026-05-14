@@ -27,6 +27,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int _totalOnlyOnSource;
     [ObservableProperty] private int _totalSelected;
     [ObservableProperty] private bool _dryRun;
+    [ObservableProperty] private bool _hasRows;
 
     public SettingsViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -83,13 +84,14 @@ public partial class SettingsViewModel : ObservableObject
             var plan = SettingsDiffer.Build(srcSnap, dstSnap);
 
             Rows.Clear();
+            HasRows = false;
             foreach (var nd in plan.Namespaces)
                 foreach (var e in nd.Entries)
-                    Rows.Add(new SettingsRowViewModel(e));
+                    AddRow(new SettingsRowViewModel(e));
             FilteredRows.Refresh();
             TotalDifferent = Rows.Count(r => r.Outcome == SettingsDiffOutcome.Different);
             TotalOnlyOnSource = Rows.Count(r => r.Outcome == SettingsDiffOutcome.OnlyOnSource);
-            TotalSelected = Rows.Count(r => r.IsSelected);
+            RefreshSelectionState();
             Status = $"Plan ready: {TotalDifferent} different + {TotalOnlyOnSource} only-on-source. {plan.Namespaces.Sum(n => n.Count(SettingsDiffOutcome.Same))} keys already aligned.";
         }
         catch (Exception ex)
@@ -100,6 +102,7 @@ public partial class SettingsViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            ScanCommand.NotifyCanExecuteChanged();
             ApplyCommand.NotifyCanExecuteChanged();
         }
     }
@@ -141,13 +144,37 @@ public partial class SettingsViewModel : ObservableObject
     private void SelectAll()
     {
         foreach (var r in Rows) if (r.Outcome != SettingsDiffOutcome.Same && r.Outcome != SettingsDiffOutcome.OnlyOnDest) r.IsSelected = true;
-        TotalSelected = Rows.Count(r => r.IsSelected);
+        RefreshSelectionState();
     }
 
     [RelayCommand]
     private void SelectNone()
     {
         foreach (var r in Rows) r.IsSelected = false;
-        TotalSelected = 0;
+        RefreshSelectionState();
+    }
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanCommand.NotifyCanExecuteChanged();
+        ApplyCommand.NotifyCanExecuteChanged();
+    }
+
+    private void AddRow(SettingsRowViewModel row)
+    {
+        row.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsRowViewModel.IsSelected))
+                RefreshSelectionState();
+        };
+        Rows.Add(row);
+        HasRows = true;
+    }
+
+    private void RefreshSelectionState()
+    {
+        HasRows = Rows.Count > 0;
+        TotalSelected = Rows.Count(r => r.IsSelected);
+        ApplyCommand.NotifyCanExecuteChanged();
     }
 }

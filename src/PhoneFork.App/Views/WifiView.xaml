@@ -18,14 +18,22 @@
         </Grid.ColumnDefinitions>
 
         <!-- Status row -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,12">
-            <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource SubtleCard}" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Wi-Fi and region pre-flight" FontSize="15" FontWeight="SemiBold"/>
+                <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+            </StackPanel>
         </Border>
 
         <!-- CSC diff card -->
         <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Card}" Margin="0,0,0,12">
             <DockPanel>
-                <Button Content="Capture region info from both phones" Command="{Binding ScanCscCommand}" DockPanel.Dock="Top" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                    <TextBlock Text="Region compatibility" FontWeight="SemiBold"/>
+                    <TextBlock Text="Checks CSC, country, locale, timezone, and carrier ISO before Wi-Fi handoff."
+                               Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,8"/>
+                    <Button Content="Capture region info from both phones" Command="{Binding ScanCscCommand}" HorizontalAlignment="Left"/>
+                </StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
@@ -49,32 +57,50 @@
         <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource Card}" Margin="0,0,12,0">
             <DockPanel>
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                    <TextBlock Text="SSIDs on source device" FontSize="14" FontWeight="SemiBold" DockPanel.Dock="Left"/>
+                    <StackPanel DockPanel.Dock="Left">
+                        <TextBlock Text="SSIDs on source device" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="PSKs are typed by the user until the helper APK lands."
+                                   Foreground="{StaticResource ForegroundMutedBrush}" FontSize="12" Margin="0,2,0,0"/>
+                    </StackPanel>
                     <Button Content="Scan source" Command="{Binding ScanSourceCommand}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
                 </DockPanel>
-                <DataGrid ItemsSource="{Binding Ssids}" RowHeight="28" Background="Transparent" BorderThickness="0">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="SSID" Binding="{Binding Ssid}" Width="2*" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Auth" Binding="{Binding Auth}" Width="80" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Hidden" Binding="{Binding Hidden}" Width="60" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Enter PSK to build QR" Binding="{Binding TypedPsk, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                        <DataGridTemplateColumn Header=" " Width="100">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="Use" Command="{Binding DataContext.UseRowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid>
+                    <DataGrid ItemsSource="{Binding Ssids}" RowHeight="28" Background="Transparent" BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="SSID" Binding="{Binding Ssid}" Width="2*" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Auth" Binding="{Binding Auth}" Width="80" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Hidden" Binding="{Binding Hidden}" Width="60" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Enter PSK to build QR" Binding="{Binding TypedPsk, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                            <DataGridTemplateColumn Header=" " Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="Use" Command="{Binding DataContext.UseRowCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Border Style="{StaticResource SubtleCard}" Margin="16"
+                            HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding HasSsids, Converter={StaticResource InverseBoolToVis}}">
+                        <StackPanel Width="360">
+                            <TextBlock Text="Scan source Wi-Fi networks" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Detected SSIDs can prefill the QR composer; passwords are not read from Android without the v0.7 helper path."
+                                       Foreground="{StaticResource ForegroundMutedBrush}"
+                                       TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
             </DockPanel>
         </Border>
 
         <!-- RIGHT: QR composer -->
         <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource Card}">
             <StackPanel>
-                <TextBlock Text="Manual join-QR composer" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <TextBlock Text="Manual join-QR composer" FontSize="14" FontWeight="SemiBold"/>
+                <TextBlock Text="Builds a standard Android camera-scannable network QR."
+                           Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
                 <TextBlock Text="SSID" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
                 <TextBox Text="{Binding QrSsid, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
                 <TextBlock Text="Pre-shared key" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
@@ -88,7 +114,22 @@
                     <Button Content="Build QR" Command="{Binding BuildQrCommand}" Style="{StaticResource AccentButton}" Margin="0,0,8,0"/>
                     <Button Content="Save PNG" Command="{Binding SaveQrCommand}"/>
                 </StackPanel>
-                <Image Source="{Binding QrImage}" Width="320" Height="320" Stretch="Uniform" HorizontalAlignment="Center"/>
+                <Border Background="{StaticResource MochaSurface0Brush}"
+                        BorderBrush="{StaticResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12"
+                        HorizontalAlignment="Center">
+                    <Grid Width="320" Height="320">
+                        <Image Source="{Binding QrImage}" Stretch="Uniform"
+                               Visibility="{Binding QrImage, Converter={StaticResource NullToVis}}"/>
+                        <TextBlock Text="QR preview appears here"
+                                   Foreground="{StaticResource ForegroundMutedBrush}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding QrImage, Converter={StaticResource InverseNullToVis}}"/>
+                    </Grid>
+                </Border>
                 <TextBlock Text="{Binding QrPayload}" Foreground="{StaticResource ForegroundMutedBrush}"
                            FontFamily="Cascadia Mono, Consolas, monospace" FontSize="11"
                            TextWrapping="Wrap" Margin="0,8,0,0"/>

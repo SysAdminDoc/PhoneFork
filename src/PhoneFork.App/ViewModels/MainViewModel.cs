@@ -16,7 +16,7 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
-        DeviceBar = new DeviceBarViewModel(devices);
+        DeviceBar = new DeviceBarViewModel(devices, host, log);
         Apps = new AppsViewModel(devices, host, log);
         Media = new MediaViewModel(devices, host, log);
         Settings = new SettingsViewModel(devices, host, log);

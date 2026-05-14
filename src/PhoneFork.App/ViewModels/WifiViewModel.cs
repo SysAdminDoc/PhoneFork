@@ -21,6 +21,8 @@ public partial class WifiViewModel : ObservableObject
     public ObservableCollection<WifiAuth> AuthChoices { get; } = new(Enum.GetValues<WifiAuth>());
 
     [ObservableProperty] private string _status = "Pick a source device and click Scan to list its SSIDs, or build a join-QR manually below.";
+    [ObservableProperty] private bool _isBusy;
+    [ObservableProperty] private bool _hasSsids;
 
     // CSC diff panel
     [ObservableProperty] private string _cscSource = "";
@@ -48,8 +50,8 @@ public partial class WifiViewModel : ObservableObject
         });
     }
 
-    private bool CanScanSource() => _devices.RoleHolder(DeviceRole.Source) is not null;
-    private bool CanScanCsc() => _devices.RoleHolder(DeviceRole.Source) is not null && _devices.RoleHolder(DeviceRole.Destination) is not null;
+    private bool CanScanSource() => !IsBusy && _devices.RoleHolder(DeviceRole.Source) is not null;
+    private bool CanScanCsc() => !IsBusy && _devices.RoleHolder(DeviceRole.Source) is not null && _devices.RoleHolder(DeviceRole.Destination) is not null;
 
     [RelayCommand(CanExecute = nameof(CanScanSource))]
     private async Task ScanSourceAsync(CancellationToken ct)
@@ -58,6 +60,7 @@ public partial class WifiViewModel : ObservableObject
         if (src is null) return;
         var data = _host.GetDevices().FirstOrDefault(d => d.Serial == src.Serial);
         if (data is null) { Status = "Source device disconnected."; return; }
+        IsBusy = true;
         Status = $"Scanning Wi-Fi on {src.DisplayName}…";
         try
         {
@@ -66,12 +69,17 @@ public partial class WifiViewModel : ObservableObject
             Ssids.Clear();
             foreach (var n in nets.OrderBy(n => n.Ssid, StringComparer.OrdinalIgnoreCase))
                 Ssids.Add(new WifiSsidRowViewModel(n));
+            HasSsids = Ssids.Count > 0;
             Status = $"{Ssids.Count} SSID(s) found on {src.DisplayName}. PSKs aren't recoverable without v0.7 helper APK — enter each PSK manually below to render a join-QR.";
         }
         catch (Exception ex)
         {
             _log.Error(ex, "Wi-Fi scan failed");
             Status = $"Scan failed: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -85,15 +93,28 @@ public partial class WifiViewModel : ObservableObject
         var dstData = _host.GetDevices().FirstOrDefault(d => d.Serial == dst.Serial);
         if (srcData is null || dstData is null) { Status = "Device disconnected."; return; }
 
+        IsBusy = true;
         var svc = new CscDiffService(_host.Client, _log);
-        var srcSnap = await svc.CaptureAsync(srcData, ct);
-        var dstSnap = await svc.CaptureAsync(dstData, ct);
-        CscSource = Format(srcSnap);
-        CscDest = Format(dstSnap);
-        var diff = svc.Diff(srcSnap, dstSnap);
-        CscWarning = diff.AnyMismatch
-            ? "Mismatch detected — region-locked items (Samsung Pay, regional Health features) may not restore cleanly."
-            : "No CSC / locale / country mismatch detected.";
+        try
+        {
+            var srcSnap = await svc.CaptureAsync(srcData, ct);
+            var dstSnap = await svc.CaptureAsync(dstData, ct);
+            CscSource = Format(srcSnap);
+            CscDest = Format(dstSnap);
+            var diff = svc.Diff(srcSnap, dstSnap);
+            CscWarning = diff.AnyMismatch
+                ? "Mismatch detected — region-locked items (Samsung Pay, regional Health features) may not restore cleanly."
+                : "No CSC / locale / country mismatch detected.";
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "CSC scan failed");
+            Status = $"Region scan failed: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -151,4 +172,10 @@ public partial class WifiViewModel : ObservableObject
 
     private static string Format(CscSnapshot s)
         => $"CSC: {s.SalesCode}   Country: {s.CountryCode}   Locale: {s.Locale}   TZ: {s.Timezone}   Carrier: {s.CarrierIso}";
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanSourceCommand.NotifyCanExecuteChanged();
+        ScanCscCommand.NotifyCanExecuteChanged();
+    }
 }

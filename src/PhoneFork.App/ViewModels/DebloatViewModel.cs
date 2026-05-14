@@ -35,6 +35,7 @@ public partial class DebloatViewModel : ObservableObject
     [ObservableProperty] private DebloatProfile _profile = DebloatProfile.Conservative;
     [ObservableProperty] private int _totalSelected;
     [ObservableProperty] private string _lastSnapshotPath = "";
+    [ObservableProperty] private bool _hasRows;
 
     public DebloatViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -97,13 +98,14 @@ public partial class DebloatViewModel : ObservableObject
 
             var defaultTiers = ProfileTiers(Profile);
             Rows.Clear();
+            HasRows = false;
             foreach (var c in candidates.OrderBy(c => c.Entry.PackageId, StringComparer.Ordinal))
             {
                 var defaultSelected = c.IsEnabled && defaultTiers.Contains(c.Entry.Tier);
-                Rows.Add(new DebloatRowViewModel(c, defaultSelected));
+                AddRow(new DebloatRowViewModel(c, defaultSelected));
             }
             FilteredRows.Refresh();
-            TotalSelected = Rows.Count(r => r.IsSelected);
+            RefreshSelectionState();
             Status = $"{Rows.Count} packages matched. {TotalSelected} selected (profile: {Profile}).";
         }
         catch (Exception ex)
@@ -114,6 +116,7 @@ public partial class DebloatViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            ScanCommand.NotifyCanExecuteChanged();
             ApplyCommand.NotifyCanExecuteChanged();
         }
     }
@@ -162,7 +165,7 @@ public partial class DebloatViewModel : ObservableObject
     {
         var tiers = ProfileTiers(Profile);
         foreach (var r in Rows) r.IsSelected = r.IsEnabledOnDevice && tiers.Contains(r.Entry.Tier);
-        TotalSelected = Rows.Count(r => r.IsSelected);
+        RefreshSelectionState();
         Status = $"{TotalSelected} selected by profile {Profile}.";
     }
 
@@ -170,7 +173,31 @@ public partial class DebloatViewModel : ObservableObject
     private void SelectNone()
     {
         foreach (var r in Rows) r.IsSelected = false;
-        TotalSelected = 0;
+        RefreshSelectionState();
+    }
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanCommand.NotifyCanExecuteChanged();
+        ApplyCommand.NotifyCanExecuteChanged();
+    }
+
+    private void AddRow(DebloatRowViewModel row)
+    {
+        row.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(DebloatRowViewModel.IsSelected))
+                RefreshSelectionState();
+        };
+        Rows.Add(row);
+        HasRows = true;
+    }
+
+    private void RefreshSelectionState()
+    {
+        HasRows = Rows.Count > 0;
+        TotalSelected = Rows.Count(r => r.IsSelected);
+        ApplyCommand.NotifyCanExecuteChanged();
     }
 
     private static HashSet<DebloatTier> ProfileTiers(DebloatProfile profile) => profile switch

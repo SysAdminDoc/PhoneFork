@@ -19,14 +19,126 @@
     <Border Style="{StaticResource Card}" Margin="0,0,0,12">
         <StackPanel>
             <DockPanel>
-                <TextBlock Text="Devices" FontSize="16" FontWeight="SemiBold"
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Devices" FontSize="16" FontWeight="SemiBold"
                            Foreground="{StaticResource ForegroundBrush}" DockPanel.Dock="Left"/>
-                <Button Content="Refresh" Command="{Binding RefreshCommand}"
-                        HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                    <TextBlock Text="Assign one phone as Source and one as Destination before applying any migration plan."
+                               Foreground="{StaticResource ForegroundMutedBrush}" FontSize="12" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                    <Button Content="Wireless ADB" Command="{Binding ToggleWirelessPairingCommand}"
+                            Margin="0,0,8,0"
+                            AutomationProperties.Name="Open wireless ADB pairing panel"/>
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}"
+                            AutomationProperties.Name="Refresh connected Android devices"/>
+                </StackPanel>
             </DockPanel>
 
             <TextBlock Text="{Binding Status}" Margin="0,6,0,12"
                        Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap"/>
+
+            <Border Style="{StaticResource SubtleCard}" Margin="0,0,0,12"
+                    Visibility="{Binding HasDevices, Converter={StaticResource InverseBoolToVis}}">
+                <StackPanel>
+                    <TextBlock Text="No phones detected yet" FontWeight="SemiBold"/>
+                    <TextBlock Text="Enable Developer options, turn on USB debugging, then accept the RSA prompt on each phone. Wireless ADB is available when USB is not practical."
+                               Foreground="{StaticResource ForegroundMutedBrush}"
+                               TextWrapping="Wrap" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SubtleCard}" Margin="0,0,0,12"
+                    Visibility="{Binding ShowWirelessPairing, Converter={StaticResource BoolToVis}}"
+                    AutomationProperties.Name="Wireless ADB pairing">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                               Text="Wireless ADB"
+                               FontWeight="SemiBold"
+                               Margin="0,0,0,4"/>
+                    <TextBlock Grid.Row="1"
+                               Text="Pair from Android's Wireless debugging pairing screen, then connect using the wireless ADB endpoint shown on the main Wireless debugging screen."
+                               Foreground="{StaticResource ForegroundMutedBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,12"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1.6*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                            <TextBlock Text="Pairing endpoint" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
+                            <TextBox Text="{Binding PairHostPort, UpdateSourceTrigger=PropertyChanged}"
+                                     AutomationProperties.Name="Pairing endpoint"
+                                     AutomationProperties.HelpText="IP address and port shown by Pair device with pairing code."/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                            <TextBlock Text="Pairing code" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
+                            <DockPanel>
+                                <TextBox Text="{Binding PairCode, UpdateSourceTrigger=PropertyChanged}"
+                                         MinWidth="100"
+                                         Margin="0,0,8,0"
+                                         AutomationProperties.Name="Pairing code"/>
+                                <Button Content="Pair"
+                                        Command="{Binding PairCommand}"
+                                        Style="{StaticResource AccentButton}"
+                                        DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Connect endpoint" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
+                            <DockPanel>
+                                <Button Content="Disconnect"
+                                        Command="{Binding DisconnectCommand}"
+                                        DockPanel.Dock="Right"
+                                        Margin="8,0,0,0"/>
+                                <Button Content="Connect"
+                                        Command="{Binding ConnectCommand}"
+                                        DockPanel.Dock="Right"
+                                        Margin="8,0,0,0"/>
+                                <TextBox Text="{Binding ConnectHostPort, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="Wireless ADB connect endpoint"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Border Style="{StaticResource SubtleCard}" Margin="0,0,0,12"
+                    Visibility="{Binding ShowWirelessPairing, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             Text="{Binding PairingQrText, UpdateSourceTrigger=PropertyChanged}"
+                             MinHeight="34"
+                             AutomationProperties.Name="Wireless debugging QR text"
+                             AutomationProperties.HelpText="Paste WIFI:T:ADB QR payload text if available."/>
+                    <Button Grid.Row="0" Grid.Column="1"
+                            Content="Parse QR"
+                            Command="{Binding ParsePairingQrCommand}"
+                            Margin="8,0,0,0"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                               Text="{Binding PairStatus}"
+                               Foreground="{StaticResource ForegroundMutedBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,8,0,0"/>
+                </Grid>
+            </Border>
 
             <ItemsControl ItemsSource="{Binding Cards}">
                 <ItemsControl.ItemsPanel>
@@ -42,7 +154,14 @@
                                 CornerRadius="8"
                                 Padding="14" Margin="6">
                             <StackPanel>
-                                <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="14"/>
+                                <DockPanel>
+                                    <Ellipse Width="10" Height="10"
+                                             Fill="{Binding IsAuthorized, Converter={StaticResource AuthBrushConv}}"
+                                             Margin="0,0,8,0"
+                                             VerticalAlignment="Center"
+                                             DockPanel.Dock="Left"/>
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="14"/>
+                                </DockPanel>
                                 <TextBlock Text="{Binding Serial}" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
                                 <TextBlock Text="{Binding AndroidLine}" Foreground="{StaticResource ForegroundMutedBrush}" Margin="0,4,0,0"/>
                                 <TextBlock Text="{Binding StatusText}"

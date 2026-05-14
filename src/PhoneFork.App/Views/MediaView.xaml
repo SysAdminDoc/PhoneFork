@@ -11,6 +11,11 @@
         <!-- Action row -->
         <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
             <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                    <TextBlock Text="Media sync plan" FontSize="15" FontWeight="SemiBold"/>
+                    <TextBlock Text="Builds source and destination manifests first, then transfers only selected categories and changed files."
+                               Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan"            Command="{Binding ScanCommand}"    Margin="0,0,8,0"/>
                     <Button Content="Apply Sync"      Command="{Binding ApplyCommand}"   Style="{StaticResource AccentButton}" Margin="0,0,16,0"/>

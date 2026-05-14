@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -22,6 +23,7 @@ public partial class AppsViewModel : ObservableObject
     [ObservableProperty] private int _selectedCount;
     [ObservableProperty] private bool _reinstall;
     [ObservableProperty] private bool _dryRun;
+    [ObservableProperty] private bool _hasRows;
 
     public AppsViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -50,6 +52,7 @@ public partial class AppsViewModel : ObservableObject
         IsBusy = true;
         Status = $"Enumerating user apps on {src.DisplayName}…";
         Rows.Clear();
+        HasRows = false;
         try
         {
             var deviceData = _host.GetDevices().FirstOrDefault(d => d.Serial == src.Serial);
@@ -57,8 +60,8 @@ public partial class AppsViewModel : ObservableObject
             var catalog = new AppCatalogService(_host.Client, _log);
             var apps = await catalog.EnumerateUserAppsAsync(deviceData, ct);
             foreach (var a in apps.OrderBy(a => a.PackageName))
-                Rows.Add(new AppRowViewModel(a));
-            SelectedCount = Rows.Count(r => r.IsSelected);
+                AddRow(new AppRowViewModel(a));
+            RefreshSelectionState();
             Status = $"Found {Rows.Count} user apps on {src.DisplayName}.";
         }
         catch (Exception ex)
@@ -69,6 +72,7 @@ public partial class AppsViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            ScanCommand.NotifyCanExecuteChanged();
             MigrateCommand.NotifyCanExecuteChanged();
         }
     }
@@ -81,56 +85,90 @@ public partial class AppsViewModel : ObservableObject
         if (src is null || dst is null) return;
 
         IsBusy = true;
-        var srcData = _host.GetDevices().FirstOrDefault(d => d.Serial == src.Serial);
-        var dstData = _host.GetDevices().FirstOrDefault(d => d.Serial == dst.Serial);
-        if (srcData is null || dstData is null) { Status = "Device disconnected."; IsBusy = false; return; }
-
-        var installer = new AppInstallerService(_host.Client, _log);
-        var picked = Rows.Where(r => r.IsSelected).ToList();
-        int ok = 0, fail = 0;
-
-        foreach (var row in picked)
+        try
         {
-            ct.ThrowIfCancellationRequested();
-            row.Status = "Pulling…";
-            var progress = new Progress<string>(s => row.Status = s);
-            try
-            {
-                if (DryRun)
-                {
-                    // Pull-only path: re-use the cache via installer (just don't call install).
-                    var pkgCache = Path.Combine(installer.CacheRoot, srcData.Serial, row.App.PackageName);
-                    Directory.CreateDirectory(pkgCache);
-                    foreach (var remote in row.App.RemoteApkPaths)
-                    {
-                        using var sync = new AdvancedSharpAdbClient.SyncService(_host.Client, srcData);
-                        using var fs = File.Create(Path.Combine(pkgCache, Path.GetFileName(remote)));
-                        await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: ct);
-                    }
-                    row.Status = "Dry-run pulled";
-                    ok++;
-                }
-                else
-                {
-                    var r = await installer.MigrateAsync(srcData, dstData, row.App, Reinstall, progress, ct);
-                    row.Status = r.Success ? $"Migrated ({r.Duration.TotalSeconds:F1}s)" : $"Failed: {r.Error}";
-                    if (r.Success) ok++; else fail++;
-                }
-            }
-            catch (Exception ex)
-            {
-                row.Status = $"Failed: {ex.Message}";
-                fail++;
-            }
-        }
+            var srcData = _host.GetDevices().FirstOrDefault(d => d.Serial == src.Serial);
+            var dstData = _host.GetDevices().FirstOrDefault(d => d.Serial == dst.Serial);
+            if (srcData is null || dstData is null) { Status = "Device disconnected."; return; }
 
-        Status = $"{ok} migrated, {fail} failed.";
-        IsBusy = false;
+            var installer = new AppInstallerService(_host.Client, _log);
+            var picked = Rows.Where(r => r.IsSelected).ToList();
+            int ok = 0, fail = 0;
+
+            foreach (var row in picked)
+            {
+                ct.ThrowIfCancellationRequested();
+                row.Status = "Pulling…";
+                var progress = new Progress<string>(s => row.Status = s);
+                try
+                {
+                    if (DryRun)
+                    {
+                        // Pull-only path: re-use the cache via installer (just don't call install).
+                        var pkgCache = Path.Combine(installer.CacheRoot, srcData.Serial, row.App.PackageName);
+                        Directory.CreateDirectory(pkgCache);
+                        foreach (var remote in row.App.RemoteApkPaths)
+                        {
+                            using var sync = new AdvancedSharpAdbClient.SyncService(_host.Client, srcData);
+                            using var fs = File.Create(Path.Combine(pkgCache, Path.GetFileName(remote)));
+                            await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: ct);
+                        }
+                        row.Status = "Dry-run pulled";
+                        ok++;
+                    }
+                    else
+                    {
+                        var r = await installer.MigrateAsync(srcData, dstData, row.App, Reinstall, progress, ct);
+                        row.Status = r.Success ? $"Migrated ({r.Duration.TotalSeconds:F1}s)" : $"Failed: {r.Error}";
+                        if (r.Success) ok++; else fail++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    row.Status = $"Failed: {ex.Message}";
+                    fail++;
+                }
+            }
+
+            Status = $"{ok} migrated, {fail} failed.";
+        }
+        finally
+        {
+            IsBusy = false;
+            ScanCommand.NotifyCanExecuteChanged();
+            MigrateCommand.NotifyCanExecuteChanged();
+        }
     }
 
     [RelayCommand]
-    private void SelectAll() { foreach (var r in Rows) r.IsSelected = true; SelectedCount = Rows.Count; MigrateCommand.NotifyCanExecuteChanged(); }
+    private void SelectAll() { foreach (var r in Rows) r.IsSelected = true; RefreshSelectionState(); }
 
     [RelayCommand]
-    private void SelectNone() { foreach (var r in Rows) r.IsSelected = false; SelectedCount = 0; MigrateCommand.NotifyCanExecuteChanged(); }
+    private void SelectNone() { foreach (var r in Rows) r.IsSelected = false; RefreshSelectionState(); }
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        ScanCommand.NotifyCanExecuteChanged();
+        MigrateCommand.NotifyCanExecuteChanged();
+    }
+
+    private void AddRow(AppRowViewModel row)
+    {
+        row.PropertyChanged += RowOnPropertyChanged;
+        Rows.Add(row);
+        HasRows = true;
+    }
+
+    private void RowOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(AppRowViewModel.IsSelected))
+            RefreshSelectionState();
+    }
+
+    private void RefreshSelectionState()
+    {
+        HasRows = Rows.Count > 0;
+        SelectedCount = Rows.Count(r => r.IsSelected);
+        MigrateCommand.NotifyCanExecuteChanged();
+    }
 }

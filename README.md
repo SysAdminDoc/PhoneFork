@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.6.5-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.6.6-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -38,8 +38,9 @@ The bundled `tools/adb.exe` ships with the app — no Android SDK needed on your
 
 1. Plug **both** phones in via USB. Accept the "Allow USB debugging?" prompt on each.
 2. Open PhoneFork. Both devices appear in the top bar; pick which is **Source** and which is **Destination**.
-3. Open the tab for whatever you want to migrate. Each tab has a **dry-run** preview before **Apply**.
-4. Audit log writes one NDJSON line per operation to `%LOCALAPPDATA%\PhoneFork\logs\audit-YYYY-MM-DD.log`.
+3. For wireless debugging, open **Wireless ADB** in the device bar, pair with the phone's pairing endpoint/code, then connect to the wireless ADB endpoint.
+4. Open the tab for whatever you want to migrate. Each tab has a **dry-run** preview before **Apply**.
+5. Audit log writes one NDJSON line per operation to `%LOCALAPPDATA%\PhoneFork\logs\audit-YYYY-MM-DD.log`.
 
 ## CLI
 
@@ -51,6 +52,8 @@ phonefork media sync   --from <src> --to <dst>
 phonefork settings dump --device <serial> --out settings.json
 phonefork settings apply --device <serial> --plan plan.json
 phonefork debloat apply --device <serial> --profile aggressive
+phonefork pair <ip:pair-port> <code>
+phonefork connect <ip:connect-port>
 ```
 
 ## Build from source
