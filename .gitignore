@@ -1,0 +1,55 @@
+# PhoneFork — .gitignore
+
+# AI agent working files (local-only, never commit)
+CLAUDE.md
+CODEX_CHANGELOG.md
+.claude/
+.codex/
+
+# Build outputs
+bin/
+obj/
+out/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# .NET / Visual Studio
+.vs/
+.vscode/
+*.swp
+*.swo
+artifacts/
+
+# Rider / JetBrains
+.idea/
+*.iml
+
+# Logs / dumps / scratch
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+.dump/
+scratch/
+
+# Local config
+local.settings.json
+appsettings.Development.json
+src/PhoneFork.App/local.settings.json
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Helper-APK build artifacts (when added in v0.x)
+helper-apk/.gradle/
+helper-apk/build/
+helper-apk/app/build/
+helper-apk/local.properties
+helper-apk/*.jks
+helper-apk/keystore.properties

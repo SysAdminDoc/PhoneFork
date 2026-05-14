@@ -1,0 +1,82 @@
+<Window x:Class="PhoneFork.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:PhoneFork.App.Views"
+        xmlns:conv="clr-namespace:PhoneFork.App.Converters"
+        xmlns:vm="clr-namespace:PhoneFork.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
+        Title="PhoneFork  &#x00B7;  v0.1.0"
+        MinWidth="1100" MinHeight="700"
+        Width="1280" Height="820"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- App title row -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
+                       Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
+            <TextBlock Text=" v0.1.0" FontSize="20" Margin="6,4,0,0"
+                       Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
+            <TextBlock Text="Dual-Samsung migration tool"
+                       FontSize="13" Margin="16,8,0,0"
+                       Foreground="{StaticResource ForegroundMutedBrush}"/>
+        </DockPanel>
+
+        <!-- Device bar -->
+        <views:DeviceBar Grid.Row="1" DataContext="{Binding DeviceBar}"/>
+
+        <!-- Tabs -->
+        <TabControl Grid.Row="2" Padding="0">
+            <TabItem Header="Apps">
+                <views:AppsView DataContext="{Binding Apps}" Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Media">
+                <views:PlaceholderView Title="Media" Version="v0.2.0 (planned)"
+                    Body="Incremental sync of /sdcard photos, videos, music, ringtones, documents, downloads. Per-category checkboxes, resumable transfers, optional SHA-256 verify. Manifest-diff engine pulls/pushes only the delta — no re-shipping 50 GB of DCIM. CLI: phonefork media sync."
+                    Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Settings">
+                <views:PlaceholderView Title="Settings" Version="v0.3.0 (planned)"
+                    Body="Snapshot AOSP secure/system/global namespaces plus Samsung's com.sec.android.provider.settings content provider. Per-key cherry-pick UI with bucket coloring (S25-only, S22-only, both-but-different). Apply via settings put. Targets: AOD, edge panels, refresh rate, font scale, status-bar tweaks, accessibility shortcuts, animation scales."
+                    Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Debloat">
+                <views:PlaceholderView Title="Debloat" Version="v0.4.0 (planned)"
+                    Body="Apply the AppManagerNG / UAD-NG curated debloat dataset (5,481 entries) to the destination. Category tree with delete / replace / caution / unsafe filtering, intersected against what's actually preinstalled. pm disable-user --user 0 only — never pm uninstall — so every action is reversible via cmd package install-existing. CLI: phonefork debloat apply --profile {conservative|recommended|aggressive}."
+                    Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Wi-Fi">
+                <views:PlaceholderView Title="Wi-Fi" Version="v0.5.0 (planned)"
+                    Body="Export saved Wi-Fi networks with PSKs from the source device. Primary path: Shizuku helper APK invoking WifiManager.getPrivilegedConfiguredNetworks(). Fallback path: render each network as a standard WIFI: QR string in the desktop UI for the destination to scan with its camera (no on-device install required). Selective import — skip work / corporate networks."
+                    Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Roles">
+                <views:PlaceholderView Title="Default Apps and Permissions" Version="v0.6.0 (planned)"
+                    Body="Snapshot default app roles (dialer, SMS, browser, launcher, assistant, home) via cmd role get-role-holders and apply them on the destination via cmd role add-role-holder. Auto-grant runtime permissions (pm grant), special access via appops (usage stats, draw-over-other-apps, accessibility services, notification listeners)."
+                    Margin="0,12,0,0"/>
+            </TabItem>
+        </TabControl>
+
+        <!-- Footer -->
+        <DockPanel Grid.Row="3" Margin="0,12,0,0">
+            <TextBlock Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"
+                       DockPanel.Dock="Left">
+                <Run Text="Audit log:"/>
+                <Run Text="%LOCALAPPDATA%\PhoneFork\logs\"/>
+            </TextBlock>
+            <TextBlock Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"
+                       HorizontalAlignment="Right" DockPanel.Dock="Right">
+                MIT &#x00B7; https://github.com/SysAdminDoc/PhoneFork
+            </TextBlock>
+        </DockPanel>
+    </Grid>
+</Window>

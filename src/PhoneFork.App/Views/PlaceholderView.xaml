@@ -1,0 +1,17 @@
+<UserControl x:Class="PhoneFork.App.Views.PlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+    <Border Style="{StaticResource Card}">
+        <StackPanel HorizontalAlignment="Left">
+            <TextBlock x:Name="TitleBlock" FontSize="20" FontWeight="SemiBold"
+                       Foreground="{StaticResource ForegroundBrush}"/>
+            <TextBlock x:Name="VersionBlock" Margin="0,2,0,12"
+                       Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold"/>
+            <TextBlock x:Name="BodyBlock" TextWrapping="Wrap" MaxWidth="720"
+                       Foreground="{StaticResource ForegroundMutedBrush}"/>
+        </StackPanel>
+    </Border>
+</UserControl>
