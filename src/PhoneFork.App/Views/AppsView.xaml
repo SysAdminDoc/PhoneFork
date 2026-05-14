@@ -24,9 +24,11 @@
                     <Button Content="Select All"       Command="{Binding SelectAllCommand}" Margin="0,0,4,0"/>
                     <Button Content="Select None"      Command="{Binding SelectNoneCommand}"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                    <CheckBox Content="Dry-run (pull only)" IsChecked="{Binding DryRun}" VerticalAlignment="Center" Margin="0,0,16,0"/>
-                    <CheckBox Content="Reinstall (-r)"      IsChecked="{Binding Reinstall}" VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="16,0,0,0">
+                    <CheckBox Content="Dry-run" IsChecked="{Binding DryRun}" VerticalAlignment="Center" Margin="0,0,14,0"
+                              ToolTip="Pull APKs only. Nothing installs on the destination."/>
+                    <CheckBox Content="Reinstall" IsChecked="{Binding Reinstall}" VerticalAlignment="Center"
+                              ToolTip="Allow installing over packages that already exist on the destination."/>
                 </StackPanel>
             </DockPanel>
         </Border>

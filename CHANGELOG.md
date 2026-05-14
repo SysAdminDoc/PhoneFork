@@ -2,6 +2,17 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.7 — 2026-05-14
+
+Screenshot-driven WPF polish repair.
+
+### Improved
+- Main WPF shell now owns the dark background explicitly so the Catppuccin surface no longer leaks the default light Windows client color.
+- Combo boxes and checkboxes now use custom Catppuccin templates instead of native light controls, including hover, focus, selected, and disabled states.
+- Tab labels and disabled commands now read as intentional interface states instead of washed-out or broken controls.
+- App migration option labels now use product-facing wording with tooltips instead of clipped CLI flag notation.
+- Windows title bar opts into dark mode where the OS supports it.
+
 ## v0.6.6 — 2026-05-14
 
 Premium WPF polish pass.

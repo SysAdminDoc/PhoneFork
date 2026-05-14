@@ -140,7 +140,10 @@
                             <Setter TargetName="border" Property="Background" Value="{StaticResource MochaSurface2Brush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MochaSurface0Brush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource MochaOverlay0Brush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource MochaOverlay1Brush}"/>
+                            <Setter Property="Opacity" Value="0.72"/>
                             <Setter Property="Cursor" Value="Arrow"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -181,7 +184,10 @@
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource MochaBlueBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" Value="0.5"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MochaSurface1Brush}"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource MochaSurface2Brush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource MochaOverlay1Brush}"/>
+                            <Setter Property="Opacity" Value="0.66"/>
                             <Setter Property="Cursor" Value="Arrow"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -233,20 +239,194 @@
         <Setter Property="Background" Value="{StaticResource MochaSurface0Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource MochaSurface1Brush}"/>
-        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,6"/>
         <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="MaxDropDownHeight" Value="260"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBox}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                MinHeight="{TemplateBinding MinHeight}"/>
+                        <ContentPresenter x:Name="contentSite"
+                                          Margin="10,0,34,0"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                          IsHitTestVisible="False"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        <Path x:Name="arrow"
+                              Data="M 0 0 L 4 4 L 8 0 Z"
+                              Fill="{StaticResource ForegroundMutedBrush}"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center"
+                              Margin="0,0,12,0"/>
+                        <ToggleButton Background="Transparent"
+                                      BorderThickness="0"
+                                      Focusable="False"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      Opacity="0"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      ClickMode="Press"/>
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               PopupAnimation="Fade">
+                            <Grid MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                  SnapsToDevicePixels="True">
+                                <Border Background="{StaticResource MochaSurface0Brush}"
+                                        BorderBrush="{StaticResource MochaSurface2Brush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Margin="0,4,0,0">
+                                    <ScrollViewer Margin="2"
+                                                  SnapsToDevicePixels="True"
+                                                  CanContentScroll="True">
+                                        <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="chrome" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="chrome" Property="Background" Value="{StaticResource MochaSurface1Brush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="chrome" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="chrome" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="chrome" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="chrome" Property="Background" Value="{StaticResource MochaSurface1Brush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="chrome" Property="Background" Value="{StaticResource MochaMantleBrush}"/>
+                            <Setter TargetName="chrome" Property="BorderBrush" Value="{StaticResource MochaSurface1Brush}"/>
+                            <Setter TargetName="contentSite" Property="Opacity" Value="0.55"/>
+                            <Setter TargetName="arrow" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type ComboBoxItem}">
         <Setter Property="Background" Value="{StaticResource MochaSurface0Brush}"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="itemBorder"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="4"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource MochaSurface1Brush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource MochaSurface2Brush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource MochaTextBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource MochaOverlay1Brush}"/>
+                            <Setter Property="Opacity" Value="0.65"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type CheckBox}">
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
-        <Setter Property="MinHeight" Value="28"/>
+        <Setter Property="MinHeight" Value="30"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid MinHeight="{TemplateBinding MinHeight}"
+                          SnapsToDevicePixels="True">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="22"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="box"
+                                Width="16"
+                                Height="16"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource MochaMantleBrush}"
+                                BorderBrush="{StaticResource MochaSurface2Brush}"
+                                BorderThickness="1"
+                                CornerRadius="4">
+                            <Path x:Name="check"
+                                  Data="M 3 8 L 6.5 11.5 L 13 4.5"
+                                  Stroke="{StaticResource MochaBaseBrush}"
+                                  StrokeThickness="2"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  Visibility="Collapsed"/>
+                        </Border>
+                        <ContentPresenter Grid.Column="1"
+                                          Margin="6,0,0,0"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="box" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="box" Property="Background" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="check" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="box" Property="Background" Value="{StaticResource WarningBrush}"/>
+                            <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource WarningBrush}"/>
+                            <Setter TargetName="check" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource MochaOverlay1Brush}"/>
+                            <Setter TargetName="box" Property="Background" Value="{StaticResource MochaMantleBrush}"/>
+                            <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource MochaSurface1Brush}"/>
+                            <Setter TargetName="check" Property="Opacity" Value="0.55"/>
+                            <Setter Property="Opacity" Value="0.78"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type DataGrid}">
@@ -324,12 +504,13 @@
     <Style TargetType="{x:Type TabControl}">
         <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
     </Style>
 
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource ForegroundMutedBrush}"/>
-        <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="Foreground" Value="{StaticResource MochaSubtext1Brush}"/>
+        <Setter Property="Padding" Value="16,9"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
@@ -337,6 +518,7 @@
                             Background="{TemplateBinding Background}"
                             BorderBrush="Transparent"
                             BorderThickness="0,0,0,2"
+                            CornerRadius="6,6,0,0"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter ContentSource="Header" RecognizesAccessKey="True"
                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -344,6 +526,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MochaSurface0Brush}"/>
                             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
@@ -351,6 +534,7 @@
                             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource MochaMantleBrush}"/>
                             <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
