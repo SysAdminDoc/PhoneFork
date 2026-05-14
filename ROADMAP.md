@@ -37,20 +37,20 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 
 ## Now (v0.2 → v0.5) — _the four-tab core_
 
-### v0.2.0 — Media tab live ([scrcpy](https://github.com/Genymobile/scrcpy), [adb-sync](https://github.com/google/adb-sync), [Neo Backup](https://github.com/NeoApplications/Neo-Backup) #525/#709)
+### v0.2.0 — Media tab live ✅ _(shipped 2026-05-14)_
 
-**Theme**: Coverage + Velocity.
+**Theme**: Coverage + Velocity. Sources: [scrcpy](https://github.com/Genymobile/scrcpy), [adb-sync](https://github.com/google/adb-sync), [Neo Backup](https://github.com/NeoApplications/Neo-Backup) #525/#709, community signal `§3`/`§7`.
 
-- **Manifest engine** — `adb shell "find /sdcard -type f -printf '%p\t%s\t%T@\n'"` per category, parsed into a `Dictionary<string,(long Size, DateTime Mtime)>`. Diff client-side, ship only the delta. Sources: [§Velocity research / community-#3 community-signal report](docs/community-signal.md).
-- **Per-category multi-select** — DCIM, Pictures, Movies, Download, Documents, Music, Ringtones, Notifications, Alarms, Recordings, WhatsApp media folder (`/sdcard/Android/media/com.whatsapp/`). Source pattern: Neo Backup `#909 data-parts selector`.
-- **Resumable chunked transfer with per-file checkpoint** — checkpoint file in `%LOCALAPPDATA%\PhoneFork\sessions\<id>\manifest.json`. Re-running the same plan after disconnect skips files where dest size+mtime match (CRC32 verify mode opt-in). Inspired by restic content-addressed snapshots and Neo Backup `#717` (Healthchecks).
-- **Parallel pull/push** — `Task.WhenAll(pullSrc, pushDst)` with bounded `SemaphoreSlim` so we exploit both phones' USB lanes. Floor: 200 MB/s sustained on UFS 4 cables (research-validated). Counters: hung-at-99% complaints from community report `§3`.
-- **`--delete` / `--reverse` / `--update` flag vocabulary on the CLI** — `phonefork media sync --from <s> --to <d> --update --exclude "Android/data/**.cache/**"`. Borrowed from rsync + archived `google/adb-sync`.
-- **Total disk-size diff before run** — show "12.4 GB → 11.8 GB, 832 files new, 14 conflicts" before commit. Source: Neo Backup `#906`.
-- **Sync-conflict filename pattern** — `IMG_20240101.sync-conflict-<sha8>.jpg` when dest already has a same-named file with different content. Direct lift from Syncthing.
-- **Ringtone-default URI restore** — after pushing `/sdcard/Ringtones/foo.ogg`, `settings put system ringtone file:///sdcard/Ringtones/foo.ogg` (and `notification_sound`, `alarm_alert`). Closes Smart Switch's missing-default-ringtone gap (community `§7`).
-
-**CLI surface**: `phonefork media manifest --device <s>`, `phonefork media diff --from <s> --to <d>`, `phonefork media sync ...`.
+- [x] **Manifest engine** — `find <root> -type f -printf '%P\t%s\t%T@\n'` per category, parsed into `Dictionary<string,(Size,Mtime)>`. Single shell call per category; missing roots return empty manifest cleanly.
+- [x] **Per-category multi-select** — 11 categories: DCIM, Pictures, Movies, Music, Download, Documents, Ringtones, Notifications, Alarms, Recordings, WhatsApp media.
+- [x] **Pull-then-push pipeline with per-file mtime preservation** — re-runs are idempotent because source mtime is propagated through `SyncService.PushAsync`.
+- [x] **`--delete` / `--update` / `--preserve-conflicts` / `--dry-run`** flag vocabulary on CLI and WPF toggles.
+- [x] **Total disk-size diff before run** — DataGrid columns: Src files/MiB, Dst files, New, Conflict, Same, Dst-only, MiB-to-xfer.
+- [x] **Sync-conflict filename pattern** — `*.sync-conflict-<ts>-<sha8>.<ext>` per Syncthing pattern, opt-in via `--preserve-conflicts`.
+- [x] **CLI**: `phonefork media manifest`, `phonefork media diff`, `phonefork media sync`.
+- [ ] _Resumable chunked transfer with per-file CRC32 checkpoint_ — deferred to v0.2.1 (basic resumability already works because identical files are skipped on re-run; CRC32 verify is an opt-in stricter mode).
+- [ ] _Parallel pull/push with bounded `SemaphoreSlim`_ — deferred to v0.2.1 (current pipeline is sequential per file; parallelism is a perf optimization, not a correctness gap).
+- [ ] _Ringtone-default URI restore_ — deferred to v0.3 (lives in Settings tab; depends on the settings-apply engine).
 
 ### v0.3.0 — Settings tab live ([cmd-shell AOSP docs](https://source.android.com/docs/core/tests/vts/shell-commands), [DiffPlex](https://github.com/mmanela/diffplex))
 
