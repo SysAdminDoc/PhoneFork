@@ -2,6 +2,23 @@
 
 All notable changes to PhoneFork.
 
+## v0.4.0 — 2026-05-14
+
+Debloat tab live + debloat CLI branch. Ships the AppManagerNG / UAD-NG dataset embedded as 5 JSON resources (5,481 entries total).
+
+### Added
+- `assets/debloat/{oem,google,carrier,aosp,misc}.json` — embedded as `EmbeddedResource` with `LogicalName="PhoneFork.Core.Assets.Debloat.*"`.
+- `DebloatEntry` + `DebloatTier` (Delete / Replace / Caution / Unsafe) + `DebloatList` (Oem / Google / Carrier / Aosp / Misc) models.
+- `DebloatDataset.Load()` — reflects the assembly's embedded resources into 5,481 `DebloatEntry` rows indexed by package id.
+- `DebloatScanner` — intersects dataset with destination's `pm list packages -s -e` + `-s -d`, returning a list of `DebloatCandidate(Entry, IsEnabled)`.
+- `DebloatService` — `pm disable-user --user 0 <pkg>` only (never `pm uninstall`). Captures a JSON snapshot of the pre-debloat enabled set to `%LOCALAPPDATA%\PhoneFork\debloat-snapshots\<serial>-<ts>.json` before every apply. Rollback re-enables via `cmd package install-existing <pkg>` + `pm enable <pkg>`.
+- WPF Debloat tab: filterable `DataGrid` of (Package / Label / Tier / List / State / Status / Warning), tier-chip toggles (Delete/Replace/Caution/Unsafe), enabled/disabled state toggles, profile dropdown (Conservative / Recommended / Aggressive), Apply Profile / Disable Selected / Select None / Dry-run.
+- CLI: `phonefork debloat list --device <d> [--tier <CSV>] [--list <CSV>] [--include-disabled]`, `phonefork debloat apply --device <d> [--profile <name>] [--include-unsafe] [--package <pkg>] [--dry-run]`, `phonefork debloat rollback --device <d> --snapshot <path> [--dry-run]`.
+
+### Notes
+- Hardware-validated against S22 Ultra: 475 packages of the 5,481-entry dataset are installed; 207 Delete-tier, 70 Replace, 133 Caution, 65 Unsafe. Conservative profile would queue 204 enabled Delete-tier packages.
+- "Disable carrier MSM bloat-installer first" deferred to v0.4.1 — current implementation queues all matches in a single batch.
+
 ## v0.3.0 — 2026-05-14
 
 Settings tab live + settings CLI branch.

@@ -1,0 +1,1788 @@
+[
+    {
+        "id": "android",
+        "description": "Android System\nAndroid system framework? Apk file name: framework-res\nCould be THE core of the android system.\nProbably very unsafe to disable.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "android.aosp.overlay",
+        "description": "Refers to the Runtime Resource Overlay (RRO) framework that is built into the AOSP.\nRRO allows for the dynamic modification of an app's resources at runtime,\nEnabling the customization of the app's appearance and behavior without modifying its source code\nhttps://source.android.com/docs/core/runtime/rros",
+        "removal": "unsafe"
+    },
+    {
+        "id": "android.auto_generated_rro__",
+        "label": "android.auto_generated_rro__",
+        "description": "RRO = Runtime Resources Overlay. Changes values of a package config, based in the overlay definitions. Overlays are heavily used by OEMs to customize the look and feel of Android.",
+        "web": [
+            "https://source.android.com/devices/architecture/rros",
+            "https://code.tutsplus.com/tutorials/quick-tip-theme-android-with-the-runtime-resource-overlay-framework--cms-29708"
+        ],
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "android.auto_generated_rro_product__",
+        "label": "android.auto_generated_rro_product__",
+        "description": "RRO = Runtime Resources Overlay. Used by OEMs to customize look and feel of certain applications.",
+        "web": [
+            "https://source.android.com/devices/architecture/rros",
+            "https://code.tutsplus.com/tutorials/quick-tip-theme-android-with-the-runtime-resource-overlay-framework--cms-29708"
+        ],
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "android.auto_generated_rro_vendor__",
+        "label": "android.auto_generated_rro_vendor__",
+        "description": "RRO = Runtime Resources Overlay. Used by OEMs to customize look and feel of certain applications.",
+        "web": [
+            "https://source.android.com/devices/architecture/rros",
+            "https://code.tutsplus.com/tutorials/quick-tip-theme-android-with-the-runtime-resource-overlay-framework--cms-29708"
+        ],
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "android.auto_generated_vendor_",
+        "label": "android.auto_generated_vendor_",
+        "description": "Auto generated vendor's stuff for Android Auto.",
+        "web": [
+            "https://www.android.com/intl/en_en/auto/"
+        ],
+        "removal": "delete",
+        "warning": "You may need this if you use Android Auto",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "android.overlay.common",
+        "description": "It has some important settings and configurations related to Android.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "android.overlay.target",
+        "description": "It has some important settings and configurations related to Android.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "android.qvaoverlay.common",
+        "description": "This app has no code and is safe to remove.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.adservices.api",
+        "description": "Android AdServices. Introduced in Android 13 privacy sandbox beta components disabled on default.\nhttps://source.android.com/docs/core/ota/modular-system/adservices",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.apps.tag",
+        "label": "Tags",
+        "description": "Support for NFC tags interactions (5 permissions, Contacts/Phone On by default).\nNFC Tags are for instance used in buses to validate your transport card with your phone.\nOther example: https://en.wikipedia.org/wiki/TecTile\nYou will still be able to connect to a NFC device (e.g a speaker) with this disabled.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.avatarpicker",
+        "description": "Lets you assign pictures to contacts. It has two options: take picture from the camera, or choose from the gallery.\nSource code: https://android.googlesource.com/platform/packages/apps/AvatarPicker",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.backupconfirm",
+        "label": "com.android.backupconfirm",
+        "description": "Restores Google settings with Google Backup restore.\nDisplays confirmation popup when doing ADB backup.",
+        "removal": "caution",
+        "warning": "Disabling this package breaks ADB Backup and crashes on attempting to add a Google account",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.basicsmsreceiver",
+        "description": "Gets SMS and creates notifications:\nhttps://android.googlesource.com/platform/packages/apps/BasicSmsReceiver/+/jb-dev/src/com/android/basicsmsreceiver/BasicSmsReceiverApp.java",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.bio.face.service",
+        "label": "com.android.bio.face.service",
+        "description": "Handles facial recognition.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.bips",
+        "label": "Default Print Service",
+        "description": "Generic printing service that should work with most printers.\nWill break printing functionality if disabled, but other replacement print services can be downloaded from the Play Store.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.bluetooth",
+        "label": "Bluetooth",
+        "description": "Handles all Bluetooth functionality including device discovery, pairing, and data transfer.",
+        "removal": "caution",
+        "warning": "Removing this will completely break Bluetooth functionality on the device."
+    },
+    {
+        "id": "com.android.bluetooth.overlay.common",
+        "description": "Overlays are usually themes.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.bluetoothmidiservice",
+        "label": "Bluetooth MIDI Service",
+        "description": "Provides classes for using the MIDI protocol over Bluetooth.",
+        "removal": "delete",
+        "warning": "Do not remove if you connect to a MIDI device via Bluetooth"
+    },
+    {
+        "id": "com.android.bookmarkprovider",
+        "label": "Bookmark Provider",
+        "description": "Only exists for compatibility reasons to prevent apps querying it from getting null cursors they do not expect and crash.",
+        "removal": "caution",
+        "warning": "Apps targeting a very old SDK might crash. For example, disabling this on LDPlayer emulator crashes the default browser."
+    },
+    {
+        "id": "com.android.browser",
+        "label": "Mi Browser",
+        "description": "Mi Browser and browser for the LDPlayer emulator. It is a privacy nightmare and should be replaced.",
+        "web": [
+            "https://www.xda-developers.com/xiaomi-mi-web-browser-pro-mint-collecting-browsing-data-incognito-mode/"
+        ],
+        "removal": "replace",
+        "suggestions": "browsers"
+    },
+    {
+        "id": "com.android.browser.provider",
+        "label": "com.android.browser.provider",
+        "description": "Old package (2014). Chrome bookmarks provider? Injects Picasa URL (https://picasaweb.google.com) in the Chrome browser's bookmarks in the browser.",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.calculator2",
+        "label": "Calculator",
+        "description": "The AOSP calculator app\nSome OEMs (e.g. Huawei and Xiaomi) use the same package name for their app",
+        "removal": "replace",
+        "suggestions": "calculators"
+    },
+    {
+        "id": "com.android.calendar",
+        "label": "Calendar",
+        "description": "The AOSP Calendar app.\nSome OEMs (e.g. Huawei and Xiaomi) use the same package name for their app.",
+        "removal": "replace",
+        "suggestions": "calendars"
+    },
+    {
+        "id": "com.android.calllogbackup",
+        "label": "Call Log Backup/Restore",
+        "description": "Call Logs Backup/Restore feature, runs in the background.",
+        "web": [
+            "https://android.googlesource.com/platform/packages/providers/CallLogProvider/+/refs/heads/master/src/com/android/calllogbackup"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.camera",
+        "description": "The stock AOSP camera app on many phones. However, on some Xiaomi phones, it is actually the Xiaomi Camera app. Deleting this will result in no camera app.\nTry Open Camera as an open source alternative:\nhttps://play.google.com/store/apps/details?id=net.sourceforge.opencamera&hl=en&gl=US",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.captiveportallogin",
+        "label": "CaptivePortalLogin",
+        "description": "Support for captive portal logins.\nA captive portal login is a web page where users have to log in or accept terms of use. Common for public wifi networks.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Captive_portal"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.carrierconfig",
+        "label": "com.android.carrierconfig",
+        "description": "Dynamically provides configuration for the carrier network.\nThe config contains: Roaming networks, Voicemail settings, SMS/MMS settings, VoLTE/IMS settings, and more.\nIf a carrier app is installed it will be queried for overrides to these settings.\nSeems to run on boot and when you swap SIM?",
+        "web": [
+            "https://source.android.com/devices/tech/config/carrier",
+            "https://cs.android.com/android/platform/superproject/+/master:packages/apps/CarrierConfig/src/com/android/carrierconfig/DefaultCarrierConfigService.java"
+        ],
+        "removal": "replace",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.carrierconfig.overlay.common",
+        "description": "Needed for (com.android.carrierconfig).",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.carrierdefaultapp",
+        "label": "CarrierDefaultApp",
+        "description": "This package is a generic solution that allows carriers to indicate when a device has run OOB (Out Of Balance). Android devices that are OOB need carrier mitigation protocols to allow select data through (like to notify users their data/balance is out, or allow them to buy more data through the carrier app).\nWill probably break that functionality if disabled, but is otherwise safe to disable (should only affect users that are out of data/balance?).",
+        "web": [
+            "https://source.android.com/devices/tech/connect/oob-users"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.cellbroadcastreceiver",
+        "label": "Emergency alerts",
+        "description": "Cell broadcast is designed to deliver messages to multiple users in an area.\nThis is notably used by ISPs to send Emergency/Government alerts.\nRuns at boot time and is also triggered after exiting airplane mode.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Cell_Broadcast",
+            "https://www.androidcentral.com/amber-alerts-and-android-what-you-need-know",
+            "https://android.googlesource.com/platform/packages/apps/CellBroadcastReceiver/+/refs/heads/master/src/com/android/cellbroadcastreceiver"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.cellbroadcastreceiver.basiccolorblack.overlay",
+        "label": "com.android.cellbroadcastreceiver.basiccolorblack.overlay",
+        "description": "Dark theme overlay for com.android.cellbroadcastreceiver",
+        "dependencies": [
+            "com.android.cellbroadcastreceiver"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.cellbroadcastreceiver.basiccolorwhite.overlay",
+        "label": "com.android.cellbroadcastreceiver.basiccolorwhite.overlay",
+        "description": "Light theme overlay for com.android.cellbroadcastreceiver",
+        "dependencies": [
+            "com.android.cellbroadcastreceiver"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.cellbroadcastreceiver.module",
+        "description": "Same as com.android.cellbroadcastreceiver.\nCell broadcasting used to send emergency alerts.\nhttps://en.wikipedia.org/wiki/Cell_Broadcast.",
+        "dependencies": [
+            "com.android.cellbroadcastreceiver"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.cellbroadcastreceiver.overlay.common",
+        "label": "com.android.cellbroadcastreceiver.overlay.common",
+        "description": "Overlay for com.android.cellbroadcastreceiver. Inside the APK, I found unused things: show_brazil_settings, show_cmas_settings, show_etws_settings.\nThey are unavailable and useless.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.cellbroadcastservice",
+        "description": "is designed to deliver messages to multiple users in an area.\nThis is notably used by ISPs to send Emergency/Government alerts.\nRuns in the background.\nhttps://en.wikipedia.org/wiki/Cell_Broadcast\nhttps://www.androidcentral.com/amber-alerts-and-android-what-you-need-know",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.certinstaller",
+        "description": "Certificate installer\nUsed for accepting and revoking Internet certificates.\nCertificates identify ownership of public keys, for use in secure communications.\nBreaks Wi-Fi if disabled.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.companiondevicemanager",
+        "label": "Companion Device Manager",
+        "description": "This handles connections to nearby (usually not remote) devices, like Bluetooth Headphones, desktop Operating Systems, etc.",
+        "removal": "caution",
+        "warning": "Removing this package may result in the inability to read the SD card from your computer's file manager (via USB)."
+    },
+    {
+        "id": "com.android.connectivity.resources",
+        "description": "Network connectivity resources.\nCause BOOTLOOP.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.contacts",
+        "label": "Contacts",
+        "description": "The AOSP Contacts app.\nSome OEMs (e.g. Xiaomi) use the same package name for their app.",
+        "removal": "replace",
+        "suggestions": "contacts"
+    },
+    {
+        "id": "com.android.credentialmanager",
+        "description": "Credential Manager\nManages with Passwords, passkeys.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.cts.ctsshim",
+        "label": "Compatibility Test Suite",
+        "description": "Used by manufacturer to test your copy of the device for performance. It just exists and doesn't run in background.",
+        "web": [
+            "https://source.android.com/docs/compatibility/cts"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.cts.priv.ctsshim",
+        "label": "Compatibility Test Suite",
+        "description": "Verifies certain upgrade scenarios.\nA shim is basically a compatibility layer for an API, that makes sure anything that uses the API does so correctly.",
+        "web": [
+            "https://android.googlesource.com/platform/frameworks/base/+/51e458e/packages/CtsShim",
+            "https://en.wikipedia.org/wiki/Shim_(computing)"
+        ],
+        "removal": "caution",
+        "warning": "Disabling could mess with OTA updates."
+    },
+    {
+        "id": "com.android.defcontainer",
+        "description": "Package Access Helper\nDetermines the recommended install location for packages and if there is enough free space for the package.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.deskclock",
+        "label": "Clock",
+        "description": "The AOSP Clock app\nSome OEMs (e.g. Huawei and Xiaomi) use the same package name for their app.",
+        "removal": "replace",
+        "suggestions": "clocks"
+    },
+    {
+        "id": "com.android.devicelockcontroller",
+        "description": "This app can't be uninstalled or disabled.\nCan restrict this device if the owner doesn't make payments per month for the new phone.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.dialer",
+        "label": "Phone",
+        "description": "The AOSP Dialer/Phone app\nDefault phone app on some older phones (like Oneplus 3).",
+        "removal": "replace",
+        "suggestions": "dialers"
+    },
+    {
+        "id": "com.android.dialer.basiccolorblack.overlay",
+        "description": "Dark theme overlay for AOSP Dialer?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.dialer.basiccolorwhite.overlay",
+        "description": "Light theme overlay for AOSP Dialer?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.documentsui",
+        "label": "Files",
+        "description": "Occasionally runs in the background.\nFile selector for other apps.",
+        "removal": "unsafe",
+        "warning": "Storage Access Framework (SAF) will break if this is disabled."
+    },
+    {
+        "id": "com.android.documentsui.a_overlay",
+        "label": "com.android.documentsui.a_overlay",
+        "description": "Some overlay for for \"Files\"?",
+        "dependencies": [
+            "com.android.documentsui"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.dreams.basic",
+        "label": "Basic Daydreams",
+        "description": "Daydream (not Google Daydream VR) is an interactive screensaver mode built into Android.\nWith it turned on, it activates and shows the screensaver of your choice when you dock or charge your device.\nCan display the time, weather, quotes, photos, news, tweets, or anything else Daydream app developers can think of.",
+        "web": [
+            "https://developer.android.com/reference/android/service/dreams/DreamService"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.dreams.phototable",
+        "label": "Photo Screensavers",
+        "description": "Daydream stuff, see com.android.dreams.basic",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.dreams.phototable.overlay",
+        "label": "com.android.dreams.phototable.overlay",
+        "description": "Overlay for the phototable daydream? Overlays are usually themes, but not sure about this one.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.dynsystem",
+        "description": "Dynamic System Updates\nRuns on boot, but doesn't seem to run in the background beyond that.\nTreble gives the ability to boot an AOSP Generic System Image (GSI) on any supported device.\nDynamic System Updates allows to boot into a Generic System Image (GSI) without interfering with the current installation.\nThat means the bootloader doesn’t need to be unlocked and the user data doesn’t need to be wiped.\nhttps://developer.android.com/topic/dsu",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.egg",
+        "label": "Android Easter Egg",
+        "description": "Android's easter egg feature (spam-tap on the android version in the settings)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.email",
+        "label": "Email",
+        "description": "The AOSP Email app.\nSome OEMs (e.g. Huawei, Xiaomi, Oppo) use the same package name for their app.",
+        "removal": "replace",
+        "suggestions": "email_clients"
+    },
+    {
+        "id": "com.android.email.partnerprovider",
+        "label": "EmailPartnerProvider",
+        "description": "Lets Google partners (OEM in most of the case) customize the default email settings.\nThe manufacturer often changes the default signature displayed at the end of each of your mail (e.g \"Sent from my Nokia phone\")",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.emergency",
+        "label": "Emergency information",
+        "description": "Shows emergency info on lockscreen and power menu. Loads on device unlock/lockscreen and power menu, so it's basically always cached in RAM, but shouldn't use much/any battery. So, the main thing gained from disabling this package is the ~9MB RAM it uses.",
+        "removal": "caution",
+        "warning": "Removing this will break Safety and Emergency in Settings, and you will miss SOS alerts."
+    },
+    {
+        "id": "com.android.emergency.basiccolorblack.overlay",
+        "description": "Dark theme for Emergency rescue?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.emergency.basiccolorwhite.overlay",
+        "description": "Dark theme for Emergency rescue?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.exchange",
+        "label": "Exchange Services",
+        "description": "Handles all aspects of starting, maintaining, and stopping the various sync adapters for the email accounts.\nIs it only needed for the email stock app?\n",
+        "removal": "replace",
+        "suggestions": "email_clients"
+    },
+    {
+        "id": "com.android.ext.adservices.api",
+        "description": "Another component of Android AdServices.\nIntroduced in Android 14.\nhttps://source.android.com/docs/core/ota/modular-system/adservices",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.externalstorage",
+        "label": "External Storage",
+        "description": "Needed by apps to access external storage such as memory cards.",
+        "removal": "unsafe",
+        "warning": "Storage Access Framework (SAF) will break if this is disabled."
+    },
+    {
+        "id": "com.android.facelock",
+        "label": "Trusted Face",
+        "description": "Package for supporting the Face Unlock feature",
+        "removal": "caution",
+        "warning": "Do not remove if you use Face Unlock"
+    },
+    {
+        "id": "com.android.federatedcompute.services",
+        "description": "FederatedCompute\nAnother component of OnDevicePersonalization. But this app learns things about users.\nIntroduced in Android 14(`com.google.android.federatedcompute` Introduced in Android 13).\nhttps://source.android.com/docs/core/ota/modular-system/ondevicepersonalization",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.fmradio",
+        "label": "FM Radio",
+        "description": "Plug in head phones and listen to the FM radio!",
+        "removal": "replace",
+        "suggestions": "radios"
+    },
+    {
+        "id": "com.android.frameworkhwext.dark",
+        "description": "Required components of the androidhwext.\nBasic functionality of Huawei Phones.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.frameworkhwext.honor",
+        "description": "Required components of the androidhwext.\nBasic functionality of Huawei Phones.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.frameworkres.overlay",
+        "description": "Runtime Resource Overlay\nThis framework provides the ability to replace application resources while the application is running. More info:\nhttps://source.android.com/docs/core/runtime/rros",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.galaxy4",
+        "label": "Black Hole",
+        "description": "Built-in Dynamic wallpaper",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.gallery3d",
+        "label": "Gallery",
+        "description": "The AOSP Gallery app, often vendors (e.g. Xiaomi) modify it to provide their own apps.",
+        "removal": "replace",
+        "suggestions": "gallery"
+    },
+    {
+        "id": "com.android.health.connect.backuprestore",
+        "description": "Backups data from Health Connect app.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.healthconnect.controller",
+        "description": "Health Connect\nManage the health and fitness data on your phone, and control which apps can access it.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.hotspot2",
+        "label": "OsuLogin",
+        "description": "Provides wifi tethering i.e. lets you share your mobile device's Internet connection with other devices.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Tethering"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.hotspot2.osulogin",
+        "label": "OsuLogin",
+        "description": "The sole purpose of the app is to provision credentials from the Wi-Fi network to the device and allow them to connect to Wi-Fi Hotspot 2.0.",
+        "web": [
+            "https://hackanons.com/2021/07/osulogin-android-everything-you-need-to-know.html"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.htmlviewer",
+        "label": "HTML Viewer",
+        "description": "Allows apps to load URLs into the WebView, which allows web content to be displayed directly in the app.",
+        "removal": "caution",
+        "warning": "Removing this causes a bootloop on some MIUI 12.5.4+ phones."
+    },
+    {
+        "id": "com.android.inputdevices",
+        "label": "Input Devices",
+        "description": "Only contains a receiver named \"Android keyboard\", possibly for an external keyboard.\nLocates available keyboard layouts. Apps can offer additional keyboard layouts to the user by declaring a suitable broadcast receiver in their manifest.",
+        "removal": "caution",
+        "warning": "If you are using the default Samsung keyboard, then deleting this package on some phones may cause the keyboard to completely stop working. You may get locked out of your phone if the only method to authenticate yourself is using password."
+    },
+    {
+        "id": "com.android.inputmethod.latin",
+        "label": "Android Keyboard (AOSP)",
+        "description": "The AOSP keyboard app",
+        "removal": "replace",
+        "warning": "Do NOT disable if you don't have another keyboard with direct boot mode support, or you'll be stuck at boot (no keyboard to unlock the phone).",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.android.intentresolver",
+        "description": "'Share' functionality will be disabled after uninstalling this package on Android 14 and up. Additionally, motion photos will become broken.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.corner",
+        "label": "Corner cutout",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.double",
+        "label": "Double cutout",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.hole",
+        "label": "Punch Hole cutout",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.narrow",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.noCutout",
+        "label": "Hide",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.tall",
+        "label": "Tall cutout",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.waterfall",
+        "label": "Waterfall cutout",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.display.cutout.emulation.wide",
+        "description": "Display cutout variant.",
+        "web": [
+            "https://developer.android.com/guide/topics/display-cutout",
+            "https://source.android.com/devices/tech/display/display-cutouts"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing the app will cause bootloop."
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.gestural",
+        "label": "Gestural Navigation Bar",
+        "description": "Gesture navigation\nLets you use swipes and other actions to navigate your device, rather than buttons.",
+        "web": [
+            "https://android-developers.googleblog.com/2019/08/gesture-navigation-backstory.html"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.gestural_extra_wide_back",
+        "label": "Gestural Navigation Bar",
+        "description": "Enables a setting increasing how far you need to move your finger to trigger the back gesture.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.gestural_narrow_back",
+        "label": "Gestural Navigation Bar",
+        "description": "Enables a setting decreasing how far you need to move your finger to trigger the back gesture.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.gestural_wide_back",
+        "label": "Gestural Navigation Bar",
+        "description": "Enables a setting increasing how far you need to move your finger to trigger the back gesture.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.hidegestural",
+        "description": "Allows 'Gesture hint' to be disabled in Navigation bar > Swipe gestures.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.threebutton",
+        "label": "3 Button Navigation Bar",
+        "description": "The default system navbar? It's what you use when you don't use gesture navigation.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.transparent",
+        "description": "Allows 'Transparent navigation bar' to be enabled in Developer options.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.navbar.twobutton",
+        "label": "2 Button Navigation Bar",
+        "description": "Enables a setting for using just 2 buttons in the system navbar?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.internal.systemui.onehanded.gestural",
+        "description": "one-handed mode, which can be found in the settings.\none-handed mode will not work. Safe to remove if you dont use these setting.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.keychain",
+        "description": "Enables apps to use system wide credential KeyChain (shared credentials between apps)\nhttps://security.stackexchange.com/questions/216716/android-keychain-what-is-a-system-wide-credential\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.launcher3",
+        "label": "Quickstep",
+        "description": "The AOSP launcher. OEMs frequently use this to deliver their own launcher.\nYou need to install another launcher before removing it.",
+        "removal": "caution",
+        "warning": "You need to install another launcher before removing it.",
+        "suggestions": "launchers"
+    },
+    {
+        "id": "com.android.localtransport",
+        "description": "Backup transport for stashing stuff into a known location on disk, and later restoring from there.\nNeeded for storing backup data locally on a device?\nThis package also provides the backup confirmation UI.\nhttps://developer.android.com/guide/topics/data/testingbackup",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.location.fused",
+        "description": "Manages underlying location technologies, such as GPS and Wi-Fi.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.magicsmoke",
+        "label": "Magic Smoke Wallpapers",
+        "description": "Bulit-in Live wallpaper.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.managedprovisioning",
+        "label": "Work Setup",
+        "description": "Work Setup/Work profile setup\nManages Android user account profiles.\nThe typical use-case is setting up a corporate profile that is controlled by the employer on an employee's personal device, to keep personal and work data separate.",
+        "web": [
+            "https://support.google.com/work/android/answer/6191949",
+            "https://developers.google.com/android/work/requirements/work-profile",
+            "https://beta.pithus.org/report/922fa478f5b2a8784e33626f04ff039d510b9dd7d5fd06db5c55002b5b5afae1"
+        ],
+        "removal": "caution",
+        "warning": "Needed for sandbox apps such as Shelter or Insular/Island."
+    },
+    {
+        "id": "com.android.mms",
+        "label": "Messages",
+        "description": "The AOSP SMS app.\nOccasionally runs in the background.\nSome OEMs (like Huawei, Xiaomi, Vivo, Oppo) use the same package name for their app.",
+        "removal": "replace",
+        "suggestions": "sms"
+    },
+    {
+        "id": "com.android.mms.service",
+        "description": "Provides support for sending MMS.\nIt doesn't cause bootloop.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.modulemetadata",
+        "label": "Module Metadata",
+        "description": "It's used to manage and store metadata about installed modules, and is accessed by the system server.",
+        "removal": "unsafe",
+        "warning": "Breaks some Android core functionalities if disabled."
+    },
+    {
+        "id": "com.android.mtp",
+        "description": "MTP Host\nHandles MTP(Media Transfer Protocol), a protocol for transfering files between the device and a connected PC.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.musicfx",
+        "label": "MusicFX",
+        "description": "Audio EQ (equalizer). Some 3rd-party music apps can use it to provide you EQ features.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.musicvis",
+        "label": "Music Visualization Wallpapers",
+        "description": "Built-in live wallpaper",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.nearby.halfsheet",
+        "description": "Useless frameworks to Wi-Fi connections, USB tethering, auto, usage.\nEvery version has random code and the app is not running in the background.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.networkstack.inprocess",
+        "label": "NetworkStack",
+        "description": "Related to the Network Stack module, which is an updatable Mainline module that ensures Android can adapt to evolving network standards and allows for interoperability with new implementations",
+        "web": [
+            "https://source.android.com/docs/core/ota/modular-system/networking"
+        ],
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.networkstack.inprocess.overlay",
+        "description": "Related to the Network Stack module,\nwhich is an updatable Mainline module that ensures Android can adapt to evolving network standards and allows for interoperability with new implementations\nhttps://source.android.com/docs/core/ota/modular-system/networking",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.networkstack.overlay",
+        "description": "WiFi will not work after remove.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.networkstack.permissionconfig",
+        "description": "Defines a permission that enables modules to perform network-related tasks.",
+        "web": [
+            "https://source.android.com/devices/architecture/modular-system/networking"
+        ],
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.networkstack.tethering.inprocess.overlay",
+        "description": "Related to the Tethering module,\nwhich allows an Android device to share its internet connection with other connected client devices.\nThis package contains classes and components that are used for in-process overlay functionality within the Tethering module.\nhttps://source.android.com/docs/core/ota/modular-system/tethering",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.networkstack.tethering.overlay",
+        "description": "Component of the Network, Tethering module.\nPackage is not a publicly documented.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.nfc",
+        "label": "Nfc Service",
+        "description": "Runs in the background as part of the System.\nI assume NFC breaks when disabled.\nWill probably run even if disabled, like most system packages. So disabling/uninstalling is probably pointless.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.noisefield",
+        "label": "Bubbles",
+        "description": "Built-in live wallpaper.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.ondevicepersonalization.services",
+        "description": "OnDevicePersonalization. Another thing to AdServices privacy sandbox.\nIntroduced in Android 13.\nhttps://source.android.com/docs/core/ota/modular-system/ondevicepersonalization",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.ons",
+        "label": "com.android.ons",
+        "description": "ons = Opportunistic Network Service\nFrom what I can glean in the source code it seems like this provides a list of available networks and assigns each network a priority.\nI've never seen it run on its own, so this might be part of some automatic network switching setting that I have turned off.",
+        "web": [
+            "https://cs.android.com/android/platform/superproject/+/master:packages/services/AlternativeNetworkAccess/src/com/android/ons/OpportunisticNetworkService.java",
+            "https://developer.android.com/reference/android/telephony/AvailableNetworkInfo",
+            "https://cs.android.com/android/platform/superproject/+/master:frameworks/base/telephony/java/android/telephony/AvailableNetworkInfo.java"
+        ],
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.otaprovisioningclient",
+        "label": "OTA Access Point Configuration",
+        "description": "OTA (Over the air) is the method used by OEMs to push updates to your device.\nAn OTA access point is used to run system software updates over a special gateway. This package is most likely customized by your OEM.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.overlay.systemui",
+        "description": "On some phones, it is an overlay to app \"com.google.android.apps.safetyhub\".\nCheck out this app code and think about it.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.packageinstaller",
+        "description": "Handles installation, upgrade, and removal of applications.\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.pacprocessor",
+        "label": "PacProcessor",
+        "description": "PAC (Proxy Auto-Config) is a file which defines how an app can automatically find the correct proxy server for fetching an URL.\nShould be safe to remove if you don't use Auto-proxy (with PAC file config).",
+        "web": [
+            "https://en.wikipedia.org/wiki/Proxy_auto-config"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.phasebeam",
+        "label": "Phase beam",
+        "description": "Built-in live wallpaper",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.phone",
+        "description": "AOSP Dialer\nRemoving this package breaks the software update/download and install screen on Samsung. WARNING: for me, it breaks the phone app completely with call routing enabled. Not sure about other cases.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.phone.a_overlay",
+        "description": "AOSP code for dialer app features.\nSIM card will not be detected if disabled.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.phone.basiccolorblack.overlay",
+        "description": "Dark theme for phone app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.phone.basiccolorwhite.overlay",
+        "description": "Light theme for phone app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.phone.overlay.common",
+        "description": "Location and dialer things.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.phone.recorder",
+        "label": "Recorder",
+        "description": "AOSP Call recorder function. Most of the time OEM use their own code for this.\nSome OEMs (like Huawei & Xiaomi) use the same package name for their app",
+        "removal": "replace",
+        "suggestions": "call_recorders"
+    },
+    {
+        "id": "com.android.printservice.recommendation",
+        "label": "Print Service Recommendation Service",
+        "description": "Recommends 3rd-party print services apps in the PlayStore. Printing will probably still work without it (by using the default print service).",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.printspooler",
+        "label": "Print Spooler",
+        "description": "Manages the printing process.\nRuns on boot, but not beyond that.",
+        "removal": "caution",
+        "warning": "Apart from breaking the printing functionality, it also breaks the connection preferences submenu in the settings app on most devices."
+    },
+    {
+        "id": "com.android.protips",
+        "label": "Home screen tips",
+        "description": "Runs on boot.\nThe tip popups you get on the homescreen.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.providers.applications",
+        "description": "Provides a list of installed applications.\nContent providers encapsulate data, providing centralized management of data shared between apps.\nhttps://developer.android.com/guide/topics/providers/content-providers.html",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.providers.blockednumber",
+        "label": "Blocked Numbers Storage",
+        "description": "Handles blocked number storage.\nOn some devices this seems to be tied to the recent apps menu.\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://gitlab.com/W1nst0n/universal-android-debloater/-/issues/6",
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.providers.calendar",
+        "label": "Calendar Storage",
+        "description": "Necessary for the stock Calendar app to work correctly.\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.providers.contacts",
+        "label": "Contacts Storage",
+        "description": "Provider for contact data.\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "caution",
+        "warning": "Breaks contact functionality if disabled. Not recommended to disable if you plan to use your device as a phone."
+    },
+    {
+        "id": "com.android.providers.downloads",
+        "description": "Downloads Manager\nProvider for downloaded files.\nContent providers encapsulate data, providing centralized management of data shared between apps.\nhttps://developer.android.com/guide/topics/providers/content-providers.html",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.providers.downloads.ui",
+        "description": "Downloads\nUser interface for downloads.\nOn some OEM's this app has ads, tracking things.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.providers.drm",
+        "label": "DRM Protected Content Storage",
+        "description": "Manages DRM storage on the device?\nProbably required for some forms of DRM; disabling might break things like Netflix streaming, which relies on DRM to function.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Digital_rights_management"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.providers.media",
+        "label": "Media Storage",
+        "description": "Provider of media files (images, videos and such).\nScans the device for media files and allows permitted apps access to them.\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "unsafe",
+        "warning": "Breaks features related to media storage (images, videos, music, etc.) if disabled"
+    },
+    {
+        "id": "com.android.providers.partnerbookmarks",
+        "label": "com.android.providers.partnerbookmarks",
+        "description": "Provides bookmarks about partners of Google in Chrome.\n",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.providers.settings",
+        "description": "Provider for settings app data.\nContent providers encapsulate data, providing centralized management of data shared between apps.\nhttps://developer.android.com/guide/topics/providers/content-providers.html",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.providers.telephony",
+        "description": "Provider for telephony data.\nHandles phone-related data such as text messages, APN list, etc.\nContent providers encapsulate data, providing centralized management of data shared between apps.\nhttps://developer.android.com/guide/topics/providers/content-providers.html",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.providers.userdictionary",
+        "label": "User Dictionary",
+        "description": "Handles user dictionary for keyboard apps.\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "caution",
+        "warning": "Removing this package may cause settings menu to crash on some Huawei phones"
+    },
+    {
+        "id": "com.android.provision",
+        "description": "Provisioning is the process of setting up a network connection that will allow new users. \nThis service is for example needed when the user's phone moves from one cell-tower to another.\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.proxyhandler",
+        "label": "ProxyHandler",
+        "description": "Handles proxy config.",
+        "removal": "caution",
+        "warning": "Do not remove if you use a system proxy"
+    },
+    {
+        "id": "com.android.quicksearchbox",
+        "label": "Quick Search",
+        "description": "Google quick search box. OEMs (e.g. Xiaomi) can modify this for their own use.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.remoteprovisioner",
+        "description": "RemoteProvisioner. Have random stuff: security, notifications, accessibility, test modes, data usage, metrics, logs.\nIts something new introduced in Android 13.\nAt this time this app is not available for users.\nAnd looks very useless.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.rkpdapp",
+        "description": "RemoteProvisioner. Have random stuff: security, notifications, accessibility, test modes, data usage, metrics, logs.\nIntroduced in android 14(it's the same app like `com.android.remoteprovisioner` Introduced in android 13).\nAgain this app is not available for users.\nAnd looks very useless.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.runintest.ddrtest",
+        "label": "DDRTest",
+        "description": "RAM Stress tester\nCan be run from the bootloader\nNOTE: I'm not sure it's really from AOSP (seen in TCL Plex phone)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.safetycenter.resources",
+        "description": "Google Safety Center.\nProbably affects malware detection in new app installs, Gmail, and Chrome. This will also revert back the \"Security & privacy\" look to the old style.\nYou can use a libre spam-blocking and DNS-blocking solution instead of this.\nhttps://safety.google",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.sdksandbox",
+        "description": "Introduced in Android 13 privacy sandbox beta disabled on default.\nCauses bootloop. Maybe this component is not only for privacy... (I think it's for testing privacy sandbox using Android Studio.)\nhttps://source.android.com/docs/core/ota/modular-system/adservices\nCause BOOTLOOP.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.se",
+        "label": "SecureElementApplication",
+        "description": "Runs in the background as part of the system.\nUnderlying implementation for the OMAPI SE service.\nEnables apps to use the OpenMobile API to access secure elements(SE) to enable smart-card payments and other secure services.\n\nAn SE is a special chip (e.g SIM-card) for storing cryptographic secrets in a way that makes illicit use hard.\nThe Open Mobile Alliance (OPA) is a standards organization which develops open standards for the mobile phone industry.",
+        "removal": "caution",
+        "warning": "ColorOS password lock requires this package."
+    },
+    {
+        "id": "com.android.se.overlay.target",
+        "description": "Looks like needed to 'com.android.se'.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.server.NetworkPermissionConfig",
+        "description": "Network configurations.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.server.telecom",
+        "description": "Manages calls via your network provider or SIM and controls the phone modem?",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.server.telecom.a_overlay",
+        "description": "Overlay for com.android.server.telecom?",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.server.telecom.basiccolorblack.overlay",
+        "description": "Dark theme for something related to call network management?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.server.telecom.basiccolorwhite.overlay",
+        "description": "Light theme for something related to call network management?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.server.telecom.overlay.common",
+        "description": "Location and dialer things.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.settings",
+        "description": "AOSP Settings app.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.settings.basiccolorblack.overlay",
+        "description": "Dark theme overlay for the Settings app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.settings.basiccolorwhite.overlay",
+        "description": "Light theme overlay for the Settings app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.settings.intelligence",
+        "label": "Settings Suggestions",
+        "description": "Handles the search and suggestions features in the settings app.\nDoesn't run in the background, so there's little benefit in disabling.",
+        "web": [
+            "https://gitlab.com/W1nst0n/universal-android-debloater/-/issues/51"
+        ],
+        "removal": "caution",
+        "warning": "Disabling this package makes the Settings app crash when you tap on search."
+    },
+    {
+        "id": "com.android.settings.intelligence.basiccolorblack.overlay",
+        "description": "Dark theme overlay for the search functionality in the Settings app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.settings.intelligence.basiccolorwhite.overlay",
+        "description": "Light theme overlay for the search functionality in the Settings app?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.sharedstoragebackup",
+        "label": "com.android.sharedstoragebackup",
+        "description": "Used during backup. Backs up the shared storage? (files accessible by every app with STORAGE permission)\nThings have changed with Android 10. Don't know if this package is still relevant for new phones.",
+        "web": [
+            "https://blog.mindorks.com/understanding-the-scoped-storage-in-android"
+        ],
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.shell",
+        "description": "Shell\nUnix shell that receives ADB commands sent from a PC.\nThis is what UAD-ng uses to execute commands on Android devices. Proobably a bad idea to disable ;)",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.simappdialog",
+        "label": "SIM App Dialog",
+        "description": "Creates a pop-up asking if the user wants to install the carrier app when a SIM is inserted. Seems to be event-triggered, i.e., doesn't run in the background.",
+        "web": [
+            "https://android.googlesource.com/platform/frameworks/base/+/master/packages/SimAppDialog/src/com/android/simappdialog/InstallCarrierAppActivity.java"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.smspush",
+        "label": "com.android.smspush",
+        "description": "This service is used to push/send specially formatted SMS messages that display an alert message to the user, and give them the option of connecting directly to a particular app.\nFor instance, an SMS notifying the user of a new e-mail, with a URL link to connect directly to the e-mail app.",
+        "web": [
+            "https://web.archive.org/web/20200915164901/https://www.nowsms.com/doc/submitting-sms-messages/sending-wap-push-messages"
+        ],
+        "removal": "replace",
+        "suggestions": "sms",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.soundrecorder",
+        "label": "Sound Recorder",
+        "description": "AOSP Sound recorder. OEMs often use their own solution.\nSome phones (Huawei and Xiaomi) also use this package name for their own recorder app.",
+        "removal": "replace",
+        "suggestions": "audio_recorders"
+    },
+    {
+        "id": "com.android.statementservice",
+        "description": "Intent Filter Verification Service\nA Statement protocol allows websites to certify that some assets represent them. Android package can to subscribe to handling chosen URIs. This package will then be called to query the website and verify that it allows this. Android package can subscribe to handling chosen URIs. This package will then be called to query the website and verify that it allows this. Sources:\n- https://developer.android.com/reference/android/content/Intent\n- https://developer.android.com/guide/components/intents-filters\n - https://android.stackexchange.com/questions/191163/what-does-the-intent-filter-verification-service-app-from-google-do\n - https://github.com/google/digitalassetlinks/blob/master/well-known/details.md\n - https://android.googlesource.com/platform/frameworks/base/+/6a34bb2",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.stk",
+        "label": "SIM Toolkit",
+        "description": "Enables carriers to initiate \"value-added services\". Basically, some operators provide SIM-cards with applications installed on them.\nThis has been abused:\n- SimJacker \n- WIBattack.\nNOTE: removing this package removes the launcher icon. \"com.android.stk\" relies on \"com.android.stk2\" and vice-versa.",
+        "web": [
+            "https://en.wikipedia.org/wiki/SIM_Application_Toolkit#cite_note-CellularZA-1",
+            "https://thehackernews.com/2019/09/simjacker-mobile-hacking.html",
+            "https://www.zdnet.com/article/new-sim-card-attack-disclosed-similar-to-simjacker/",
+            "https://en.wikipedia.org/wiki/Mobile_identity_management"
+        ],
+        "removal": "caution",
+        "warning": "Disabling/uninstalling this package will break mobile identity management which could be used by apps (for example, your Bank) to authenticate you."
+    },
+    {
+        "id": "com.android.stk2",
+        "label": "SIM Toolkit",
+        "description": "Special package for dual-sim devices?\nEnables carriers to initiate \"value-added services\". Basically, some operators provide SIM-cards with applications installed on them.\nThis has been abused:\n- SimJacker \n- WIBattack.\nNOTE: removing this package removes the launcher icon. \"com.android.stk2\" relies on \"com.android.stk\" and vice-versa.",
+        "web": [
+            "https://en.wikipedia.org/wiki/SIM_Application_Toolkit#cite_note-CellularZA-1",
+            "https://thehackernews.com/2019/09/simjacker-mobile-hacking.html",
+            "https://www.zdnet.com/article/new-sim-card-attack-disclosed-similar-to-simjacker/",
+            "https://en.wikipedia.org/wiki/Mobile_identity_management"
+        ],
+        "removal": "caution",
+        "warning": "Vulnerable to hacking, should be disabled."
+    },
+    {
+        "id": "com.android.storagemanager",
+        "label": "Smart Storage",
+        "description": "Storage manager (Maintenance/Storage panel in the settings)\nClean up unused files, show size of files regrouped by categories.",
+        "removal": "caution",
+        "warning": "May break the storage settings in Android Settings."
+    },
+    {
+        "id": "com.android.systemui",
+        "description": "Everything you see in Android that's not an app. User interface of Android\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.systemui.accessibility.accessibilitymenu",
+        "description": "Hidden menu that only shows 2 buttons:\nLarge buttons - that increases size of accessibility menu buttons,\nand Help - that redirects to support google com site accessibility.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.systemui.accessibility.accessibilitymenu.auto_generated_rro_product__",
+        "description": "Product RRO for Accessibility menu.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.systemui.gesture.line.overlay",
+        "description": "Configurations to navigation bar.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.systemui.icon.overlay",
+        "description": "In code found configs icon mask.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.systemui.navigation.bar.overlay",
+        "description": "Configurations to navigation bar.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.systemui.overlay",
+        "description": "System UI Overlay. DO NOT remove this.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.systemui.overlay.common",
+        "description": "System UI Theme pack\nThe package name is pretty self-explanatory.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.systemui.theme.dark",
+        "label": "Dark",
+        "description": "Enables you to use Android dark theme.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.theme.font.notoserifsource",
+        "description": "Noto Serif / Source Sans Pro",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon.circle",
+        "label": "Circle",
+        "description": "Android icons pack [Circle]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon.pebble",
+        "label": "Pebble",
+        "description": "Android icons pack [Pebble]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon.square",
+        "label": "Square",
+        "description": "Android icons pack [Square]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon.taperedrect",
+        "label": "Tapered Rect",
+        "description": "Android icons pack [Taperedrect]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon.vessel",
+        "label": "Vessel",
+        "description": "Android icons pack [Vessel]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon_pack.rounded.systemui",
+        "label": "Rounded",
+        "description": "Android icons pack [Rounded]",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.theme.icon_pack.rounded.themepicker",
+        "label": "Rounded",
+        "description": "Obviously related to the \"rounded\" icon pack but the full package is strange. A themepicker class only for a specific icon package?",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.timezone.updater",
+        "label": "Time Zone Updater",
+        "description": "Automatically updates the clock to correspond to your current time zone.",
+        "removal": "caution",
+        "warning": "This may cause a bootloop if removed. Timezone packages often causes that."
+    },
+    {
+        "id": "com.android.traceur",
+        "label": "System Tracing",
+        "description": "Recording device activity over a short period of time is known as system tracing. System tracing produces a trace file that can be used to generate a system report.\nNot useful if you're not a developer.",
+        "web": [
+            "https://developer.android.com/topic/performance/tracing"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.uwb.resources",
+        "description": "Ultra-wideband (UWB) communication feature.\nUWB is a radio technology that enables precise ranging between devices,\nAllowing for accurate location measurements with an accuracy of 10 cm.\nhttps://developer.android.com/develop/connectivity/uwb\nhttps://source.android.com/docs/core/connect/uwb",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.virtualmachine.res",
+        "description": "unknown app with no code that only has permissions to Use, Manage, Debug: Virtual Machine.\nIntroduced in Android 14.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.voicedialer",
+        "label": "Voice Dialer",
+        "description": "The AOSP Voice dialer. Lets you call someone or open an app with your voice from the dialer.\nOEM often use their own code (embeded in their voice-controlled digital assistant)\nSome OEMs (Huawei, Sony, Xiaomi) also use this package name for their own voice dialer app.",
+        "removal": "replace",
+        "suggestions": "dialers"
+    },
+    {
+        "id": "com.android.vpndialogs",
+        "label": "VpnDialogs",
+        "description": "Provide VPN support to Android\nSafe to remove if you don't plan to use a VPN.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.wallpaper.holospiral",
+        "label": "Holo Spiral",
+        "description": "Built-in live wallpaper.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.wallpaper.livepicker",
+        "label": "Live Wallpaper Picker",
+        "description": "Enables you to pick a live wallpaper.",
+        "removal": "caution",
+        "warning": "Removing it will break some weather applications (especially ones with widgets) and wallpaper applications like Muzei."
+    },
+    {
+        "id": "com.android.wallpaper.livepicker.overlay",
+        "label": "com.android.wallpaper.livepicker.overlay",
+        "description": "Overlay for live wallpaper picker? Overlays are usually themes, but not sure about this one.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.wallpaperbackup",
+        "label": "com.android.wallpaperbackup",
+        "description": "Backs up and restores wallpaper and metadata related to it.\nThis agent has its own package because it does full backup as opposed to SystemBackupAgent which does key/value backup.\nThis class stages wallpaper files for backup by copying them into its own directory because of the following reasons:\nNon-system users don't have permission to read the directory that the system stores the wallpaper files in\nBackupAgent enforces that backed up files must live inside the package's getFilesDir()\nThere are 3 files to back up:\nThe \"wallpaper info\"  file which contains metadata like the crop applied to the wallpaper or the live wallpaper component name.\nThe \"system\" wallpaper file.\nAn optional \"lock\" wallpaper, which is shown on the lockscreen instead of the system wallpaper if set.\nOn restore, the metadata file is parsed and WallpaperManager APIs are used to set the wallpaper.\nNote that if there's a live wallpaper, the live wallpaper package name will be part of the metadata file and the wallpaper will be applied when the package it's installed.",
+        "web": [
+            "https://android.googlesource.com/platform/frameworks/base/+/master/packages/WallpaperBackup/src/com/android/wallpaperbackup/WallpaperBackupAgent.java"
+        ],
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.wallpapercropper",
+        "label": "com.android.wallpapercropper",
+        "description": "Wallpaper cropper.",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.wallpaperpicker",
+        "label": "com.android.wallpaperpicker",
+        "description": "Enables you to pick a wallpaper.",
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.webview",
+        "label": "Android System WebView",
+        "description": "enables Android apps to display web content within the app itself, based on Chrome.",
+        "removal": "caution",
+        "warning": "Make sure to have another Webview before uninstalling it or some apps may not work properly and crash.",
+        "suggestions": "webviews"
+    },
+    {
+        "id": "com.android.wifi.dialog",
+        "description": "Needed for wifi dialogs.\nCan brick basic functionality android.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.wifi.mainline.resources.overlay",
+        "description": "Related to the Wi-Fi module in the AOSP. The Wi-Fi module is a part of Project Mainline,\nWhich allows for updates to specific system components outside of the normal Android release cycle.\nThe package contains resources and overlays that are used to customize the Wi-Fi module.\nThese overlays can be used to override default configurations and customize the behavior of the Wi-Fi module\nhttps://source.android.com/docs/core/ota/modular-system/wifi\nhttps://www.xda-developers.com/android-project-mainline-modules-explanation",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.wifi.resources",
+        "label": "System Wi-Fi Resources",
+        "description": "System Wi-Fi resources.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.wifi.resources.overlay",
+        "label": "com.android.wifi.resources.overlay",
+        "description": "Contains resources that can be overlaid or customized to modify the behavior of the Wi-Fi module.\nhttps://source.android.com/docs/core/ota/modular-system/wifi",
+        "removal": "unsafe",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.wifi.resources.overlay.WifiResScanCountryCode",
+        "label": "com.android.wifi.resources.overlay.WifiResScanCountryCode",
+        "description": "Related to overlay for Wi-Fi scanning for country code.",
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.wifi.system.mainline.resources.overlay",
+        "description": "Related to the Wi-Fi module and its resources overlay.\nThe Wi-Fi module in Android is updatable, meaning it can receive updates to functionality outside of the normal Android release cycle.\nThe module provides a consistent Wi-Fi experience across Android devices and allows for fixes to interoperability issues through module updates\nhttps://source.android.com/docs/core/ota/modular-system/wifi",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.wifi.system.resources.overlay",
+        "description": "Contains resources that can be overlaid to customize the Wi-Fi module's behavior.\nhttps://source.android.com/docs/core/ota/modular-system/wifi",
+        "removal": "caution"
+    },
+    {
+        "id": "com.example.android.notepad",
+        "label": "NotePad",
+        "description": "(Bad) notepad app.",
+        "removal": "replace",
+        "suggestions": "note_taking_apps"
+    },
+    {
+        "id": "com.google.android.adservices.api",
+        "description": "Introduced in Android 13 privacy sandbox beta components disabled on default.\nhttps://source.android.com/docs/core/ota/modular-system/adservices",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.androidforwork",
+        "description": "Assistant Android Work\nNot needed, theres only user consent activity about that:\n(Your organization controls your device and keeps it secure)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.googlecamera.fishfood",
+        "description": "ApertureLensLauncher\nNot sure how it works but redirects to google app lens `com.google.android.googlequicksearchbox`.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.appsearch.apk",
+        "description": "AppSearch is an on-device search library for managing locally stored structured data, with APIs for indexing data and retrieving data using full-text search. Use it to build custom in-app search capabilities for your users.\nhttps://developer.android.com/jetpack/androidx/releases/appsearch",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.captiveportallogin",
+        "label": "CaptivePortalLogin",
+        "description": "it's the same as (com.android.captiveportallogin). Support for captive portal.\nA captive portal login is a web page where the users have to input their login information or accept the displayed terms of use. \nSome networks (typically public wifi network) use the captive portal login to block access until the user inputs \nsome necessary information\nNOTE : This package is a now a mandatory mainline module\nhttps://en.wikipedia.org/wiki/Captive_portal\nhttps://www.xda-developers.com/android-project-mainline-modules-explanation",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.carrierconfig",
+        "label": "com.google.android.carrierconfig",
+        "description": "Same as com.android.carrierconfig? Here's that description:\nDynamically provides configuration for the carrier network.\nThe config contains: Roaming networks, Voicemail settings, SMS/MMS settings, VoLTE/IMS settings, and more.\nIf a carrier app is installed it will be queried for overrides to these settings.\nSeems to run on boot and when you swap SIM card?",
+        "web": [
+            "https://source.android.com/devices/tech/config/carrier",
+            "https://cs.android.com/android/platform/superproject/+/master:packages/apps/CarrierConfig/src/com/android/carrierconfig/DefaultCarrierConfigService.java"
+        ],
+        "removal": "replace",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.connectivity.resources",
+        "label": "System Connectivity Resources",
+        "description": "Handles connectivity-related resources, such as Wi-Fi, Bluetooth, and cellular network management.",
+        "removal": "unsafe",
+        "warning": "Removing this packages causes a bootloop."
+    },
+    {
+        "id": "com.google.android.documentsui",
+        "label": "Files",
+        "description": "Occasionally runs in the background.\nFile selector for other apps.",
+        "removal": "unsafe",
+        "warning": "Storage Access Framework (SAF) will break if this is disabled."
+    },
+    {
+        "id": "com.google.android.email",
+        "label": "Email",
+        "description": "Newer versions of AOSP Mail are renamed to com.android.email and Gmail was migrated to com.google.android.gm",
+        "removal": "replace",
+        "suggestions": "email_clients"
+    },
+    {
+        "id": "com.google.android.ext.services",
+        "description": "The ExtServices module updates framework components for core OS functionality such as notification ranking, autofill text-matching strategies, storage cache, package watchdog, and other services that run continually. This module is updatable, meaning it can receive updates to functionality outside of the normal Android release cycle.\nCan run before the user unlocks the device (direct-boot aware) and Android 9+ version have internet and location permissions.\n\nWARNING: Causes bootloop on most Android 11+ phones. This module is related to the Android mainline project (which is a useful project).There is no reason to mess with this.\n\nSources:\nhttps://source.android.com/devices/architecture/modular-system/extservices\nhttps://arstechnica.com/gadgets/2016/11/android-extensions-could-be-googles-plan-to-make-android-updates-suck-less/\nPithus analysis (Android 11): https://beta.pithus.org/report/e5e4a181082b88baf55e19aab0f9cb62e131d612eeaa73cddb510a52e0ff5c1a",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.ext.shared",
+        "label": "Android Shared Library",
+        "description": "Used to share common code between apps.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.federatedcompute",
+        "description": "FederatedCompute.\nAnother component of OnDevicePersonalization. But this app learns things about users.\nIntroduced in Android 13.\nhttps://source.android.com/docs/core/ota/modular-system/ondevicepersonalization",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.gallery3d",
+        "description": "Built-in Gallery app.\nThe ID could be \"recycled\" by OEMs for their own gallery implementations.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.hotspot2.osulogin",
+        "description": "The sole purpose of the OsuLogin App is to provision credentials from the Wi-Fi network to the device and allow them to connect to Wi-Fi Hotspot 2.0. See https://hackanons.com/2021/07/osulogin-android-everything-you-need-to-know.html for more information.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.modulemetadata",
+        "description": "Module that contains metadata about the list of modules on the device. And that’s about it.\nI wouldn't advise you to mess with it as it could break important modules (see #37)\nGood explanation of what android modules are : https://www.xda-developers.com/android-project-mainline-modules-explanation/",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.nearby.halfsheet",
+        "description": "Useless frameworks to Wi-Fi connections, USB tethering, auto, usage.\nEvery version has random code and the app is not running in the background.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.networkstack",
+        "description": "Network Stack Components\nhttps://source.android.com/devices/architecture/modular-system/networking\nProvides common IP services, network connectivity monitoring, and captive login portal detection.\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.networkstack.overlay",
+        "description": "WiFi will not work after remove.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.networkstack.permissionconfig",
+        "description": "Network Stack Permission Configuration\nDefines a permission that enables modules to perform network-related tasks.\nhttps://source.android.com/devices/architecture/modular-system/networking\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.networkstack.tethering",
+        "label": "Tethering",
+        "description": "Used for USB and/or Wi-Fi tethering?",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.networkstack.tethering.overlay",
+        "label": "com.google.android.networkstack.tethering.overlay",
+        "description": "Needed for tethering? I found: arrays.xml\narray name (config_tether_usb_regexs)\nitem rndis d\nitem usb d",
+        "removal": "unsafe",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.ondevicepersonalization.services",
+        "description": "OnDevicePersonalization.\nAnother thing to AdServices privacy sandbox.\nIntroduced in Android 13.\nhttps://source.android.com/docs/core/ota/modular-system/ondevicepersonalization",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.managedprovisioning",
+        "description": "In code I have seen lists of some system apps and stuff of `managedprovisioning` user.\nSafe to remove if you removed `com.android.managedprovisioning`.\nBut it probably doesn't affect anything.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.modules.captiveportallogin.forframework",
+        "description": "Configs default captiveportallogin. (not needed)\nNo effects after remove.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.modules.cellbroadcastservice",
+        "description": "",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.modules.ext.services",
+        "label": "com.google.android.overlay.modules.ext.services",
+        "dependencies": [
+            "com.google.android.ext.services"
+        ],
+        "description": "It's overlay that depends on (com.google.android.ext.services)",
+        "removal": "unsafe",
+        "warning": "Removing it causes bootloop."
+    },
+    {
+        "id": "com.google.android.overlay.modules.permissioncontroller",
+        "label": "com.google.android.overlay.modules.permissioncontroller",
+        "description": "I only detect on this app: help_app_permissions (link below). It looks very useless, not needed.\nIt doesnt affect com.google.android.permissioncontroller",
+        "web": [
+            "https://support.google.com/googleplay/answer/6270602"
+        ],
+        "removal": "delete",
+        "warning": "when disabling this package on a Samsung N960F running Android Q, the pop-up UI reverts. Disabling this package (as it's an overlay) will also put the pop-up UI to (like full-screen notification) to the center instead of the bottom."
+    },
+    {
+        "id": "com.google.android.overlay.modules.permissioncontroller.forframework",
+        "label": "com.google.android.overlay.modules.permissioncontroller.forframework",
+        "description": "config_incidentReportApproverPackage\nIt looks very useless.\nNot needed, it doesnt affect on (com.google.android.permissioncontroller)",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.permissioncontroller",
+        "description": "Breaks Google Play System updates (GPSu), related to Project Mainline. Page on Settings will crash altogether, or ask Play Store to be updated.\nhttps://support.google.com/product-documentation/answer/14343500",
+        "dependencies": [
+            "com.android.vending"
+        ],
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.packageinstaller",
+        "description": "Google package installer. Seems to replace com.android.packageinstaller on newer phones. It is strangely not needed on older devices (you can still install APKs without it by using the AOSP package installer) but since Android 9, it also handles permissions control and could bootloop your device if removed.\nOn Android 8.1, disabling the app also disabled the 'Permissions' settings within all the apps. Besides that, I couldn't install an '.apk' file download from outside the Play Store.\nSource: https://source.android.com/docs/core/architecture/modular-system/permissioncontroller.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.packageinstaller.a_overlay",
+        "description": "Gives ability to install, update or remove applications on the device.\nIf you delete this package, your phone will probably bootloop.\n",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.permissioncontroller",
+        "description": "Permission controller\nControls app permissions.\nhttps://source.android.com/devices/architecture/modular-system/permissioncontroller",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.photopicker",
+        "description": "Photo picker\nProvides a browsable interface that presents the user with their media library, sorted by date from newest to oldest. Safe, built-in way for users to grant your app access to only selected images and videos, instead of their entire media library.\nhttps://developer.android.com/training/data-storage/shared/photopicker",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.printservice.recommendation",
+        "label": "Print Service Recommendation Service",
+        "description": "I think this has to do with recommending a printservice app you can get from the Play store. I think printing still works with this off.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.providers.media.module",
+        "label": "Media",
+        "description": "In Android 11+ this provides file access to apps without \"Manage All Files\" permission. In previous versions it's just an index of all audio-visual (no text) files in the user's file-system (`/sdcard/`, `/storage/emulated/0/`, etc...). This allows music-players and photo-galleries to list files quickly, without caching their own indices..\nContent providers encapsulate data, providing centralized management of data shared between apps.",
+        "web": [
+            "https://developer.android.com/guide/topics/providers/content-providers.html"
+        ],
+        "removal": "unsafe",
+        "warning": "Breaks file browsers and other forms of file access."
+    },
+    {
+        "id": "com.google.android.safetycenter.resources",
+        "label": "Google Safety Center Resources",
+        "description": "Google Safe Browsing.",
+        "web": [
+            "https://www.android.com/safety/"
+        ],
+        "removal": "caution",
+        "warning": "Crashes Security and Privacy settings if removed."
+    },
+    {
+        "id": "com.google.android.sdksandbox",
+        "description": "Introduced in Android 13 privacy sandbox beta disabled on default.\nCauses bootloop. Maybe this component is not only for privacy... (I think it's for testing privacy sandbox using Android Studio.)\nhttps://source.android.com/docs/core/ota/modular-system/adservices\nCause BOOTLOOP.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.speech.pumpkin",
+        "description": "PumpkinService\nHas something to speech.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.mainline.adservices",
+        "description": "Adservices Train Version Package. AdServices too.\nuses ondevicepersonalization.\nIntroduced in Android 13\nNOTE: This package is a mandatory mainline module, which is also not documented. I don't trust it when it comes to adservices.",
+        "removal": "delete"
+    },
+    {
+        "id": "org.chromium.webview_shell",
+        "description": "Simple Browser for WebView tester used in AOSP.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.companiondevicemanager.auto_generated_characteristics_rro",
+        "label": "Companion Device Manager Auto-Generated Characteristics RRO",
+        "description": "Auto-generated Runtime Resource Overlay used for Permission Controller's per-device characteristic descriptions (Wear / Glasses / TV companion devices).",
+        "removal": "unsafe",
+        "warning": "Build-system-generated overlay; removing produces missing strings in Companion Device Manager dialogs."
+    },
+    {
+        "id": "com.android.devicediagnostics",
+        "label": "Android Device Diagnostics",
+        "description": "Pixel / partner Device Diagnostics app that runs hardware self-tests (display, sensors, charging) and surfaces results in Settings > About > Diagnostics.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.phone.auto_generated_characteristics_rro",
+        "label": "Phone Auto-Generated Characteristics RRO",
+        "description": "Auto-generated Runtime Resource Overlay carrying default configuration values for the Phone (Telephony) service.",
+        "removal": "unsafe",
+        "warning": "Build-system-generated overlay; removing can break carrier-config-driven dialer behaviour."
+    },
+    {
+        "id": "com.android.providers.contactkeys",
+        "label": "Android Contact Keys Provider",
+        "description": "AOSP provider added in Android 14 (E2EE Contact Keys API) that lets messaging apps surface and verify per-contact end-to-end encryption keys via the system Contacts UI.",
+        "web": [
+            "https://developer.android.com/about/versions/14/features#contact-key-management"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing breaks the E2EE Contact Keys API for any app that integrates it (Signal, Google Messages, etc.)."
+    },
+    {
+        "id": "com.android.providers.telephony.auto_generated_characteristics_rro",
+        "label": "Telephony Provider Auto-Generated Characteristics RRO",
+        "description": "Auto-generated Runtime Resource Overlay for the Telephony content provider's default values (APN templates, MMS sizes, carrier hints).",
+        "removal": "unsafe",
+        "warning": "Removing can break SMS / MMS / APN configuration."
+    },
+    {
+        "id": "com.android.virtualization.terminal",
+        "label": "Android Linux Terminal (AVF)",
+        "description": "Android 15+ Linux Terminal app built on the Android Virtualization Framework (AVF). Boots a minimal Debian VM directly on supported devices.",
+        "web": [
+            "https://source.android.com/docs/core/virtualization",
+            "https://android-developers.googleblog.com/2025/03/linux-terminal-on-android.html"
+        ],
+        "removal": "delete",
+        "warning": "Removing only loses the Linux Terminal feature itself. AVF infrastructure is provided by other modules and remains."
+    },
+    {
+        "id": "android.ext.shared",
+        "description": "Android Shared Library, removing may cause a bootloop.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.wifi.resources.overlay",
+        "description": "A google mainline module overlay for com.android.wifi.resources, which might be useless if gms is removed, as it only provides gms customizations for Wi-Fi, not android system customizations.\n Only safe to remove if you have removed gms.\n There's no such package as com.google.android.wifi.resources, but only com.android.wifi.resources. And there are multiple packages with such names, that cause no damage when removed.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.providers.partnerbrowsercustomizations",
+        "description": "Provides browser customizations from partners (for chrome only). Total bloatware, especialy useless if you use another browser than Chrome.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.uwb.resources.overlay.common",
+        "description": "Overlay for UWB (Ultra-Wideband) resources. Used for device-to-device ranging and location features.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.setupwizard",
+        "description": "An overlay for com.google.android.setupwizard. Safe to remove if com.google.android.setupwizard has been removed.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.wifi.resources.overlay.common",
+        "description": "An overlay-google addition for `com.android.wifi.resources`, presumably Google bloat.\nA user reported some issues with Hotspot",
+        "removal": "replace"
+    },
+    {
+        "id": "android.ui.overlay.ct",
+        "description": "An overlay that customizes Android UI for the China Telecom operator (3rd largest operator in China).\nSafe to remove if you don't live in china or don't use/plan to use this carrier. Often present on ROMs and devices outside of China.",
+        "removal": "replace"
+    },
+    {
+        "id": "android.aosp.overlay.telephony",
+        "description": "Likely an important overlay for telephony services and com.android.providers.telephony. Not safe to delete.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.providers.settings.overlay",
+        "description": "Required for com.android.providers.settings. Not safe to delete.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.android.overlay.circletosearch",
+        "description": "An overlay likely deeply tied with system ui, because it causes a soft brick (all system apps suddenly crashing and inability to launch any app or process after that) on HyperOS 2.0.\nWill most likely also bootloop your device. Totally NOT safe to delete.",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.settings.intelligence",
+        "description": "Setting Services. Adds the main search bar for the settings app (the one at the top on the default page).\n",
+        "removal": "replace"
+    },
+    {
+        "id": "com.android.phasebeamorange",
+        "description": "\"Sun Beam\" live wallpaper. Just Phase Beam but orange.",
+        "removal": "delete"
+    }
+]

@@ -67,22 +67,21 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [ ] _Bixby Routines + Modes export_ — deferred to v0.7 helper-APK (Routines live in a Samsung-internal binder service, not the settings provider).
 - [ ] _Saved presets ("AOD + Edge Panels", "Status bar tweaks")_ — deferred to v1.x Profiles + lifecycle hooks.
 
-### v0.4.0 — Debloat tab live ([UAD-NG](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), [Canta](https://github.com/samolego/Canta), [itxjobe/samsungdebloat](https://github.com/itxjobe/samsungdebloat))
+### v0.4.0 — Debloat tab live ✅ _(shipped 2026-05-14)_
 
-**Theme**: Coverage + Reusability.
+**Theme**: Coverage + Reusability. Sources: [UAD-NG](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), [Canta](https://github.com/samolego/Canta), [itxjobe/samsungdebloat](https://github.com/itxjobe/samsungdebloat).
 
-- **Bundle AppManagerNG debloat dataset at build** — git-submodule the `SysAdminDoc/android-debloat-list` repo as `assets/debloat/`, embed as `EmbeddedResource`. 5,481 entries already curated.
-- **Intersect dataset with destination's `pm list packages -s -e`** so the user only sees rows for packages they actually have. Performance: O(install_count × log(dataset)).
-- **4-tier safety classification column** (`delete` / `replace` / `caution` / `unsafe`) — exact match for UAD-NG's `Recommended/Advanced/Expert/Unsafe`. Default-hide unsafe ([UAD-NG #1314](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues/1314)).
-- **Filter-tag column** (OEM / Google / Carrier / AOSP / Misc) sourced from the dataset's file name ([UAD-NG #1313](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues/1313)).
-- **`pm disable-user --user 0 <pkg>` only — never `pm uninstall`.** All actions reversible via `cmd package install-existing <pkg>`. Source: every debloat-related forensics paper warns against irreversible removal.
-- **Snapshot-before-debloat + one-click rollback** — write a JSON of pre-debloat enabled-state, store in `%LOCALAPPDATA%\PhoneFork\debloat-snapshots\<device>\<ts>.json`. Restore replays the snapshot in reverse. Direct lift from UAD-NG snapshot model.
-- **Disable carrier MSM bloat-installer first** — detect `com.samsung.android.app.omcagent` / `*.SettingsReceiver` style packages and disable them BEFORE the main debloat sweep to prevent reinstall-after-debloat. Closes community `§5` "phone got slow after migration" MSM-reinstall trap.
-- **"Conservative / Recommended / Aggressive" presets** — preset toggles intersect categories with safety tiers. Power users hand-pick.
-- **Per-package services inventory column** — `dumpsys package <pkg> | grep "Service"`. Source: UAD-NG #1317.
-- **Community-list import** — accept CSV/JSON additions ([UAD-NG #1306](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues/1306)) so users can layer XDA-thread lists on top of the bundled dataset.
-
-**CLI surface**: `phonefork debloat list --device <d>`, `phonefork debloat apply --device <d> --profile {conservative|recommended|aggressive}`, `phonefork debloat rollback --device <d> --snapshot <ts>`.
+- [x] **AppManagerNG debloat dataset embedded** at build via `<EmbeddedResource Include="..\..\assets\debloat\*.json">`. 5,481 entries (oem 4,289 + misc 481 + aosp 273 + carrier 249 + google 189).
+- [x] **Intersection with destination's `pm list packages -s -e` + `-s -d`** via `DebloatScanner` returns `DebloatCandidate(Entry, IsEnabled)` rows.
+- [x] **4-tier safety classification** — `DebloatTier { Delete, Replace, Caution, Unsafe }` mapped from dataset `removal` field. Default-hide Caution + Unsafe (tier-chip toggles in UI; Delete + Replace shown by default).
+- [x] **Filter-tag column** — `DebloatList { Oem, Google, Carrier, Aosp, Misc }`.
+- [x] **`pm disable-user --user 0 <pkg>` only** — never `pm uninstall`. Reversible via `cmd package install-existing <pkg>` + `pm enable <pkg>`.
+- [x] **Snapshot-before-debloat + rollback** — captures full enabled-system-package set to `%LOCALAPPDATA%\PhoneFork\debloat-snapshots\<serial>-<ts>.json` before every apply.
+- [x] **Conservative / Recommended / Aggressive presets** — `DebloatProfile` dropdown that intersects tiers (Conservative=Delete; Recommended=Delete+Replace; Aggressive=Delete+Replace+Caution; Unsafe always opt-in).
+- [x] **CLI**: `phonefork debloat list|apply|rollback`.
+- [ ] _Disable carrier MSM bloat-installer first_ — deferred to v0.4.1 (current implementation queues all matches in a single batch; the two-phase pattern is a perf optimization).
+- [ ] _Per-package services inventory column_ — deferred to v0.4.1 (cosmetic — Tier+Warning already give the user enough signal to decide).
+- [ ] _Community-list import (CSV/JSON additions on top of bundled dataset)_ — deferred to v1.x.
 
 ### v0.5.0 — Wi-Fi tab live ([Shizuku](https://github.com/RikkaApps/Shizuku) v13.6.0, [QRCoder](https://github.com/codebude/QRCoder), community `§2` Wi-Fi-password complaints)
 

@@ -38,6 +38,17 @@ app.Configure(config =>
         settings.AddCommand<SettingsApplyCommand>("apply")
             .WithDescription("Capture both devices live and apply source -> destination via settings put.");
     });
+
+    config.AddBranch("debloat", debloat =>
+    {
+        debloat.SetDescription("Apply AppManagerNG/UAD-NG curated debloat list. Reversible via snapshot rollback.");
+        debloat.AddCommand<DebloatListCommand>("list")
+            .WithDescription("List packages on the device that intersect the dataset.");
+        debloat.AddCommand<DebloatApplyCommand>("apply")
+            .WithDescription("Disable matched packages by profile or explicit allowlist. Snapshots pre-state for rollback.");
+        debloat.AddCommand<DebloatRollbackCommand>("rollback")
+            .WithDescription("Re-enable packages that were disabled by a prior apply, using its snapshot JSON.");
+    });
 });
 
 return await app.RunAsync(args);

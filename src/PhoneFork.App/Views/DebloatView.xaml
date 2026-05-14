@@ -1,0 +1,74 @@
+<UserControl x:Class="PhoneFork.App.Views.DebloatView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PhoneFork.App.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:DebloatViewModel}">
+
+    <DockPanel>
+        <!-- Action row -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button Content="Scan"           Command="{Binding ScanCommand}"          Margin="0,0,8,0"/>
+                    <Button Content="Apply Profile"  Command="{Binding ApplyProfileCommand}"  Margin="0,0,4,0"/>
+                    <Button Content="Select None"    Command="{Binding SelectNoneCommand}"     Margin="0,0,16,0"/>
+                    <TextBlock Text="Profile:" VerticalAlignment="Center" Margin="0,0,6,0"
+                               Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding Profile}" MinWidth="140" Margin="0,0,16,0"/>
+                    <Button Content="Disable Selected" Command="{Binding ApplyCommand}" Style="{StaticResource AccentButton}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <TextBlock Text="Filter:" VerticalAlignment="Center" Margin="0,0,6,0"
+                               Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" MinWidth="180" Margin="0,0,16,0"/>
+                    <CheckBox Content="Dry-run" IsChecked="{Binding DryRun}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Filter chips row -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,12">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <TextBlock Text="Tier:" Foreground="{StaticResource ForegroundMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <CheckBox Content="Delete"  IsChecked="{Binding ShowDelete}"  VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{StaticResource MochaGreenBrush}"/>
+                    <CheckBox Content="Replace" IsChecked="{Binding ShowReplace}" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{StaticResource MochaSapphireBrush}"/>
+                    <CheckBox Content="Caution" IsChecked="{Binding ShowCaution}" VerticalAlignment="Center" Margin="0,0,12,0" Foreground="{StaticResource MochaPeachBrush}"/>
+                    <CheckBox Content="Unsafe"  IsChecked="{Binding ShowUnsafe}"  VerticalAlignment="Center" Margin="0,0,24,0" Foreground="{StaticResource MochaRedBrush}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
+                    <TextBlock Text="State:" Foreground="{StaticResource ForegroundMutedBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <CheckBox Content="Enabled"  IsChecked="{Binding IncludeEnabled}"  VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <CheckBox Content="Disabled" IsChecked="{Binding IncludeDisabled}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Status row -->
+        <Border DockPanel.Dock="Top" Margin="0,0,0,12">
+            <TextBlock Text="{Binding Status}" Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap"/>
+        </Border>
+
+        <!-- Diff table -->
+        <Border Style="{StaticResource Card}" Padding="0">
+            <DataGrid ItemsSource="{Binding FilteredRows}"
+                      RowHeight="30"
+                      Background="Transparent"
+                      BorderThickness="0">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header=" " Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" Width="40"/>
+                    <DataGridTextColumn Header="Package"  Binding="{Binding PackageId}" Width="2.4*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Label"    Binding="{Binding Label}"     Width="1.6*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Tier"     Binding="{Binding Tier}"      Width="80"   IsReadOnly="True"/>
+                    <DataGridTextColumn Header="List"     Binding="{Binding List}"      Width="80"   IsReadOnly="True"/>
+                    <DataGridTextColumn Header="State"    Binding="{Binding OnDevice}"  Width="80"   IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Status"   Binding="{Binding Status}"    Width="1.2*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Warning"  Binding="{Binding Warning}"   Width="2*"   IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </DockPanel>
+</UserControl>

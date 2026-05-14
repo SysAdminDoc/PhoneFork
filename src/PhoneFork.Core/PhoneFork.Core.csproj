@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\..\assets\debloat\*.json">
+      <Link>Assets\Debloat\%(Filename)%(Extension)</Link>
+      <LogicalName>PhoneFork.Core.Assets.Debloat.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
     <PackageReference Include="AlphaOmega.ApkReader" Version="2.0.10" />
     <PackageReference Include="CliWrap" Version="3.10.1" />
