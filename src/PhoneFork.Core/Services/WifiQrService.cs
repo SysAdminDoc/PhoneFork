@@ -42,6 +42,7 @@ public static class WifiQrService
         using var qrData = qrGen.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
         using var pngQr = new PngByteQRCode(qrData);
         var bytes = pngQr.GetGraphic(pixelsPerModule);
+        EnsureOutputDirectory(outPath);
         File.WriteAllBytes(outPath, bytes);
         return outPath;
     }
@@ -56,7 +57,15 @@ public static class WifiQrService
         using var qrData = qrGen.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
         var svgQr = new SvgQRCode(qrData);
         var svg = svgQr.GetGraphic(pixelsPerModule);
+        EnsureOutputDirectory(outPath);
         File.WriteAllText(outPath, svg);
         return outPath;
+    }
+
+    private static void EnsureOutputDirectory(string outPath)
+    {
+        var dir = Path.GetDirectoryName(Path.GetFullPath(outPath));
+        if (!string.IsNullOrWhiteSpace(dir))
+            Directory.CreateDirectory(dir);
     }
 }

@@ -14,7 +14,7 @@ public sealed record SettingsApplyResult(
 
 /// <summary>
 /// Applies a subset of <see cref="SettingsDiffEntry"/> rows to the destination via
-/// <c>settings put NS KEY VAL</c>. Hard-blocks a small allowlist of known-locked keys
+/// <c>settings put NS KEY VAL</c>. Hard-blocks a small blocklist of known-locked keys
 /// where the call would <c>SecurityException</c> from shell UID.
 /// </summary>
 public sealed class SettingsApplyService
@@ -91,8 +91,7 @@ public sealed class SettingsApplyService
                 // Quote the value to survive whitespace and shell metas. The settings shim accepts
                 // a single quoted argument as the entire value.
                 var nsName = entry.Namespace.ToString().ToLowerInvariant();
-                var quoted = QuoteForShell(value);
-                var cmd = $"settings put {nsName} {entry.Key} {quoted}";
+                var cmd = $"settings put {nsName} {AdbShell.Arg(entry.Key)} {AdbShell.Arg(value)}";
                 var output = await _client.ShellAsync(destination, cmd, ct);
                 if (!string.IsNullOrWhiteSpace(output) && output.Contains("Exception", StringComparison.Ordinal))
                 {
@@ -136,7 +135,7 @@ public sealed class SettingsApplyService
         {
             if (string.IsNullOrEmpty(remote)) return;
             var uri = $"file://{remote}";
-            var cmd = $"settings put system {key} {QuoteForShell(uri)}";
+            var cmd = $"settings put system {AdbShell.Arg(key)} {AdbShell.Arg(uri)}";
             try
             {
                 var output = await _client.ShellAsync(destination, cmd, ct);
@@ -153,13 +152,5 @@ public sealed class SettingsApplyService
         await ApplyOne("alarm_alert", alarmRemotePath);
         return applied;
     }
-
-    private static string QuoteForShell(string value)
-    {
-        // Wrap in single quotes; escape any inner single-quotes with the standard `'\''` dance.
-        var escaped = value.Replace("'", "'\\''");
-        return $"'{escaped}'";
-    }
-
     private static string Truncate(string s, int max) => s.Length <= max ? s : s[..max] + "…";
 }

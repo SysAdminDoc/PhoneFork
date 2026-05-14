@@ -149,7 +149,7 @@ public partial class WifiViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(QrSsid)) return;
         var net = new WifiNetwork { Ssid = QrSsid, Psk = QrPsk, Auth = QrAuth, Hidden = QrHidden };
-        var safe = string.Concat(QrSsid.Select(c => char.IsLetterOrDigit(c) || c is '-' or '_' ? c : '_'));
+        var safe = LocalPathNames.SafeFileName(QrSsid, "wifi-network");
         var dir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "PhoneFork", "wifi-qrs");

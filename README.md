@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.6.7-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.6.8-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -62,6 +62,7 @@ phonefork connect <ip:connect-port>
 git clone https://github.com/SysAdminDoc/PhoneFork.git
 cd PhoneFork
 dotnet build -c Release
+dotnet test -c Release
 dotnet run --project src/PhoneFork.App
 ```
 

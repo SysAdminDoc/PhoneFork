@@ -4,4 +4,7 @@
     <Project Path="src/PhoneFork.Cli/PhoneFork.Cli.csproj" />
     <Project Path="src/PhoneFork.Core/PhoneFork.Core.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj" />
+  </Folder>
 </Solution>

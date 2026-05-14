@@ -28,18 +28,10 @@ public partial class DeviceCardViewModel : ObservableObject
     public string Serial => Phone.Serial;
     public string AndroidLine => string.IsNullOrEmpty(Phone.OneUiVersion)
         ? $"Android {Phone.AndroidVersion}"
-        : $"Android {Phone.AndroidVersion} \u00B7 One UI {FormatOneUi(Phone.OneUiVersion)}";
+        : $"Android {Phone.AndroidVersion} \u00B7 One UI {Phone.FormattedOneUiVersion}";
 
     public string StatusText => Phone.IsAuthorized ? "Ready" : "Unauthorized — accept USB debugging prompt";
     public bool IsAuthorized => Phone.IsAuthorized;
-
-    private static string FormatOneUi(string raw)
-    {
-        // ro.build.version.oneui is encoded as <major><minor><patch>, e.g. 80000 = 8.0.0
-        if (raw.Length >= 5 && int.TryParse(raw, out var n))
-            return $"{n / 10000}.{(n / 100) % 100}.{n % 100}";
-        return raw;
-    }
 }
 
 public partial class DeviceBarViewModel : ObservableObject

@@ -53,7 +53,8 @@ public sealed class AppCatalogService
             ct.ThrowIfCancellationRequested();
 
             // pm path returns one or more package:/path/foo.apk lines (base + splits).
-            var pathsOut = await _client.ShellAsync(device, $"pm path {pkg}", ct);
+            var pkgArg = AdbShell.PackageArg(pkg);
+            var pathsOut = await _client.ShellAsync(device, $"pm path {pkgArg}", ct);
             var remotePaths = (pathsOut ?? "")
                 .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .Where(s => s.StartsWith("package:", StringComparison.Ordinal))
@@ -71,7 +72,7 @@ public sealed class AppCatalogService
 
             try
             {
-                var dump = await _client.ShellAsync(device, $"dumpsys package {pkg}", ct);
+                var dump = await _client.ShellAsync(device, $"dumpsys package {pkgArg}", ct);
                 if (!string.IsNullOrEmpty(dump))
                 {
                     var lm = AppLabel.Match(dump);
@@ -90,7 +91,7 @@ public sealed class AppCatalogService
                 // Best-effort total size via `stat -c %s` per split (cheap on shell).
                 foreach (var p in remotePaths)
                 {
-                    var sz = await _client.ShellAsync(device, $"stat -c %s {Quote(p)}", ct);
+                    var sz = await _client.ShellAsync(device, $"stat -c %s {AdbShell.Arg(p)}", ct);
                     if (long.TryParse((sz ?? "").Trim(), out var n)) totalSize += n;
                 }
             }
@@ -114,6 +115,4 @@ public sealed class AppCatalogService
         _log.Information("Enumerated {Count} user apps on {Serial}", apps.Count, device.Serial);
         return apps;
     }
-
-    private static string Quote(string path) => $"\"{path.Replace("\"", "\\\"")}\"";
 }

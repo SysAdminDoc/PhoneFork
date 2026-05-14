@@ -33,7 +33,7 @@ public sealed class WifiQrCommand : Command<WifiQrCommand.Settings>
     {
         var auth = Enum.TryParse<WifiAuth>(s.Auth, ignoreCase: true, out var a) ? a : WifiAuth.Wpa;
         var net = new WifiNetwork { Ssid = s.Ssid, Psk = s.Psk, Auth = auth, Hidden = s.Hidden };
-        var outPath = s.Out ?? $"{Sanitize(s.Ssid)}.png";
+        var outPath = s.Out ?? $"{LocalPathNames.SafeFileName(s.Ssid, "wifi-network")}.png";
 
         var payload = WifiQrService.BuildPayload(net);
         AnsiConsole.MarkupLine($"[grey]Payload:[/] {Markup.Escape(payload)}");
@@ -50,6 +50,4 @@ public sealed class WifiQrCommand : Command<WifiQrCommand.Settings>
         }
         return 0;
     }
-
-    private static string Sanitize(string s) => string.Concat(s.Select(c => char.IsLetterOrDigit(c) || c is '-' or '_' ? c : '_'));
 }

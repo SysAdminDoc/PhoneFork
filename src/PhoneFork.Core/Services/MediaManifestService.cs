@@ -52,7 +52,8 @@ public sealed class MediaManifestService
         var root = cat.RemotePath();
         // First confirm the category root exists; missing roots are normal (e.g. WhatsApp on phones
         // without it installed). Skip cleanly with an empty manifest.
-        var probe = await _client.ShellAsync(device, $"[ -d \"{root}\" ] && echo Y || echo N", ct);
+        var quotedRoot = AdbShell.Arg(root);
+        var probe = await _client.ShellAsync(device, $"[ -d {quotedRoot} ] && echo Y || echo N", ct);
         if (!probe.Trim().StartsWith("Y", StringComparison.Ordinal))
         {
             return new MediaCategoryManifest
@@ -65,7 +66,7 @@ public sealed class MediaManifestService
 
         // find -printf is available on Toybox (Android 6+). %P is path-relative-to-arg, %s is bytes,
         // %T@ is mtime as epoch.fractional. Tab-separated for trivial split.
-        var cmd = $"find \"{root}\" -type f -printf '%P\\t%s\\t%T@\\n'";
+        var cmd = $"find {quotedRoot} -type f -printf '%P\\t%s\\t%T@\\n'";
         var output = await _client.ShellAsync(device, cmd, ct);
 
         var files = new List<MediaFile>();

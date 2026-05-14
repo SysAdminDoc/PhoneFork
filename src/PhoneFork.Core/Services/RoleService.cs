@@ -36,7 +36,7 @@ public sealed class RoleService
             ct.ThrowIfCancellationRequested();
             // `cmd role get-role-holders <role>` prints either nothing, or "package:<pkg>" possibly
             // followed by other text, or "[<pkg>]" depending on Android version. Match either.
-            var output = await _client.ShellAsync(device, $"cmd role get-role-holders --user 0 {role}", ct);
+            var output = await _client.ShellAsync(device, $"cmd role get-role-holders --user 0 {AdbShell.Arg(role)}", ct);
             string? holder = null;
             var m = CmdRolePackageLine.Match(output ?? "");
             if (m.Success)
@@ -77,7 +77,7 @@ public sealed class RoleService
             if (dryRun) { applied++; continue; }
             try
             {
-                var output = await _client.ShellAsync(destination, $"cmd role add-role-holder --user 0 {role} {pkg}", ct);
+                var output = await _client.ShellAsync(destination, $"cmd role add-role-holder --user 0 {AdbShell.Arg(role)} {AdbShell.PackageArg(pkg)}", ct);
                 if (string.IsNullOrWhiteSpace(output) || !output.Contains("Exception", StringComparison.Ordinal))
                     applied++;
                 else
@@ -102,8 +102,8 @@ public sealed class RoleService
     /// return the raw shell output for diagnostics.
     /// </summary>
     public async Task<string> GrantAsync(DeviceData device, string pkg, string permission, CancellationToken ct = default)
-        => await _client.ShellAsync(device, $"pm grant {pkg} {permission}", ct);
+        => await _client.ShellAsync(device, $"pm grant {AdbShell.PackageArg(pkg)} {AdbShell.Arg(permission)}", ct);
 
     public async Task<string> SetAppOpAsync(DeviceData device, string pkg, string op, string mode, CancellationToken ct = default)
-        => await _client.ShellAsync(device, $"appops set {pkg} {op} {mode}", ct);
+        => await _client.ShellAsync(device, $"appops set {AdbShell.PackageArg(pkg)} {AdbShell.Arg(op)} {AdbShell.Arg(mode)}", ct);
 }

@@ -43,23 +43,10 @@ public sealed class AppInstallerService
         CancellationToken ct)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        var pkgCache = Path.Combine(_cacheRoot, source.Serial, app.PackageName);
-        Directory.CreateDirectory(pkgCache);
-        var localFiles = new List<string>();
-
         try
         {
             // 1) Pull every split APK to the local cache.
-            foreach (var remote in app.RemoteApkPaths)
-            {
-                ct.ThrowIfCancellationRequested();
-                var name = Path.GetFileName(remote);
-                var local = Path.Combine(pkgCache, name);
-                progress?.Report($"Pulling {app.PackageName}/{name}…");
-                _log.Information("Pull {Pkg} {Remote} -> {Local}", app.PackageName, remote, local);
-                await PullAsync(source, remote, local, ct);
-                localFiles.Add(local);
-            }
+            var localFiles = await PullApksToCacheAsync(source, app, progress, ct);
 
             // 2) install-multiple on destination with Play-Store attribution.
             progress?.Report($"Installing {app.PackageName}…");
@@ -104,10 +91,71 @@ public sealed class AppInstallerService
         }
     }
 
+    public async Task<IReadOnlyList<string>> PullApksToCacheAsync(
+        DeviceData source,
+        AppInfo app,
+        IProgress<string>? progress,
+        CancellationToken ct)
+    {
+        if (!AdbShell.IsPackageName(app.PackageName))
+            throw new ArgumentException($"Invalid Android package identifier: {app.PackageName}", nameof(app));
+
+        var pkgCache = Path.Combine(
+            _cacheRoot,
+            LocalPathNames.SafeFileName(source.Serial, "device"),
+            LocalPathNames.SafeFileName(app.PackageName, "package"));
+        Directory.CreateDirectory(pkgCache);
+
+        var localFiles = new List<string>(app.RemoteApkPaths.Count);
+        var usedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        for (var i = 0; i < app.RemoteApkPaths.Count; i++)
+        {
+            ct.ThrowIfCancellationRequested();
+            var remote = app.RemoteApkPaths[i];
+            var rawName = remote.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+            var name = LocalPathNames.SafeFileName(rawName, $"split-{i + 1}.apk");
+            if (!name.EndsWith(".apk", StringComparison.OrdinalIgnoreCase))
+                name += ".apk";
+
+            var candidate = name;
+            var suffix = i + 1;
+            while (!usedNames.Add(candidate))
+            {
+                candidate = $"{Path.GetFileNameWithoutExtension(name)}-{suffix}{Path.GetExtension(name)}";
+                suffix++;
+            }
+            name = candidate;
+
+            var local = Path.Combine(pkgCache, name);
+            progress?.Report($"Pulling {app.PackageName}/{name}...");
+            _log.Information("Pull {Pkg} {Remote} -> {Local}", app.PackageName, remote, local);
+            await PullAsync(source, remote, local, ct);
+            localFiles.Add(local);
+        }
+
+        if (localFiles.Count == 0)
+            throw new InvalidOperationException($"No APK paths were available for {app.PackageName}.");
+
+        return localFiles;
+    }
+
     private async Task PullAsync(DeviceData device, string remote, string local, CancellationToken ct)
     {
         using var sync = new SyncService(_client, device);
-        using var fs = File.Create(local);
-        await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: ct);
+        var temp = local + ".tmp";
+        try
+        {
+            await using (var fs = File.Create(temp))
+                await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: ct);
+            File.Move(temp, local, overwrite: true);
+        }
+        finally
+        {
+            if (File.Exists(temp))
+            {
+                try { File.Delete(temp); } catch { }
+            }
+        }
     }
 }

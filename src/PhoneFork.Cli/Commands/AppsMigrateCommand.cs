@@ -67,15 +67,7 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
                         // Pull only — install skipped.
                         try
                         {
-                            // Reuse the installer's cache-prepare path by pulling into the cache then aborting.
-                            var pkgCache = Path.Combine(installer.CacheRoot, src.Serial, app.PackageName);
-                            Directory.CreateDirectory(pkgCache);
-                            foreach (var remote in app.RemoteApkPaths)
-                            {
-                                using var sync = new AdvancedSharpAdbClient.SyncService(host.Client, src);
-                                using var fs = File.Create(Path.Combine(pkgCache, Path.GetFileName(remote)));
-                                await sync.PullAsync(remote, fs, callback: null, useV2: false, cancellationToken: default);
-                            }
+                            await installer.PullApksToCacheAsync(src, app, progress, cancellationToken);
                             ok++;
                             AnsiConsole.MarkupLine($"[green]dry-run pulled[/] {Markup.Escape(app.PackageName)}");
                         }
@@ -87,7 +79,7 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
                     }
                     else
                     {
-                        var r = await installer.MigrateAsync(src, dst, app, settings.Reinstall, progress, default);
+                        var r = await installer.MigrateAsync(src, dst, app, settings.Reinstall, progress, cancellationToken);
                         if (r.Success)
                         {
                             ok++;
