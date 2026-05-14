@@ -81,6 +81,13 @@ app.Configure(config =>
         perms.AddCommand<PermsGrantCommand>("grant")
             .WithDescription("Grant a runtime permission and/or set an appop mode for a package.");
     });
+
+    config.AddCommand<PairCommand>("pair")
+        .WithDescription("Pair with a phone over Wireless debugging (TLS pairing on Android 11+).");
+    config.AddCommand<ConnectCommand>("connect")
+        .WithDescription("Connect to a paired wireless ADB endpoint.");
+    config.AddCommand<DisconnectCommand>("disconnect")
+        .WithDescription("Disconnect a wireless ADB endpoint (or all when omitted).");
 });
 
 return await app.RunAsync(args);
