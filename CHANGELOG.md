@@ -2,6 +2,22 @@
 
 All notable changes to PhoneFork.
 
+## v0.3.0 — 2026-05-14
+
+Settings tab live + settings CLI branch.
+
+### Added
+- `PhoneFork.Core.Models.SettingsSnapshot` + `SettingsNamespace` enum (Secure / System / Global).
+- `SettingsSnapshotService` — captures all three AOSP namespaces via `settings list <ns>`. First-`=`-split parsing tolerates values that legitimately contain `=` (JSON blobs, URIs). Drops the AOSP "null" sentinel.
+- `SettingsDiffer` — set-diff yielding `SettingsPlan` with per-namespace buckets: OnlyOnSource / OnlyOnDest / Same / Different.
+- `SettingsApplyService` — `settings put` per row with safety blocklist (15 keys: `device_provisioned`, `adb_enabled`, `android_id`, `bluetooth_address`, carrier `preferred_network_mode`, etc.). Single-quote shell-escaping for values with whitespace. Exception-text detection on Android's stderr-on-stdout fallback.
+- `SettingsApplyService.SetDefaultSoundUrisAsync` — sets `system.ringtone` / `notification_sound` / `alarm_alert` URI by remote path. Closes Smart Switch's missing-default-ringtone gap that Media-tab pushes alone don't.
+- WPF Settings tab: filterable `DataGrid` of (Ns / Key / Outcome / Source value / Dest value), "Show only applicable" toggle, free-text filter, per-row checkbox, "Select All applicable" / "Select None" / Apply buttons, Dry-run toggle. Default-select rows with outcome `Different`; "only on source" rows are opt-in.
+- CLI: `phonefork settings dump --device <s> [--namespaces <CSV>]`, `phonefork settings diff --src a.json --dst b.json [--show-different]`, `phonefork settings apply --from <s> --to <d> [--namespaces ...] [--keys ...] [--include-only-on-source] [--dry-run]`.
+
+### Notes
+- Hardware-validated against S25 Ultra (1,062 keys) and S22 Ultra (967 keys): 271 keys are applicable (sum of Different + OnlyOnSource), 791 already aligned, 48 OnlyOnDest. Dry-run pipeline works clean end-to-end.
+
 ## v0.2.0 — 2026-05-14
 
 Media tab live + media CLI branch.

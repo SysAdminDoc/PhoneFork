@@ -52,19 +52,20 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [ ] _Parallel pull/push with bounded `SemaphoreSlim`_ — deferred to v0.2.1 (current pipeline is sequential per file; parallelism is a perf optimization, not a correctness gap).
 - [ ] _Ringtone-default URI restore_ — deferred to v0.3 (lives in Settings tab; depends on the settings-apply engine).
 
-### v0.3.0 — Settings tab live ([cmd-shell AOSP docs](https://source.android.com/docs/core/tests/vts/shell-commands), [DiffPlex](https://github.com/mmanela/diffplex))
+### v0.3.0 — Settings tab live ✅ _(shipped 2026-05-14)_
 
-**Theme**: Coverage + Honesty.
+**Theme**: Coverage + Honesty. Sources: [cmd-shell AOSP docs](https://source.android.com/docs/core/tests/vts/shell-commands), [Hur 2021](https://doi.org/10.1016/j.fsidi.2021.301172).
 
-- **Snapshot engine** — `settings list secure|system|global` per device into ordered `Dictionary<string,string>`. Source/dest/reference (fresh One UI 8) three-way diff.
-- **Bucket coloring**: source-only / dest-only / both-but-different / both-same. `LINQ Except/Intersect`; for richer 3-way merge consider DiffPlex `InlineDiffBuilder`.
-- **Cherry-pick `DataGrid`** with checkboxes per key. Saved presets ("AOD + Edge Panels", "Status bar tweaks", "Animation scales", "Adaptive brightness curve"). Source pattern: AppManager Profiles, Neo Backup tag/filter.
-- **Samsung-specific keys via `com.sec.android.provider.settings` content provider** — `content query --uri content://com.sec.android.provider.settings/...`. Targets: AOD style (`aod_mode`, `aod_clock_face`), edge panel layout, refresh-rate mode, font scale, status-bar battery-percent toggle, accessibility shortcuts. Reference: [Hur 2021](https://doi.org/10.1016/j.fsidi.2021.301172) format work and AOSP shell-cmd docs.
-- **Known-locked-allowlist** — keys that `settings put` rejects from shell UID on Android 14/15/16. Hardcoded list maintained per One UI version; fail loud, suggest Shizuku helper path.
-- **Bixby Routines + Modes export** — Routines live in a Samsung-internal content provider; expose read-only export to JSON. Closes community `§7` Bixby-Routines-lost complaint.
-- **Per-contact ringtone assignment migration** — read `contacts2.db` ringtone URI column over a content-provider helper APK (v0.7+ dependency); v0.3 ships a pre-flight warning that this domain needs the helper. Closes community `§7`.
-
-**CLI surface**: `phonefork settings dump --device <s> --out s.json`, `phonefork settings diff src.json dst.json`, `phonefork settings apply --device <d> --plan plan.json`.
+- [x] **Snapshot engine** — `settings list secure|system|global` per device into ordered `Dictionary<string,string>`. First-`=`-split parsing tolerates values that legitimately contain `=`. Drops AOSP "null" sentinel.
+- [x] **Bucket coloring**: OnlyOnSource / OnlyOnDest / Same / Different. Set-diff via dictionary intersect.
+- [x] **Cherry-pick `DataGrid`** — filterable by free-text + namespace + outcome. Default-select Different; OnlyOnSource is opt-in.
+- [x] **Known-locked / dangerous allowlist** — 15-key blocklist enforced by `SettingsApplyService.KnownLockedOrDangerous` (`device_provisioned`, `android_id`, `bluetooth_address`, carrier `preferred_network_mode`, etc.).
+- [x] **Single-quote shell-escaping** for values with whitespace / shell metas (the standard `'\''` dance).
+- [x] **Ringtone-default URI restore** — `SettingsApplyService.SetDefaultSoundUrisAsync` sets `system.ringtone` / `notification_sound` / `alarm_alert` URI to a `file:///sdcard/Ringtones/...` remote path. Closes Smart Switch's missing-default-ringtone gap.
+- [x] **CLI**: `phonefork settings dump|diff|apply`.
+- [ ] _Samsung `com.sec.android.provider.settings` content-provider read_ — deferred to v0.3.1 (Phase-2 of Settings tab; v0.3 covers the three AOSP namespaces which already include most Samsung One UI keys exposed via `secure`/`system`).
+- [ ] _Bixby Routines + Modes export_ — deferred to v0.7 helper-APK (Routines live in a Samsung-internal binder service, not the settings provider).
+- [ ] _Saved presets ("AOD + Edge Panels", "Status bar tweaks")_ — deferred to v1.x Profiles + lifecycle hooks.
 
 ### v0.4.0 — Debloat tab live ([UAD-NG](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), [Canta](https://github.com/samolego/Canta), [itxjobe/samsungdebloat](https://github.com/itxjobe/samsungdebloat))
 
