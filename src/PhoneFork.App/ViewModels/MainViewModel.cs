@@ -10,6 +10,7 @@ public partial class MainViewModel : ObservableObject
     public AppsViewModel Apps { get; }
     public MediaViewModel Media { get; }
     public SettingsViewModel Settings { get; }
+    public DebloatViewModel Debloat { get; }
 
     public MainViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -17,5 +18,6 @@ public partial class MainViewModel : ObservableObject
         Apps = new AppsViewModel(devices, host, log);
         Media = new MediaViewModel(devices, host, log);
         Settings = new SettingsViewModel(devices, host, log);
+        Debloat = new DebloatViewModel(devices, host, log);
     }
 }

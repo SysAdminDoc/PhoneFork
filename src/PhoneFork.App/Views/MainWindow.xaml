@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.3.0"
+        Title="PhoneFork  &#x00B7;  v0.4.0"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen">
@@ -24,7 +24,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text=" v0.3.0" FontSize="20" Margin="6,4,0,0"
+            <TextBlock Text=" v0.4.0" FontSize="20" Margin="6,4,0,0"
                        Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
             <TextBlock Text="Dual-Samsung migration tool"
                        FontSize="13" Margin="16,8,0,0"
@@ -46,9 +46,7 @@
                 <views:SettingsView DataContext="{Binding Settings}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Debloat">
-                <views:PlaceholderView Title="Debloat" Version="v0.4.0 (planned)"
-                    Body="Apply the AppManagerNG / UAD-NG curated debloat dataset (5,481 entries) to the destination. Category tree with delete / replace / caution / unsafe filtering, intersected against what's actually preinstalled. pm disable-user --user 0 only — never pm uninstall — so every action is reversible via cmd package install-existing. CLI: phonefork debloat apply --profile {conservative|recommended|aggressive}."
-                    Margin="0,12,0,0"/>
+                <views:DebloatView DataContext="{Binding Debloat}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Wi-Fi">
                 <views:PlaceholderView Title="Wi-Fi" Version="v0.5.0 (planned)"

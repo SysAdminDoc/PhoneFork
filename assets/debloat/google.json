@@ -1,0 +1,1507 @@
+[
+    {
+        "id": "com.android.chrome",
+        "label": "Google Chrome",
+        "description": "Google Chrome: Slow & Painful\nOccasionally runs in the background, not to mention how it tracks everything.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.android.chrome",
+            "https://privacytests.org/android.html",
+            "https://fidoalliance.org/passkeys/"
+        ],
+        "removal": "replace",
+        "warning": "Removing the app may break creating and storing passkeys on your phone, so keep this enabled if you want to use that form of authentication. Google Play Services can also provide this functionality on some devices. When Chrome is updated via the Play Store, the Trichrome Library is also updated automatically. If Chrome is disabled or removed, it may impact WebView functionality.\nThis is because Chrome, WebView, and the Trichrome Library work together as a bundle starting from Android 10 (API 29) and above.",
+        "suggestions": "browsers"
+    },
+    {
+        "id": "com.android.hotwordenrollment.okgoogle",
+        "label": "OK Google enrollment",
+        "description": "\"OK Google\" detection service that hears everything.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.hotwordenrollment.xgoogle",
+        "label": "Google Assistant",
+        "description": "Formerly, X Google enrollment. \"OK Google\" detection service that hears everything.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.partnerbrowsercustomizations.chromeHomepage",
+        "label": "com.android.partnerbrowsercustomizations.chromeHomepage",
+        "description": "Horrible stuff for Google Chrome. This package bypass your DNS settings (for letting pass Google ads).",
+        "removal": "delete"
+    },
+    {
+        "id": "com.android.soundpicker",
+        "label": "Sounds",
+        "description": "Needed to pick up a phone ringtone. No weird permissions.",
+        "web": [
+            "https://beta.pithus.org/report/f5f7c265c6d98666c78267b91643bbfb635021d5d4f85c93407079ba4aad88ee"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.android.systemui.plugin.globalactions.wallet",
+        "label": "com.android.systemui.plugin.globalactions.wallet",
+        "description": "Apk file name: QuickAccessWallet. This is the Google Pay widget in the power menu(hold power button for 1sec to show this menu), below the Emergency, Power off and Reboot buttons.",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.android.vending",
+        "label": "Google Play Store",
+        "description": "The malware delivery store. Most apps are full of ads, trackers and malware.",
+        "web": [
+            "https://www.xda-developers.com/google-play-store-more-safety/"
+        ],
+        "removal": "caution",
+        "suggestions": "app_stores"
+    },
+    {
+        "id": "com.chrome.beta",
+        "label": "Chrome Beta",
+        "description": "The beta version of Google Chrome.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.chrome.beta"
+        ],
+        "removal": "replace",
+        "suggestions": "browsers"
+    },
+    {
+        "id": "com.chrome.canary",
+        "label": "Chrome Canary (Unstable)",
+        "description": "Canary version of Google Chrome, usually provides nightly builds.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.chrome.canary"
+        ],
+        "removal": "replace",
+        "suggestions": "browsers"
+    },
+    {
+        "id": "com.chrome.dev",
+        "label": "Chrome Dev",
+        "description": "Google Chrome developer edition.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.chrome.dev"
+        ],
+        "removal": "replace",
+        "suggestions": "browsers"
+    },
+    {
+        "id": "com.google.android.GoogleCamera",
+        "label": "Google Camera",
+        "description": "Camera with incredible features with the cost of tracking. Try the tracker-free mods if you're too much into Google Camera.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.GoogleCamera"
+        ],
+        "removal": "replace",
+        "suggestions": "cameras"
+    },
+    {
+        "id": "com.google.android.accessibility.soundamplifier",
+        "description": "Accessibility sound amplifier (https://play.google.com/store/apps/details?id=com.google.android.accessibility.soundamplifier)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.access.wifi.consumer",
+        "label": "Google Wifi",
+        "description": "Google Wifi app",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.adm",
+        "label": "Google Find My Device",
+        "description": "Lets you locate your Android device.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.adm"
+        ],
+        "removal": "delete",
+        "suggestions": "locators"
+    },
+    {
+        "id": "com.google.android.apps.ads.publisher",
+        "label": "Google AdSense",
+        "description": "Google Adsense app",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.adwords",
+        "label": "Google Ads",
+        "description": "Lets you monitor your ad campaigns.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.adwords"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.assistant",
+        "label": "Google Assistant Go",
+        "description": "Lightweight Google Assistant for low-end devices (Go edition)",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.assistant"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.authenticator2",
+        "label": "Google Authenticator",
+        "description": "Generates 2-Step Verification codes on your phone.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+        ],
+        "removal": "replace",
+        "suggestions": "authenticators"
+    },
+    {
+        "id": "com.google.android.apps.blogger",
+        "label": "Blogger",
+        "description": "Official app for Blogger/blogspot.com",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.blogger"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.books",
+        "label": "Google Play Books",
+        "description": "Lets you buy and read ebooks, audiobooks, comics and manga.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.books"
+        ],
+        "removal": "replace",
+        "suggestions": "ebook_readers"
+    },
+    {
+        "id": "com.google.android.apps.chromecast.app",
+        "label": "Google Home",
+        "description": "Lets you set up, manage, and control your Google Nest, Google Wifi, Google Home and Chromecast devices. Let Google harvest your data with your money.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.chromecast.app"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.cloudprint",
+        "label": "Cloud Print",
+        "description": "Let you print anywhere from any Android tablet or smartphone via Google.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.apps.cultural",
+        "label": "Google Arts & Culture",
+        "description": "Know and interact with arts but with a price: Your privacy.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.cultural"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.currents",
+        "label": "Google Currents",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.docs",
+        "label": "Google Drive",
+        "description": "The drive where no personal data should ever be kept unencrypted.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.docs"
+        ],
+        "removal": "delete",
+        "suggestions": "cloud_services"
+    },
+    {
+        "id": "com.google.android.apps.docs.editors.docs",
+        "label": "Google Docs",
+        "description": "Google Docs client for Android",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.docs.editors.docs"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.docs.editors.sheets",
+        "label": "Google Sheets",
+        "description": "Google Sheets client for Android",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.docs.editors.sheets"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.docs.editors.slides",
+        "label": "Google Slides",
+        "description": "Google Slides client for Android",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.docs.editors.slides"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.dynamite",
+        "label": "Google Chat",
+        "description": "Previously Hangout Chat, is a communication and collaboration tool focusing on conversation.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.dynamite"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.enterprise.cpanel",
+        "label": "Google Admin",
+        "description": "Lets you manage your Google Cloud account on-the-go.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.enterprise.cpanel"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.enterprise.dmagent",
+        "label": "Google Apps Device Policy",
+        "description": "Allows your IT administrator to mandate security settings like screen lock or device encryption and keep corporate data safe.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.enterprise.dmagent"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.fireball",
+        "label": "Google Allo",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.fitness",
+        "label": "Google Fit",
+        "description": "Fitness tracker that does not respect your privacy.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.fitness"
+        ],
+        "removal": "delete",
+        "suggestions": "fitness_trackers"
+    },
+    {
+        "id": "com.google.android.apps.freighter",
+        "label": "Google Datally",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.giant",
+        "label": "Google Analytics",
+        "description": "Lets you monitor all of your Analytics properties so that you can keep track of your business while you're on the go.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.giant"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.googleassistant",
+        "label": "Google Assistant",
+        "description": "The assistant that can stab you on the back.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.googleassistant"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.handwriting.ime",
+        "label": "Google Handwriting Input",
+        "description": "Google Handwriting Input",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.apps.hangoutsdialer",
+        "label": "Hangouts Dialer",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.inbox",
+        "label": "Inbox by Gmail",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.inputmethod.hindi",
+        "label": "Google Indic Keyboard",
+        "description": "(Discontinued) Google Keyboard + Hindi characters",
+        "removal": "replace",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.google.android.apps.kids.familylink",
+        "label": "Google Family Link",
+        "description": "Parental controls app from Google.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.kids.familylink"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.kids.familylinkhelper",
+        "label": "Family Link parental controls",
+        "description": "Companion app to Google Family Link.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.kids.familylinkhelper"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.m4b",
+        "label": "Google My Maps",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.magazines",
+        "label": "Google News",
+        "description": "A personalized news aggregator that organizes and highlights what’s happening in the world.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.magazines"
+        ],
+        "removal": "replace",
+        "suggestions": "rss_readers"
+    },
+    {
+        "id": "com.google.android.apps.maps",
+        "label": "Google Maps",
+        "description": "A map navigator that makes it easier for the govt agencies to locate you.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.maps"
+        ],
+        "removal": "replace",
+        "suggestions": "maps"
+    },
+    {
+        "id": "com.google.android.apps.mapslite",
+        "label": "Google Maps Go",
+        "description": "A map navigator that makes it easier for the govt agencies to locate you.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.mapslite"
+        ],
+        "removal": "replace",
+        "suggestions": "maps"
+    },
+    {
+        "id": "com.google.android.apps.mediahome.launcher",
+        "description": "Entertainment Space\nAll-in-one application for entertainment purposes like movies, games, books etc.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.meetings",
+        "label": "Google Meet",
+        "description": "Formerly Hangouts Meet. Lets you create, schedule or join an online meeting.",
+        "removal": "replace",
+        "suggestions": "meeting_apps"
+    },
+    {
+        "id": "com.google.android.apps.messaging",
+        "label": "Messages",
+        "description": "RCS client from Google, also supports SMS/MMS. Runs in the background.\nCould be a global dependency for SMS, MMS, RCS, OTP, and other services/verifications.\nGSMA has recently standardized E2EE, but currently, there is not alternative available for Android.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.messaging"
+        ],
+        "removal": "replace",
+        "warning": "Once disabled/uninstalled, even if reinstalled, a factory reset may be required to re-obtain full functionality.",
+        "suggestions": "sms"
+    },
+    {
+        "id": "com.google.android.apps.navlite",
+        "label": "Navigation for Google Maps Go",
+        "description": "Provides GPS turn-by-turn voice guided navigation and is optimized for performance on low-memory phones.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.navlite"
+        ],
+        "removal": "replace",
+        "suggestions": "maps"
+    },
+    {
+        "id": "com.google.android.apps.nbu.files",
+        "label": "Files",
+        "description": "Used to be for cleaning and sharing. But nowadays, it became a hybrid app. Runs in the background.\nFOSS alternative is https://github.com/TeamAmaze/AmazeFileUtilities",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.files"
+        ],
+        "removal": "delete",
+        "warning": "Android itself provides the options to clean up your device in Settings."
+    },
+    {
+        "id": "com.google.android.apps.nbu.paisa.user",
+        "label": "Google Pay",
+        "description": "Digital wallet and payment system.\nYou really should not trust Google not to sell your data (even if they claim the contrary).\nThe app itself has a LOT of permissions & login with your google account is mandatory to use the app.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.nbu.paisa.user",
+            "https://support.google.com/googlepay/answer/10223752?hl=en&co=GENIE.Platform%3DAndroid#zippy=%2Cinfo-that-google-may-collect",
+            "https://venturebeat.com/2020/11/20/probeat-google-will-eventually-sell-ads-against-your-financial-data/",
+            "https://www.bleepingcomputer.com/news/google/google-payment-privacy-settings-hidden-behind-special-url/",
+            "https://beta.pithus.org/report/36b22c539b5f25c27a7699516c906351a25ba2daa2894eed08ae22f7a2a72c0e"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.nexuslauncher",
+        "label": "Pixel Launcher",
+        "description": "Used to be called Nexus Launcher (back when Google phones were called Nexus, not Pixel).",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.nexuslauncher"
+        ],
+        "removal": "caution",
+        "warning": "Your system will break if there is no other launcher. So, download another launcher before removing it.",
+        "suggestions": "launchers"
+    },
+    {
+        "id": "com.google.android.apps.paidtasks",
+        "label": "Google Opinion Rewards",
+        "description": "Answer quick surveys and earn Rewards. If you insist on keeping it for earning free credits, just give them all the wrong answers :)",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.paidtasks"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.pdfviewer",
+        "label": "Google PDF Viewer",
+        "description": "Discontinued. PDF viewers are very sensitive applications. You should always use an app that is uptodate.",
+        "removal": "replace",
+        "suggestions": "ebook_readers"
+    },
+    {
+        "id": "com.google.android.apps.photos",
+        "label": "Google Photos",
+        "description": "Allows Google to scan and catalog all your photos so that it knows you and your relations more than you do.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.photos"
+        ],
+        "removal": "replace",
+        "suggestions": "gallery"
+    },
+    {
+        "id": "com.google.android.apps.photos.scanner",
+        "label": "PhotoScan by Google Photos",
+        "description": "Companion app to Google Photos for reviving old pictures.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.photos.scanner"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.plus",
+        "label": "Google+",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.podcasts",
+        "label": "Google Podcasts",
+        "description": "Lets you explore, subscribe and play podcasts.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.podcasts"
+        ],
+        "removal": "replace",
+        "suggestions": "podcasts"
+    },
+    {
+        "id": "com.google.android.apps.privacy.wildlife",
+        "description": "VPN by Google One. Discontinued. Succeeded by VPN by Google and Google Fi VPN.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.recorder",
+        "label": "Recorder",
+        "description": "Audio recorder from Google LLC.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.recorder"
+        ],
+        "removal": "replace",
+        "suggestions": "audio_recorders"
+    },
+    {
+        "id": "com.google.android.apps.restore",
+        "label": "Data Restore Tool",
+        "description": "The backup restore wizard used for pulling Android system backups from your Google account.\nRuns on boot.\nYou only need this if you factory restore, in which case it’s automatically re-enabled for you.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.restore"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.apps.safetyhub",
+        "label": "Personal Safety",
+        "description": "A Pixel app that helps you prepare and react in an emergency by quickly calling emergency services (e.g if your phone detects that you've been in a car crash, it can call for help automatically).\nThis app has obviously a lot of dangerous permissions due to its operation.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.safetyhub",
+            "https://beta.pithus.org/report/e207f7d0f59d9df268154b90fc10cd861d0483465e30bbac8f68a7b12340c67f"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.santatracker",
+        "label": "Google Santa Tracker",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.scone",
+        "description": "Automatically switches basebands between LTE and 5G on demand",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.searchlite",
+        "label": "Google Go",
+        "description": "The Google search app made for low-RAM devices.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.searchlite"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.security.securityhub",
+        "description": "Checks security your phone(you can find it in settings). Not very useful.\nhttps://play.google.com/store/apps/details?id=com.google.android.apps.security.securityhub",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.setupwizard.searchselector",
+        "label": "Search Engine Selector",
+        "description": "The search selection screen in the setupwizard you see on new/factory reset phones. Runs on boot, but doesn't seem to run in the background beyond that.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.subscriptions.red",
+        "label": "Google One",
+        "description": "Lets you manage your Google cloud storage.\nOccasionally runs in the background.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.subscriptions.red"
+        ],
+        "removal": "delete",
+        "suggestions": "cloud_services"
+    },
+    {
+        "id": "com.google.android.apps.tachyon",
+        "label": "Google Meet",
+        "description": "Formerly Google Duo. Lets you create, schedule or join an online meeting.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.tachyon"
+        ],
+        "removal": "replace",
+        "suggestions": "meeting_apps"
+    },
+    {
+        "id": "com.google.android.apps.tasks",
+        "label": "Google Tasks",
+        "description": "Manage, capture, and edit your tasks with synchronisation.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.tasks"
+        ],
+        "removal": "replace",
+        "suggestions": "task_managers"
+    },
+    {
+        "id": "com.google.android.apps.translate",
+        "label": "Google Translate",
+        "description": "Google Translate mobile client.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.translate"
+        ],
+        "removal": "replace",
+        "suggestions": "translators"
+    },
+    {
+        "id": "com.google.android.apps.travel.onthego",
+        "label": "Google Trip",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.turbo",
+        "label": "Device Health Services",
+        "description": "Discontinued.",
+        "removal": "caution",
+        "warning": "Breaks battery settings.",
+        "suggestions": "battery_managers"
+    },
+    {
+        "id": "com.google.android.apps.tycho",
+        "description": "Google Fi Wireless\nhttps://play.google.com/store/apps/details?id=com.google.android.apps.tycho",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.uploader",
+        "label": "Picasa Uploader",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.vega",
+        "label": "Google My Business",
+        "description": "Discontinued.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.walletnfcrel",
+        "label": "Google Wallet",
+        "description": "Formerly Google Pay. Use cash, protect your privacy.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.wallpaper",
+        "label": "Wallpapers",
+        "description": "Wallpaper app from Google. Lets you set wallpaper from various sources including Google Earth collection",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.weather",
+        "description": "The new Weather app by Google. If removed, \"At a Glance\" and the lock screen will still redirect to the Google app (like before).\nhttps://play.google.com/store/apps/details?id=com.google.android.apps.weather",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.wellbeing",
+        "label": "Digital Wellbeing",
+        "description": "Lets you track device and app usage and set usage limits.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.wellbeing"
+        ],
+        "removal": "caution",
+        "warning": "It is a hard dependency for the settings app on Android 12+ on Pixel phones. After uninstalling, there will be an empty entry on Settings. Rebooting should make it disappear."
+    },
+    {
+        "id": "com.google.android.apps.work.oobconfig",
+        "label": "Device Setup",
+        "description": "Sets up device to be managed by EMM (Enterprise Mobility Management), which \"allows organizations to securely enable employee use of mobile devices\".\nMight also be what does the actual management on your device, if you set it up as a work device.\nOnly seems to run on boot(not in the background after boot) if you haven't set up your device as a work device.\nI tried to disable it through UAD, but nothing happens? Seems immune to disabling?\nhttps://bayton.org/2020/11/google-announce-big-changes-to-zero-touch/\nhttps://bayton.org/docs/enterprise-mobility/android/what-is-android-zero-touch-enrolment/\nContains 4 services: GcmJobService, GservicesChangedObserverService, AppMeasurementService and FirebaseInstanceIdService.\nGCM(Google Cloud Messaging) was the backend for Android's push messaging system 2012-2019, after which it was replaced by FCM(Firebase Cloud Messaging). I assume the GCM/Firebase connection is for Push notification functionality.\nThe MANAGE_CARRIER_OEM_UNLOCK_STATE permission hints at doing something with carrier locks?\nNeeds Google Play Services to function?",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.apps.youtube.creator",
+        "label": "YouTube Studio",
+        "description": "Intended for YouTube creators to track their channel activities and analytics.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.creator"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.youtube.gaming",
+        "label": "YouTube Gaming",
+        "description": "Discontinued in March 2019, features integrated in main YouTube app.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.youtube.kids",
+        "label": "YouTube Kids",
+        "description": "YouTube for kids.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.kids",
+            "https://qz.com/youtube-has-become-the-worlds-nanny-1850047610"
+        ],
+        "removal": "replace",
+        "suggestions": "streaming_apps"
+    },
+    {
+        "id": "com.google.android.apps.youtube.mango",
+        "label": "YouTube Go",
+        "description": "Lite version of the YouTube app. Discontinued in August 2022. Still present in Google Play Store for some reason.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.kids",
+            "https://support.google.com/youtube/thread/162222567/youtube-go-is-going-away-in-august-of-this-year"
+        ],
+        "removal": "replace",
+        "suggestions": "streaming_apps"
+    },
+    {
+        "id": "com.google.android.apps.youtube.music",
+        "label": "YouTube Music",
+        "description": "YouTube Music client for Android",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.music"
+        ],
+        "removal": "replace",
+        "suggestions": "music_apps"
+    },
+    {
+        "id": "com.google.android.apps.youtube.vr",
+        "label": "YouTube VR",
+        "description": "Watch YouTube in VR.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.youtube.vr"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.as",
+        "label": "Android System Intelligence",
+        "description": "Previously, Device Personalization Services. Runs in the background.\n\"Enables intelligent features across Android\", like: Live Caption, Screen Attention, Improved Copy-Paste, App Predictions in the launcher, Notification Smart Actions, Smart Text Selection and Linkifying text in apps.\nAlso known as device learning, e.g., enhanced keyboard auto suggestions, keeps the screen on when looking at it (with help of the camera), smart replies.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.as",
+            "https://milaq.net/android-bloatware"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.as.oss",
+        "description": "Private Compute Services. On-device behavior analysis\nEnables live caption, music recognition and smart replies.\nSeems to be a dependency of System Intelligence.\nhttps://play.google.com/store/apps/details?id=com.google.android.as.oss\nhttps://milaq.net/android-bloatware",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.backup",
+        "label": "Google Backup Transport",
+        "description": "Allows Android apps to back up their data on Google servers (on Android 4.2).",
+        "removal": "replace",
+        "suggestions": "backup_apps"
+    },
+    {
+        "id": "com.google.android.backuptransport",
+        "label": "Google Backup Transport",
+        "description": "Allows Android apps to back up their data on Google servers.",
+        "removal": "replace",
+        "suggestions": "backup_apps"
+    },
+    {
+        "id": "com.google.android.calculator",
+        "label": "Calculator",
+        "description": "Calculator app from Google LLC. What sort of calculator collects personal info?",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.calculator"
+        ],
+        "removal": "replace",
+        "suggestions": "calculators"
+    },
+    {
+        "id": "com.google.android.calendar",
+        "label": "Google Calendar",
+        "description": "Calendar app from Google LLC.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.calendar"
+        ],
+        "removal": "replace",
+        "suggestions": "calendars"
+    },
+    {
+        "id": "com.google.android.cellbroadcastreceiver",
+        "label": "Wireless emergency alerts",
+        "dependencies": [
+            "com.google.android.cellbroadcastservice"
+        ],
+        "description": "Cell broadcast is designed to deliver messages to multiple users in an area.\nThis is notably used by ISP to send Emergency/Government alerts.\nRuns at boot and is also triggered after exiting airplane mode.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Cell_Broadcast",
+            "https://www.androidcentral.com/amber-alerts-and-android-what-you-need-know",
+            "https://android.googlesource.com/platform/packages/apps/CellBroadcastReceiver/+/refs/heads/master/src/com/android/cellbroadcastreceiver"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.cellbroadcastservice",
+        "label": "Cell Broadcast Service",
+        "required_by": [
+            "com.google.android.cellbroadcastreceiver"
+        ],
+        "description": "Cell broadcast is designed to deliver messages to multiple users in an area.\nThis is notably used by ISP to send Emergency/Government alerts.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Cell_Broadcast",
+            "https://www.androidcentral.com/amber-alerts-and-android-what-you-need-know"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.configupdater",
+        "label": "ConfigUpdater",
+        "description": "Intents used to provide unbundled updates of system data. All require the UPDATE_CONFIG permission. Updates:\n- system wide certificate pins for TLS connections.\n- System wide Intent firewall.\n- List of permium SMS short codes.\n- List of carrier provisioning URLs.\n- Set of trusted logs used for Certificate Transparency support for TLS connections language detection model file\n- Smart selection model file\n- Conversation actions model file\n- Network watchlist config file\n- Intent action indicating that the updated carrier id config is available\n- The emergency number database into the devices\n- An integer to indicate the numeric version of the new data -- devices should only install if the update version is newer than the current one\n- Hash of the database, which is encoded by base-16 SHA512.",
+        "web": [
+            "https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/os/ConfigUpdate.java"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.contacts",
+        "label": "Contacts",
+        "description": "Contacts by Google LLC.\nOccasionally runs in the background.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.contacts"
+        ],
+        "removal": "replace",
+        "suggestions": "contacts"
+    },
+    {
+        "id": "com.google.android.deskclock",
+        "label": "Clock",
+        "description": "Clock by Google LLC.",
+        "removal": "replace",
+        "warning": "On some phones, removing this makes it so alarms and notifications only vibrate and don't make any sound (via any installed app), and makes the 'Alarm' section unavailable in 'Settings > Sound & Vibration'",
+        "suggestions": "clocks"
+    },
+    {
+        "id": "com.google.android.dialer",
+        "label": "Phone",
+        "description": "Formerly Google Dialer.\nDefault dialer on some phones.\nGoogle Analytics are embedded in the app, assume everything is datamined.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.dialer",
+            "https://www.virustotal.com/gui/file/a978d90f27d5947dca33ed59b73bd8efbac67253f9ef7a343beb9197c8913d1a/details"
+        ],
+        "removal": "replace",
+        "suggestions": "dialers"
+    },
+    {
+        "id": "com.google.android.feedback",
+        "label": "Market Feedback Agent",
+        "description": "This is the package that sends crash-report feedback to the Play Store? The crash pop-up still happens with this disabled.\nDoesn't seem to run on its own.\nHas permission to access system logs and package usage stats. Only connects to 4 Google domains. App developers likely have to go through the Play Store to access any sent data.",
+        "web": [
+            "https://beta.pithus.org/report/7041823ff880c207ed2ddacdc92e5ed803b1eb105e4483696d2152bea44903aa"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.gm",
+        "label": "Gmail",
+        "description": "Gmail client from Google LLC. It also allows adding other E-Mail accounts.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.gm"
+        ],
+        "removal": "replace",
+        "suggestions": "email_clients"
+    },
+    {
+        "id": "com.google.android.gm.lite",
+        "label": "Gmail Go",
+        "description": "Gmail client by Google LLC for low-end devices.",
+        "removal": "replace",
+        "suggestions": "email_clients"
+    },
+    {
+        "id": "com.google.android.gms",
+        "label": "Google Play services",
+        "description": "GMS = Google Mobile Services. It is a layer that sits on top of the OS and provides a lot of proprietary Google APIs, giving apps access to various Google Services, such as: \"fused\"-location (internet and GPS chip), QR Code scanner, 2FA, G-Drive storage, Firebase API, Cloud Messaging, etc.\nIf you remove it, all the apps relying on it will either:\n- detect the lack of Play-Services and refuse to run\n- detect the lack of Play-Services but allow you to run (improperly) by dismissing an annoying popup.\nDisabling this package will improve battery life a lot.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.gms"
+        ],
+        "removal": "caution",
+        "warning": "Removing Google Play Services can cause bootloops. If you use “Find My Device”, you will need to remove it from the \"Device admin apps\" settings panel to be able to remove this package."
+    },
+    {
+        "id": "com.google.android.gms.location.history",
+        "label": "Google Location History",
+        "description": "This app has nothing in the code. Only png logo google and name.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.gms.policy_sidecar_aps",
+        "label": "com.google.android.gms.policy_sidecar_aps",
+        "description": "Not sure what purpose it has, but it gets some network and phone data and connects to some Google domains, but never on its own; it has no permissions and never runs on its own, it likely exists as a helper package for other Google services.\nDoesn't seem to exist in newer versions of Android; it's not in Android 11, but it is in 9.\nNeeds a Google Account and Google Play Services to work.\nGiven its name it could be related to Android auto?\nSeems safe to remove, noticed no breakage (didn't test Android Auto though).",
+        "web": [
+            "https://beta.pithus.org/report/60835b97f38d9e64d4f554a73dab71c892153486a8e0fd81461c3d85359d9fae"
+        ],
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.gms.supervision",
+        "description": "Family Link parental controls\nIt has something to Family Link parental controls.\nIntroduced in android 13.\nhttps://play.google.com/store/apps/details?id=com.google.android.gms.supervision",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.googlequicksearchbox",
+        "label": "Google",
+        "description": "Formerly, Google Search Box.\nRuns in the background.\nPointless. If you need a shortcut to Google on your homescreen just use a web-browser shortcut. Does also remove the Google Sound Search widget, but you can get that functionality from an app like Shazam, that additionally doesn't run in the background constantly like this package does.\nThis app also powers the Google Discover page (the news 'widget' when you go to the left of the home screen) and the app symbol called 'Google'.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.googlequicksearchbox"
+        ],
+        "removal": "caution",
+        "warning": "Disabling this package also breaks the Ok Google Search functionality as well as Google Lens."
+    },
+    {
+        "id": "com.google.android.gsf",
+        "label": "Google Services Framework",
+        "description": "Supports the Play Services application in application updates, user authentication, location services, user searches & more.\nSame recommendation as com.google.android.gms except I've never seen a bootloop because of deleting this package.",
+        "web": [
+            "https://android.stackexchange.com/questions/216176/what-is-the-exact-functionality-of-google-play-services-google-services-framew",
+            "https://stackoverflow.com/questions/37337448/what-is-the-difference-between-google-service-frameworkgsfgoogle-mobile-servi"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.gsf.login",
+        "label": "Google Account Manager",
+        "description": "Support for managing Google accounts.",
+        "removal": "caution",
+        "warning": "Safe to remove if you don't use a Google account."
+    },
+    {
+        "id": "com.google.android.health.connect.backuprestore",
+        "description": "Health Connect for Android backup/restore.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.healthconnect.controller",
+        "description": "Health Connect by Android gives you a simple way to share data between your health, fitness, and wellbeing apps without compromising on privacy.\nOnce you've downloaded Health Connect, you can access it through your settings by going to Settings > Apps > Health Connect, or from your Quick Settings menu.\nhttps://play.google.com/store/apps/details?id=com.google.android.apps.healthdata",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.ims",
+        "label": "Carrier Services",
+        "description": "Runs in the background.\nPlay store description claims power savings in addition to the features, but I don't see how that could be the case.\nIMS(Ip Multimedia Subsystem) is an open industry standard for voice and multimedia communications over packet-based IP networks (VoLTE/VoIP/Wifi calling).",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.ims"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.inputmethod.japanese",
+        "label": "Google Japanese Input",
+        "description": "(Discontinued) Google Keyboard + Japanese characters.",
+        "removal": "replace",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.google.android.inputmethod.korean",
+        "label": "Google Korean Input",
+        "description": "(Discontinued) Google Keyboard + Korean characters.",
+        "removal": "replace",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.google.android.inputmethod.latin",
+        "label": "Gboard",
+        "description": "Sometimes the only keyboard app on a phone.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin"
+        ],
+        "removal": "replace",
+        "warning": "Make sure you have another installed before you disable.",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.google.android.inputmethod.pinyin",
+        "label": "Google Pinyin Input",
+        "description": "(Discontinued) Google Keyboard + Pinyin (Chinese) characters",
+        "removal": "replace",
+        "suggestions": "keyboards"
+    },
+    {
+        "id": "com.google.android.instantapps.supervisor",
+        "label": "Instant Apps",
+        "description": "Lets you try new games directly on Google Play.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.instantapps.supervisor",
+            "https://www.zdnet.com/article/googles-instant-apps-goes-live-now-you-can-try-android-apps-before-installing-them/"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.keep",
+        "label": "Google Keep",
+        "description": "Note taking app from Google.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.keep"
+        ],
+        "removal": "replace",
+        "suggestions": "note_taking_apps"
+    },
+    {
+        "id": "com.google.android.launcher",
+        "label": "Google Now Launcher",
+        "description": "Launcher app from google.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.launcher"
+        ],
+        "removal": "replace",
+        "warning": "Make sure you have another installed before you disable.",
+        "suggestions": "launchers"
+    },
+    {
+        "id": "com.google.android.location",
+        "label": "UnifiedNlp",
+        "description": "Handles location services on older devices. On newer ones Google location services is part of Google Play Services and Android location service is provided by com.android.location.fused or com.android.location.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.markup",
+        "label": "Markup",
+        "description": "Google Markup app made for modifying pictures, shipped by default on every Pie+ device.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.marvin.talkback",
+        "label": "Android Accessibility Suite",
+        "description": "Helps blind and vision-impaired users.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.marvin.talkback"
+        ],
+        "removal": "caution",
+        "warning": "Removal causes com.motorola.dynamicvolume to not display the respective volume for individual apps when the volume button pressed. Seems to revert to an older (maybe testing) version of the dynamicvolume package?"
+    },
+    {
+        "id": "com.google.android.music",
+        "label": "Google Play Music",
+        "description": "Discontinued and replaced by com.google.android.apps.youtube.music",
+        "removal": "replace",
+        "suggestions": "music_apps"
+    },
+    {
+        "id": "com.google.android.onetimeinitializer",
+        "label": "Google One Time Init",
+        "description": "Provides first time setup, safe to remove.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig",
+        "description": "Useless configurations about webview, wifi and bluetooth to scan for better location. Everything works without it.\nWARNING: causes the Galaxy App to force-close after a few seconds on a Samsung N960F running Android Q.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.asi",
+        "description": "it's another component of\nAndroid System Intelligence (previously Device Personalization Services)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.common",
+        "label": "com.google.android.overlay.gmsconfig.common",
+        "description": "If you delete this package, you won't be able to log in to your Google account on a Google app. But if you don't need to log in to a Google account, you can safely remove this.",
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.comms",
+        "label": "com.google.android.overlay.gmsconfig.comms",
+        "description": "Useless configurations for Google's Phone, Messages, Contacts apps, everything works without it.",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.geotz",
+        "description": "Provides Geolocation Time Zone detection.\nand it's used by (com.google.android.overlay.gmsconfig.common)?\nNo effects after remove.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.gsa",
+        "label": "com.google.android.overlay.gmsconfig.gsa",
+        "description": "configures default assistant? And have config to allow disabling assist disclosure?\nI think it doesn't affect anything.\nSafe to remove if you removed (com.google.android.googlequicksearchbox).",
+        "removal": "caution",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.personalsafety",
+        "description": "Not needed for (com.google.android.apps.safetyhub).",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.photos",
+        "label": "com.google.android.overlay.gmsconfig.photos",
+        "description": "Overlay to Gallery (com.google.android.apps.photos). Useless.",
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.searchlauncherqs",
+        "description": "Useless gmsconfig. it's config default launcher but not needed.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.searchselector",
+        "description": "Not needed for (com.google.android.apps.setupwizard.searchselector).",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.gmsconfig.ww",
+        "description": "useless unused overlay gmsconfig to family link.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.overlay.modules.cellbroadcastreceiver",
+        "label": "com.google.android.overlay.modules.cellbroadcastreceiver",
+        "dependencies": [
+            "com.google.android.cellbroadcastreceiver"
+        ],
+        "description": "Overlay (theme/notification) module for com.google.android.cellbroadcastreceiver",
+        "web": [
+            "https://docs.samsungknox.com/CCMode/G973F_LTE_R.pdf"
+        ],
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.overlay.modules.documentsui",
+        "label": "com.google.android.overlay.modules.documentsui",
+        "description": "In code only found: `is_launcher_enabled` is set to false.\nIt's only made to hide app icon (com.google.android.documentsui)\nNo effects after removal (the launcher icon will be not back), it's useless.",
+        "web": [
+            "https://docs.samsungknox.com/CCMode/G973F_LTE_R.pdf"
+        ],
+        "removal": "delete",
+        "suppress": "LabelSameAsId"
+    },
+    {
+        "id": "com.google.android.partnersetup",
+        "label": "Google Partner Setup",
+        "description": "Occasionally runs in the background. Based on an unclear explanation online: Enables applications to interact with your Google account/apps, for example: adding a Google Calendar event from a To-Do app.\nProbably safe to disable; Haven't noticed any consequences of disabling from weeks of use.",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.pixel.setupwizard",
+        "label": "Pixel Setup",
+        "description": "It's the basic configuration setup guides you through the basics of setting up Google features on your device. The package is only present on Pixel phones.",
+        "removal": "caution",
+        "warning": "Removing the package breaks the Google Play System update page found on \"Security & privacy\"."
+    },
+    {
+        "id": "com.google.android.play.games",
+        "label": "Google Play Games",
+        "description": "Google Play Games.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.play.games"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.projection.gearhead",
+        "label": "Android Auto",
+        "description": "Smart driving companion.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.projection.gearhead"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.setupwizard",
+        "label": "Android Setup",
+        "description": "The factory reset device basic configuration setup guides you through the basics of setting up your device.",
+        "web": [
+            "https://en.wikipedia.org/wiki/Mobile_identity_management"
+        ],
+        "removal": "caution",
+        "warning": "Oddly enough, disabling/uninstalling this package will break mobile identity management which could be used by apps (for example your bank) to authenticate you."
+    },
+    {
+        "id": "com.google.android.setupwizard.a_overlay",
+        "label": "com.google.android.setupwizard.a_overlay",
+        "description": "Overlay for setupwizard?",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.soundpicker",
+        "label": "Google Sounds",
+        "description": "Removable if you already have another media select service.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.street",
+        "label": "Google Street View",
+        "description": "(Discontinued) Google Street View",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.syncadapters.bookmarks",
+        "label": "Google Bookmarks Sync",
+        "description": "Synchronisation for Google Chrome bookmarks",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.syncadapters.calendar",
+        "label": "Google Calendar Sync",
+        "description": "Synchronisation for Google Calendar.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.syncadapters.contacts",
+        "label": "Google Contacts Sync",
+        "description": "Synchronisation for Google Contacts.",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.tag",
+        "label": "Tags",
+        "description": "Support for NFC tags interactions (5 permissions : Contacts/Phone On by default).\nNFC Tags are for instance used in bus to let you validate your transport card with your phone\nOther example: https://en.wikipedia.org/wiki/TecTile\nYou will still be able to connect to an NFC device (e.g a speaker) if removed.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.talk",
+        "label": "Hangouts",
+        "description": "(Discontinued) Google Hangouts",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.tts",
+        "label": "Speech Recognition and Synthesis",
+        "description": "Default Text To Speech (TTS) engine on most of Android devices. It enables apps to convert text into voice.\nNote: many apps like navigation and health/sport apps rely on a TTS engine to provide speech services.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.tts",
+            "https://beta.pithus.org/report/f0a2303e1c1bd049bf1cdc5a3454dfe19b2aaf26008662c7a307aaec2538558b"
+        ],
+        "removal": "replace",
+        "suggestions": "tts"
+    },
+    {
+        "id": "com.google.android.turboadapter",
+        "description": "Device Health Services Adapter\nAnother app for Device Health Services(discontinued)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.tv.remote",
+        "label": "Android TV Remote Control",
+        "description": "(Discontinued) Android TV remote control",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.videoeditor",
+        "label": "Movie Studio",
+        "description": "(Discontinued) Google Movie Studio",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.videos",
+        "label": "Google TV",
+        "description": "Previously Google Play Movies & TV.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.videos"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.voicesearch",
+        "label": "Voice Search",
+        "description": "(Discontinued) Google Voice Search (Speech-To-Text)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.vr.home",
+        "label": "Daydream",
+        "description": "VR stuff.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.vr.inputmethod",
+        "label": "Daydream Keyboard",
+        "description": "Daydream virtual keyboard, VR stuff.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.wearable.app",
+        "label": "Wear OS",
+        "description": "Wear OS Smartwatch",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.wearable.app"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.webview",
+        "label": "Android System WebView",
+        "description": "Allows Android apps to display content from the web directly inside the app. Based on Chrome.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.webview"
+        ],
+        "removal": "replace",
+        "warning": "Installing a third-party webview requires root.",
+        "suggestions": "webviews"
+    },
+    {
+        "id": "com.google.android.wifi.dialog",
+        "description": "Wi-Fi dialog. App to launch user dialogs requested by the Wi-Fi service is stored here. Contains the Activity the dialogs are launched from.\nhttps://source.android.com/docs/core/ota/modular-system/wifi\nhttps://android.googlesource.com/platform/packages/apps/Settings/+/refs/heads/main/src/com/android/settings/wifi/WifiDialog.java\nhttps://android.googlesource.com/platform/packages/apps/Settings/+/refs/heads/main/src/com/android/settings/wifi/WifiDialog2.kt",
+        "removal": "caution"
+    },
+    {
+        "id": "com.google.android.wifi.resources",
+        "description": "Wi-Fi Service Resources. Overlay APK manifest is stored here. Extracts Wi-Fi configs.\nhttps://source.android.com/docs/core/ota/modular-system/wifi",
+        "removal": "unsafe"
+    },
+    {
+        "id": "com.google.android.youtube",
+        "label": "YouTube",
+        "description": "The YouTube app",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.youtube"
+        ],
+        "removal": "replace",
+        "suggestions": "streaming_apps"
+    },
+    {
+        "id": "com.google.ar.core",
+        "label": "Google Play Services for AR",
+        "description": "Augmented Reality stuff",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.ar.core",
+            "https://beta.pithus.org/report/99ea324529f950fe351d22724f8b894cce19c16607fcc9c2855bc906b1f8e644"
+        ],
+        "removal": "delete",
+        "warning": "Disabling it can mess with apps that use it, like Pokemon GO."
+    },
+    {
+        "id": "com.google.ar.lens",
+        "label": "Google Lens",
+        "description": "Google Lens (for AR too)",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.ar.lens"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.audio.hearing.visualization.accessibility.scribe",
+        "label": "Live Transcribe & Notification",
+        "description": "Provides push notifications for critical sounds around you. This feature can be helpful for people with hearing loss. Works offline",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.audio.hearing.visualization.accessibility.scribe",
+            "https://blog.google/products/android/new-sound-notifications-on-android/"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.chromeremotedesktop",
+        "label": "Chrome Remote Desktop",
+        "description": "Lets you access your computers from your Android device.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.chromeremotedesktop"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.earth",
+        "label": "Google Earth",
+        "description": "The Google Earth app",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.earth"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.mainline.telemetry",
+        "description": "Contains data on which versions of modules are installed. Google Play uses this data to determine if updates are available for the modules, and to show which security patch is installed.\nThis module doesn’t contain active code and has no functionality on its own.\nAnyway I wont trust it when adservices are also in mainline.\nhttps://www.xda-developers.com/android-project-mainline-modules-explanation/\nhttps://gitlab.com/W1nst0n/universal-android-debloater/-/issues/27#note_410012436",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.marvin.talkback",
+        "label": "Android Accessibility Suite",
+        "description": "Helps blind and vision-impaired users. Discontinued and replaced by com.google.android.marvin.talkback",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.samples.apps.cardboarddemo",
+        "label": "Cardboard",
+        "description": "Google Cardboard (VR stuff)",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.samples.apps.cardboarddemo"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.tango.measure",
+        "label": "Measure",
+        "description": "(Discontinued) Turn your phone into a tape measure.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.vr.cyclops",
+        "label": "Cardboard Camera",
+        "description": "(Discontinued) Take photos you can experience in virtual reality—all on your smartphone (VR stuff).",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.vr.expeditions",
+        "label": "Expeditions",
+        "description": "See anything, go anywhere (VR stuff).",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.vr.vrcore",
+        "label": "Google VR Services",
+        "description": "Provides virtual reality functionality for Daydream and Cardboard apps.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.vr.vrcore"
+        ],
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.zxing.client.android",
+        "label": "Barcode Scanner",
+        "description": "Discontinued. This is only an example app for the ZXing library.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
+        ],
+        "removal": "replace",
+        "suggestions": "barcode_scanners"
+    },
+    {
+        "id": "com.google.android.apps.aiwallpapers",
+        "label": "Google AI Wallpapers",
+        "description": "Generates AI 'imagined' wallpapers from text prompts. Pixel-exclusive, ships on Pixel 8+ via the Wallpaper & Style picker.",
+        "web": [
+            "https://blog.google/products/pixel/google-pixel-feature-drop-october-2023/"
+        ],
+        "removal": "delete",
+        "warning": "Removing only loses the AI Wallpapers tab in the Pixel wallpaper picker."
+    },
+    {
+        "id": "com.google.android.apps.bard",
+        "label": "Google Gemini",
+        "description": "Google Gemini app (formerly Bard). Replaces Google Assistant on most Pixel and Samsung devices. Sends queries to Google's cloud LLM.",
+        "web": [
+            "https://play.google.com/store/apps/details?id=com.google.android.apps.bard",
+            "https://reports.exodus-privacy.eu.org/reports/com.google.android.apps.bard/latest/"
+        ],
+        "removal": "replace",
+        "warning": "Removing forces Assistant fallback. Local-first / privacy-respecting alternatives below.",
+        "suggestions": "automation_apps"
+    },
+    {
+        "id": "com.google.android.contactkeys",
+        "label": "Google Contact Keys",
+        "description": "Google's user-facing implementation of Android 14+ Contact Keys — verifies that an end-to-end-encrypted messaging key for a contact hasn't changed.",
+        "web": [
+            "https://developer.android.com/about/versions/14/features#contact-key-management"
+        ],
+        "removal": "caution",
+        "warning": "Removing breaks contact-key verification for E2EE messaging apps that integrate the API."
+    },
+    {
+        "id": "com.google.android.overlay.modules.healthfitness.forframework",
+        "label": "Google Health Fitness Framework Overlay",
+        "description": "Runtime Resource Overlay (RRO) that wires Health Connect mainline-module strings/configuration into the Android framework on supported devices.",
+        "removal": "unsafe",
+        "warning": "Removing breaks Health Connect integration with system Settings and other apps."
+    },
+    {
+        "id": "com.google.android.rkpdapp",
+        "label": "Google Remote Key Provisioning Daemon",
+        "description": "Implements Android Remote Key Provisioning (RKP) — replaces factory-installed attestation keys with periodically-rotated keys signed by Google's CA. Underpins hardware attestation, Play Integrity, key attestation, DRM provisioning.",
+        "web": [
+            "https://source.android.com/docs/core/ota/modular-system/remote-key-provisioning"
+        ],
+        "removal": "unsafe",
+        "warning": "Removing breaks hardware attestation, Play Integrity API, key attestation for banking/payment apps, and DRM provisioning."
+    },
+    {
+        "id": "com.google.android.server.deviceconfig.resources",
+        "label": "Google DeviceConfig Resources",
+        "description": "Resources for the system DeviceConfig service that delivers Google-side feature flags / experiment values (Phenotype) to system components.",
+        "removal": "caution",
+        "warning": "Removing can stall A/B feature rollouts and lock the device on default flag values."
+    },
+    {
+        "id": "com.google.android.apps.pixel.subzero",
+        "description": "Daily Hub - useless a general-purpose news app",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.photosgo",
+        "description": "Google Gallery (https://play.google.com/store/apps/details?id=com.google.android.apps.photosgo)",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.speechservices",
+        "description": "Google Speech Services\nAbsolute garbage. There is already another speech recognition app (Speech Recognition and Synthesis from Google), so this app is just spyware, judging by the URLs it connects to.\nhttps://www.virustotal.com/gui/file/9340b2aa1cb6f3fab3481a4bd5c0dacae2441bbb0849691b08a6e8bcedae2662/details",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.apps.gcs",
+        "description": "Internet services for Pixel and Nexus devices, including Wi-Fi/Mobile data switching, enabling a Google VPN on public networks, and Call Casting for Chromebooks. https://play.google.com/store/apps/details?id=com.google.android.apps.gcs",
+        "removal": "replace"
+    },
+    {
+        "id": "com.google.android.apps.genie.geniewidget",
+        "description": "News and weather widget. App was discontinued in 2018 and no longer works, therefore there is no point to have it anymore.",
+        "removal": "delete"
+    },
+    {
+        "id": "com.google.android.gm.exchange",
+        "description": "Microsoft Exchange ActiveSync support for Gmail. Now part of the Gmail (com.google.android.gm) app.",
+        "removal": "delete"
+    }
+]
