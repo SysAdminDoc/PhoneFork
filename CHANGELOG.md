@@ -2,6 +2,21 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.0 — 2026-05-14
+
+Roles tab live + roles/perms CLI branches. **All six core migration tabs now live.**
+
+### Added
+- `DefaultRoles` constants for the 8 AOSP role IDs PhoneFork enumerates (`android.app.role.{DIALER, SMS, BROWSER, HOME, ASSISTANT, CALL_REDIRECTION, CALL_SCREENING, EMERGENCY}`).
+- `RoleHolder` + `RoleSnapshot` models.
+- `RoleService` — wraps `cmd role get-role-holders --user 0 <role>` (handles both `package:<pkg>` and `[<pkg>]` Android-version output formats) and `cmd role add-role-holder --user 0 <role> <pkg>`. Also `GrantAsync` for `pm grant` and `SetAppOpAsync` for `appops set`.
+- WPF Roles tab: side-by-side `DataGrid` (Role / Source holder / Dest holder / Match / Status) with default-select-different rows, Apply Selected / Select All Different / Select None / Dry-run.
+- CLI: `phonefork roles get --device <s>`, `phonefork roles apply --from <s> --to <d> [--dry-run]`, `phonefork perms grant --device <d> --package <pkg> [--permission <p>] [--appop OP=mode]`.
+
+### Notes
+- Hardware-validated S25: all 8 roles snapshotted including non-default holders (Brave as browser, Google Messages as SMS, Should I Answer as call screener) — the exact preferences Smart Switch silently drops.
+- Notification listener + Accessibility service enablers via `cmd notification allow_listener` and `enabled_accessibility_services` deferred to v0.6.1 (cosmetic; `cmd role` covers the high-value defaults).
+
 ## v0.5.0 — 2026-05-14
 
 Wi-Fi tab live + Wi-Fi/CSC CLI branches.
