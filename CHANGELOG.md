@@ -2,6 +2,24 @@
 
 All notable changes to PhoneFork.
 
+## v0.2.0 — 2026-05-14
+
+Media tab live + media CLI branch.
+
+### Added
+- `PhoneFork.Core.Models.MediaCategory` enum with 11 user-storage subtrees (DCIM, Pictures, Movies, Music, Download, Documents, Ringtones, Notifications, Alarms, Recordings, WhatsAppMedia).
+- `MediaManifestService` — single-shell-call enumeration via `find <root> -type f -printf '%P\t%s\t%T@\n'`. Skips missing roots cleanly (e.g. WhatsApp on a phone without it).
+- `MediaDiffer` — set-diff producing `MediaPlan` with per-category buckets (NewOnSource / Conflict / Identical / NewOnDest) and byte counters.
+- `MediaSyncService` — pull-then-push pipeline. Honors `--delete` (mirror destination), `--update` (skip conflicts when source mtime ≤ dest), `--preserve-conflicts` (rename dest to `*.sync-conflict-<ts>-<sha8>.<ext>` per Syncthing pattern), `--dry-run`.
+- **Mtime preservation** — source mtime is propagated through `SyncService.PushAsync` so re-running a sync correctly classifies files as Identical, not Conflict.
+- WPF Media tab: per-category checkbox `DataGrid` with Src/Dst counts + plan buckets + MiB-to-transfer columns, action toolbar (Scan / Apply / Select All / Select None), four toggle checkboxes, live progress bar + current-file display.
+- CLI: `phonefork media manifest --device <s> --categories <CSV> --out <json>`, `phonefork media diff --src a.json --dst b.json`, `phonefork media sync --from <s> --to <d> [--dry-run] [--delete] [--update] [--preserve-conflicts]`.
+- Stable JSON manifest format with `JsonStringEnumConverter` — categories serialize as `"Dcim"` not `0`.
+
+### Notes
+- Stage directory: `%LOCALAPPDATA%\PhoneFork\stage\<sourceSerial>\<Category>\`.
+- Hardware-validated against S25 Ultra → S22 Ultra: 789 files / 131.6 MiB across 3 categories enumerated, diff correctly identified 6 files / 4.0 MiB to transfer with 0 conflicts.
+
 ## v0.1.0 — 2026-05-14
 
 Initial release.

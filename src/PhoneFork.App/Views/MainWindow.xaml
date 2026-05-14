@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.1.0"
+        Title="PhoneFork  &#x00B7;  v0.2.0"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen">
@@ -24,7 +24,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text=" v0.1.0" FontSize="20" Margin="6,4,0,0"
+            <TextBlock Text=" v0.2.0" FontSize="20" Margin="6,4,0,0"
                        Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
             <TextBlock Text="Dual-Samsung migration tool"
                        FontSize="13" Margin="16,8,0,0"
@@ -40,9 +40,7 @@
                 <views:AppsView DataContext="{Binding Apps}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Media">
-                <views:PlaceholderView Title="Media" Version="v0.2.0 (planned)"
-                    Body="Incremental sync of /sdcard photos, videos, music, ringtones, documents, downloads. Per-category checkboxes, resumable transfers, optional SHA-256 verify. Manifest-diff engine pulls/pushes only the delta — no re-shipping 50 GB of DCIM. CLI: phonefork media sync."
-                    Margin="0,12,0,0"/>
+                <views:MediaView DataContext="{Binding Media}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Settings">
                 <views:PlaceholderView Title="Settings" Version="v0.3.0 (planned)"

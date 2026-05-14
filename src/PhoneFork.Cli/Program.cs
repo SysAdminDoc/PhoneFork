@@ -16,6 +16,17 @@ app.Configure(config =>
         apps.AddCommand<AppsMigrateCommand>("migrate")
             .WithDescription("Pull APKs+splits from a source device and install on a destination device.");
     });
+
+    config.AddBranch("media", media =>
+    {
+        media.SetDescription("/sdcard media manifesting, diffing, and incremental sync.");
+        media.AddCommand<MediaManifestCommand>("manifest")
+            .WithDescription("Build a JSON manifest of /sdcard media on a device.");
+        media.AddCommand<MediaDiffCommand>("diff")
+            .WithDescription("Diff two manifests; emit a migration plan.");
+        media.AddCommand<MediaSyncCommand>("sync")
+            .WithDescription("Incremental sync of /sdcard media between two devices.");
+    });
 });
 
 return await app.RunAsync(args);
