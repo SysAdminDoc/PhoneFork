@@ -27,6 +27,17 @@ app.Configure(config =>
         media.AddCommand<MediaSyncCommand>("sync")
             .WithDescription("Incremental sync of /sdcard media between two devices.");
     });
+
+    config.AddBranch("settings", settings =>
+    {
+        settings.SetDescription("System settings snapshot, diff, and selective apply.");
+        settings.AddCommand<SettingsDumpCommand>("dump")
+            .WithDescription("Dump secure/system/global namespaces to a JSON snapshot.");
+        settings.AddCommand<SettingsDiffCommand>("diff")
+            .WithDescription("Diff two snapshots; show buckets by namespace.");
+        settings.AddCommand<SettingsApplyCommand>("apply")
+            .WithDescription("Capture both devices live and apply source -> destination via settings put.");
+    });
 });
 
 return await app.RunAsync(args);

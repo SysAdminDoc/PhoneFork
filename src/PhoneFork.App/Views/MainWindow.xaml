@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.2.0"
+        Title="PhoneFork  &#x00B7;  v0.3.0"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen">
@@ -24,7 +24,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text=" v0.2.0" FontSize="20" Margin="6,4,0,0"
+            <TextBlock Text=" v0.3.0" FontSize="20" Margin="6,4,0,0"
                        Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
             <TextBlock Text="Dual-Samsung migration tool"
                        FontSize="13" Margin="16,8,0,0"
@@ -43,9 +43,7 @@
                 <views:MediaView DataContext="{Binding Media}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Settings">
-                <views:PlaceholderView Title="Settings" Version="v0.3.0 (planned)"
-                    Body="Snapshot AOSP secure/system/global namespaces plus Samsung's com.sec.android.provider.settings content provider. Per-key cherry-pick UI with bucket coloring (S25-only, S22-only, both-but-different). Apply via settings put. Targets: AOD, edge panels, refresh rate, font scale, status-bar tweaks, accessibility shortcuts, animation scales."
-                    Margin="0,12,0,0"/>
+                <views:SettingsView DataContext="{Binding Settings}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Debloat">
                 <views:PlaceholderView Title="Debloat" Version="v0.4.0 (planned)"
