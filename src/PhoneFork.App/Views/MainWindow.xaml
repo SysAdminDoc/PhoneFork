@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.4.0"
+        Title="PhoneFork  &#x00B7;  v0.5.0"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen">
@@ -24,7 +24,7 @@
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" DockPanel.Dock="Left"/>
-            <TextBlock Text=" v0.4.0" FontSize="20" Margin="6,4,0,0"
+            <TextBlock Text=" v0.5.0" FontSize="20" Margin="6,4,0,0"
                        Foreground="{StaticResource ForegroundMutedBrush}" DockPanel.Dock="Left"/>
             <TextBlock Text="Dual-Samsung migration tool"
                        FontSize="13" Margin="16,8,0,0"
@@ -49,9 +49,7 @@
                 <views:DebloatView DataContext="{Binding Debloat}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Wi-Fi">
-                <views:PlaceholderView Title="Wi-Fi" Version="v0.5.0 (planned)"
-                    Body="Export saved Wi-Fi networks with PSKs from the source device. Primary path: Shizuku helper APK invoking WifiManager.getPrivilegedConfiguredNetworks(). Fallback path: render each network as a standard WIFI: QR string in the desktop UI for the destination to scan with its camera (no on-device install required). Selective import — skip work / corporate networks."
-                    Margin="0,12,0,0"/>
+                <views:WifiView DataContext="{Binding Wifi}" Margin="0,12,0,0"/>
             </TabItem>
             <TabItem Header="Roles">
                 <views:PlaceholderView Title="Default Apps and Permissions" Version="v0.6.0 (planned)"

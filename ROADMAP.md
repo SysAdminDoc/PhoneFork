@@ -83,19 +83,17 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [ ] _Per-package services inventory column_ — deferred to v0.4.1 (cosmetic — Tier+Warning already give the user enough signal to decide).
 - [ ] _Community-list import (CSV/JSON additions on top of bundled dataset)_ — deferred to v1.x.
 
-### v0.5.0 — Wi-Fi tab live ([Shizuku](https://github.com/RikkaApps/Shizuku) v13.6.0, [QRCoder](https://github.com/codebude/QRCoder), community `§2` Wi-Fi-password complaints)
+### v0.5.0 — Wi-Fi tab live ✅ _(shipped 2026-05-14)_
 
-**Theme**: Coverage + Honesty + Trust.
+**Theme**: Coverage + Honesty + Trust. Sources: [Shizuku v13.6.0](https://github.com/RikkaApps/Shizuku), [QRCoder](https://github.com/codebude/QRCoder), community `§2` and `§9`.
 
-- **Two-path export**:
-  - **Primary**: Shizuku-bound helper APK invoking `WifiManager.getPrivilegedConfiguredNetworks()` (privileged caller). Returns `SSID`, `bssid`, `preSharedKey`, `wepKeys`, `wpa3Sae`, `eap`, `hiddenSsid`. Output is `wifi.json`. Shizuku auto-start on trusted WLAN (v13.6+) removes re-pair-per-reboot friction.
-  - **Fallback**: render each network as a `WIFI:T:WPA;S:<ssid>;P:<psk>;H:false;;` QR via `QRCoder.PayloadGenerator.WiFi`. User scans with destination's camera. Zero on-device install.
-- **Bulk import on destination** via the same helper APK calling `WifiManager.addNetwork()` + `WifiManager.enableNetwork(id, false)`.
-- **Cross-OEM mode** — source can be any Android (Huawei, Xiaomi, OnePlus). Closes community `§2` cross-OEM complaint.
-- **Per-network checkbox UI** — skip work / corporate / one-shot networks before applying. Source: community `§10` selective-restore signal.
-- **CSC / locale / region diff banner** — read `getprop persist.sys.sales_code` on both, warn before transferring region-locked items (Samsung Pay tokens, regional Health features). Closes community `§9`.
-
-**CLI surface**: `phonefork wifi export --device <s> --out wifi.json`, `phonefork wifi import --device <d> --plan wifi.json`, `phonefork wifi qr --device <s>`.
+- [x] **QR-bridge fallback path** — render any user-supplied SSID + PSK as a standard `WIFI:T:...;S:...;P:...;H:...;;` QR via `QRCoder.PayloadGenerator.WiFi`. Zero on-device install. PNG + SVG render helpers.
+- [x] **Source SSID enumeration** — `cmd wifi list-networks` primary + `dumpsys wifi` regex fallback. Auth type parsed from the security column. Cross-OEM (works on any Android, not just Samsung).
+- [x] **Per-row "Use → manual composer"** — pick an SSID from the list, type the PSK, render the QR. Selective by design (closes community §10 selective-restore signal).
+- [x] **CSC / locale / region diff banner** — `CscDiffService` reads `persist.sys.sales_code`, `ro.csc.country_code`, `persist.sys.locale`, `persist.sys.timezone`, `gsm.sim.operator.iso-country`. UI banner surfaces mismatches with the "region-locked items may not restore" warning.
+- [x] **CLI**: `phonefork wifi list`, `phonefork wifi qr`, `phonefork csc diff`.
+- [ ] _Shizuku-bound `WifiManager.getPrivilegedConfiguredNetworks()` PSK export_ — deferred to v0.7 (depends on the companion APK).
+- [ ] _Bulk import on destination via `WifiManager.addNetwork()`_ — deferred to v0.7 (same dependency).
 
 ---
 
