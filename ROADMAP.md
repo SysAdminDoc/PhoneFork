@@ -120,7 +120,7 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [x] **`WIFI:T:ADB;S:<svc>;P:<code>;;` QR parser** for Android Studio-style pairing QRs.
 - [x] **CLI**: `phonefork pair <ip:port> <code>`, `phonefork connect <ip:port>`, `phonefork disconnect [ip:port]`.
 - [x] **WPF Wireless ADB panel from DeviceBar** — shipped in v0.6.6. Pair, connect, disconnect, QR-payload parse, inline status feedback, and device-list refresh.
-- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.7 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a discovery shim).
+- [ ] _mDNS auto-reconnect via `_adb-tls-connect._tcp` discovery_ — deferred to v0.6.8 (the bundled `adb.exe` already handles auto-reconnect when paired; PhoneFork's wrapper just needs a discovery shim).
 - [ ] _Per-install ADB RSA key in `%LOCALAPPDATA%\PhoneFork\adb-keys\`_ — deferred to v1.0.0 trust-hardening (currently inherits the shared `%USERPROFILE%\.android\adbkey`).
 
 ### v0.6.6 — Premium WPF polish ✅ _(shipped 2026-05-14)_
@@ -131,6 +131,14 @@ Three-project .NET 10 solution (`PhoneFork.Core` + `PhoneFork.App` (WPF) + `Phon
 - [x] **First-run empty states** — Apps, Settings, Debloat, Wi-Fi, and Roles tables explain what to scan, what will happen next, and which safety model applies.
 - [x] **Visible command readiness** — selected-row counters and individual checkbox updates now refresh Apply/Migrate command enabled states immediately.
 - [x] **Device trust/readiness polish** — no-device guidance, authorization status dots, and the local-only / no-root / no-cloud header copy reinforce the product's trust posture.
+
+### v0.6.7 — Screenshot-driven shell polish ✅ _(shipped 2026-05-14)_
+
+**Theme**: Reach + WCAG groundwork.
+
+- [x] **Dark shell ownership** — MainWindow now sets dark background, typography, layout rounding, and OS dark-title-bar preference explicitly so the client chrome does not flash or settle into default Windows light colors.
+- [x] **Native control leak repair** — combo boxes and checkboxes now use app-owned Catppuccin templates with consistent focus, hover, selected, checked, and disabled states.
+- [x] **Navigation and disabled-state contrast** — tab labels and unavailable commands now retain enough contrast to look deliberate while still communicating availability.
 
 ### v0.7.0 — Helper companion APK + push-and-run JAR ([scrcpy](https://github.com/Genymobile/scrcpy) `app_process` pattern, [gonodono/adbsms](https://github.com/gonodono/adbsms))
 
