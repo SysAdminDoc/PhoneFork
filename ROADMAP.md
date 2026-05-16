@@ -312,10 +312,10 @@ Scale: Impact/Effort/Risk = 1 low to 5 high. Prevalence: T = table stakes, C = c
 ### Next: v0.9.0 - Backup Interop (🟢 PARTIALS SHIPPED 2026-05-16)
 
 1. [x] Write and read AppManager-compatible backups (F029, F030). — `AppManagerBackupWriter` / `AppManagerBackupReader` round-trip the v5 layout with SHA-256 checksum verification.
-2. [ ] Add `.ab` legacy import for Android <= 11 archives (F031). — Pending; nelenkov/android-backup-extractor reference.
-3. [ ] Add Open Android Backup archive bridge for 7-Zip/open export compatibility (F032). — Pending.
+2. [~] Add `.ab` legacy import for Android <= 11 archives (F031). — `AndroidBackupReader.Sniff()` parses the ANDROID BACKUP header (version + compression + encryption + key block presence). Tar walking / AES-256 decryption follows in v0.9.1.
+3. [~] Add Open Android Backup archive bridge for 7-Zip/open export compatibility (F032). — `OpenAndroidBackupReader.Sniff()` detects archive + sidecar; 7z extraction follows in v0.9.1.
 4. [x] Implement snapshot retention by count, days, and size (F033, F034). — `BackupRetentionSweeper` + `RetentionPolicy`.
-5. [ ] Emit Android cross-platform-transfer metadata where it maps cleanly (F035). — Schema slot in `OpenArchiveManifest` already; bound to UI in v0.9.1.
+5. [x] Emit Android cross-platform-transfer metadata where it maps cleanly (F035). — `CrossPlatformMetadata` field added to `OpenArchiveManifest`; the iOS interop app list populates from per-app `<cross-platform-transfer>` rules.
 6. [ ] Document Seedvault v0/v1 boundaries without overpromising (F036). — Roadmap-note only; v0.9.1 README.
 
 **Why next:** interop turns PhoneFork from a one-shot migrator into a reusable backup asset manager.
