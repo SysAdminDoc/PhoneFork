@@ -118,6 +118,25 @@ app.Configure(config =>
         shz.AddCommand<ShizukuStatusCommand>("status")
             .WithDescription("Detect Shizuku state on a device and print the runbook.");
     });
+
+    config.AddBranch("smartswitch", ss =>
+    {
+        ss.SetDescription("Samsung Smart Switch detection and handoff (F024 / F025).");
+        ss.AddCommand<SmartSwitchDetectCommand>("detect")
+            .WithDescription("Detect Smart Switch (legacy MSI + Microsoft Store) and backup folder.");
+    });
+
+    config.AddBranch("trusted", t =>
+    {
+        t.SetDescription("Trusted-pair registry (F004). Hashed serials only — no raw IDs on disk.");
+        t.AddCommand<TrustedListCommand>("list")
+            .WithDescription("List trusted pairs.");
+        t.AddCommand<TrustedForgetCommand>("forget")
+            .WithDescription("Forget one trusted pair by hash (copy from `trusted list`).");
+    });
+
+    config.AddCommand<BurstModeCommand>("burst-mode")
+        .WithDescription("Toggle ADB Burst Mode (F104). Affects newly-started ADB servers; restart required.");
 });
 
 return await app.RunAsync(args);
