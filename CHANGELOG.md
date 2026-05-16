@@ -2,6 +2,25 @@
 
 All notable changes to PhoneFork.
 
+## v0.9.0-pre — 2026-05-16
+
+Backup format detection layer (F031, F032) + Android `<cross-platform-transfer>`
+metadata in the open archive manifest (F035). All sniffer paths are read-only;
+real extraction/decryption follows in v0.9.1.
+
+### Added
+- `AndroidBackupReader.Sniff()` — parses the legacy `adb backup` archive header
+  (magic, format version, compression flag, encryption tag, key-block presence).
+- `OpenAndroidBackupReader.Sniff()` — detects an Open Android Backup archive
+  directory (`*.7z` + optional sidecar JSON / txt).
+- `CrossPlatformMetadata` on `OpenArchiveManifest` — carries the per-archive
+  list of apps that opted into Android 16 QPR2+ iOS interop.
+
+### Tests
+- 113 → 122 (+9). New coverage: AB header sniffer (plain, compressed/encrypted,
+  non-AB, missing file), OAB archive detection with both sidecar shapes,
+  cross-platform metadata JSON serialization, optional manifest field.
+
 ## v0.8.0 — 2026-05-16
 
 Smart Switch interop + backup interop foundations + pre-flight bundle + media
