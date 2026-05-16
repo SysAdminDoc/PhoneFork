@@ -13,6 +13,7 @@
             <conv:BoolToVisibilityConverter x:Key="InverseBoolToVis" Invert="True"/>
             <conv:NullToVisibilityConverter x:Key="NullToVis"/>
             <conv:NullToVisibilityConverter x:Key="InverseNullToVis" Invert="True"/>
+            <conv:WirelessToggleConverter x:Key="WirelessToggleConv"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

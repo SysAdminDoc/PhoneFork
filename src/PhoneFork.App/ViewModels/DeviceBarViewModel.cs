@@ -38,6 +38,8 @@ public partial class DeviceBarViewModel : ObservableObject
 {
     private readonly DeviceService _devices;
     private readonly AdbHostService _host;
+    private readonly WirelessPolicy _wireless;
+    private readonly TrustedPairRegistry _trusted;
     private readonly ILogger _log;
 
     public ObservableCollection<DeviceCardViewModel> Cards { get; } = new();
@@ -54,18 +56,119 @@ public partial class DeviceBarViewModel : ObservableObject
     [ObservableProperty] private string _connectHostPort = "";
     [ObservableProperty] private string _pairingQrText = "";
     [ObservableProperty] private string _pairStatus = "Pair with the phone's Wireless debugging pairing endpoint, then connect to its wireless ADB endpoint.";
+    [ObservableProperty] private bool _wirelessOptedIn;
+    [ObservableProperty] private bool _allowUnpatchedOverride;
+    [ObservableProperty] private string _wirelessSessionStatus = "Wireless ADB is off. USB is the default trust posture.";
+    [ObservableProperty] private string _mdnsStatus = "Tap Discover to scan the LAN for wireless ADB services.";
+    [ObservableProperty] private bool _isMdnsBusy;
 
-    public DeviceBarViewModel(DeviceService devices, AdbHostService host, ILogger log)
+    public ObservableCollection<MdnsServiceRowViewModel> MdnsServices { get; } = new();
+
+    public DeviceBarViewModel(DeviceService devices, AdbHostService host, SecurityPostureService _posture, WirelessPolicy wireless, TrustedPairRegistry trusted, ILogger log)
     {
         _devices = devices;
         _host = host;
+        _wireless = wireless;
+        _trusted = trusted;
         _log = log;
-        _devices.PhonesChanged += (_, __) => Application.Current.Dispatcher.Invoke(Rebuild);
+        _devices.PhonesChanged += (_, __) => Application.Current.Dispatcher.Invoke(() =>
+        {
+            Rebuild();
+            UpdateTrustForCurrentDevices();
+        });
         Rebuild();
+        UpdateTrustForCurrentDevices();
+        RefreshWirelessSessionStatus();
+    }
+
+    /// <summary>
+    /// For each currently visible authorized device, refresh its trusted-pair record.
+    /// The registry only stores hashes; the visible label is rebuilt from PhoneInfo
+    /// each session and remains volatile.
+    /// </summary>
+    private void UpdateTrustForCurrentDevices()
+    {
+        foreach (var card in Cards)
+        {
+            if (!card.IsAuthorized) continue;
+            var transport = SecurityPostureService.ClassifyTransport(card.Serial);
+            _trusted.Touch(card.Serial, card.DisplayName, transport,
+                lastEndpoint: transport == AdbTransport.Tcp ? card.Serial : null);
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleWirelessSession()
+    {
+        if (_wireless.WirelessOptedIn)
+        {
+            _wireless.KillWireless();
+        }
+        else
+        {
+            _wireless.OptInWireless();
+        }
+        WirelessOptedIn = _wireless.WirelessOptedIn;
+        RefreshWirelessSessionStatus();
+    }
+
+    private void RefreshWirelessSessionStatus()
+    {
+        WirelessOptedIn = _wireless.WirelessOptedIn;
+        AllowUnpatchedOverride = _wireless.AllowUnpatchedOverride;
+        WirelessSessionStatus = _wireless.WirelessOptedIn
+            ? $"Wireless ADB session active. Expires {_wireless.SessionExpiresAt.ToLocalTime():HH:mm}. Patch level >= 2026-05-01 required."
+            : "Wireless ADB is off. USB is the default trust posture.";
+    }
+
+    partial void OnAllowUnpatchedOverrideChanged(bool value)
+    {
+        _wireless.AllowUnpatchedOverride = value;
+        RefreshWirelessSessionStatus();
     }
 
     [RelayCommand]
     private void Refresh() => _devices.Refresh();
+
+    [RelayCommand]
+    private async Task DiscoverMdnsAsync(CancellationToken ct)
+    {
+        IsMdnsBusy = true;
+        MdnsStatus = "Scanning the LAN for wireless ADB services…";
+        try
+        {
+            var svc = new AdbPairingService(_host.AdbPath, _log);
+            var services = await svc.ListMdnsServicesAsync(ct);
+            MdnsServices.Clear();
+            foreach (var s in services)
+            {
+                var hash = SerialHash.Of(s.HostPort);
+                var trusted = _trusted.Get(s.HostPort);
+                var label = trusted?.Label ?? (string.IsNullOrEmpty(s.Instance) ? s.HostPort : s.Instance);
+                MdnsServices.Add(new MdnsServiceRowViewModel(s, label, trusted is not null, hash));
+            }
+            MdnsStatus = MdnsServices.Count == 0
+                ? "No wireless ADB services discovered. Ensure both devices are on the same Wi-Fi network and have Wireless debugging enabled."
+                : $"{MdnsServices.Count} service(s) found. Click Reconnect on a trusted entry, or paste its endpoint into Connect above.";
+        }
+        catch (Exception ex)
+        {
+            _log.Error(ex, "mDNS discovery failed");
+            MdnsStatus = $"mDNS discovery failed: {ex.Message}";
+        }
+        finally
+        {
+            IsMdnsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ReconnectMdns(MdnsServiceRowViewModel? row)
+    {
+        if (row is null) return;
+        ConnectHostPort = row.Service.HostPort;
+        PairStatus = $"Endpoint {row.Service.HostPort} loaded into Connect. Verify trust, then Connect.";
+    }
 
     [RelayCommand]
     private void ToggleWirelessPairing() => ShowWirelessPairing = !ShowWirelessPairing;
@@ -103,6 +206,14 @@ public partial class DeviceBarViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanPair))]
     private async Task PairAsync(CancellationToken ct)
     {
+        var gate = _wireless.EvaluateHostPort(PairHostPort.Trim());
+        if (!gate.IsAllowed)
+        {
+            PairStatus = $"Pair refused. {gate.Reason}";
+            _log.Warning("Wireless ADB pair blocked: {Reason}", gate.Reason);
+            return;
+        }
+
         IsPairingBusy = true;
         PairStatus = $"Pairing {PairHostPort.Trim()}…";
         try
@@ -121,18 +232,32 @@ public partial class DeviceBarViewModel : ObservableObject
         finally
         {
             IsPairingBusy = false;
+            RefreshWirelessSessionStatus();
         }
     }
 
     [RelayCommand(CanExecute = nameof(CanConnect))]
     private async Task ConnectAsync(CancellationToken ct)
     {
+        var gate = _wireless.EvaluateHostPort(ConnectHostPort.Trim());
+        if (!gate.IsAllowed)
+        {
+            PairStatus = $"Connect refused. {gate.Reason}";
+            _log.Warning("Wireless ADB connect blocked: {Reason}", gate.Reason);
+            return;
+        }
+
         IsPairingBusy = true;
         PairStatus = $"Connecting {ConnectHostPort.Trim()}…";
         try
         {
             var svc = new AdbPairingService(_host.AdbPath, _log);
-            var result = await svc.ConnectAsync(ConnectHostPort.Trim(), ct);
+            var endpoint = ConnectHostPort.Trim();
+            var result = await svc.ConnectAsync(endpoint, ct);
+            if (result.Success)
+            {
+                _trusted.Touch(endpoint, $"Wireless {endpoint}", AdbTransport.Tcp, endpoint);
+            }
             PairStatus = result.Success
                 ? CleanAdbResult("Connected", result.Output, result.Error)
                 : CleanAdbResult("Connect failed", result.Output, result.Error);
@@ -146,6 +271,7 @@ public partial class DeviceBarViewModel : ObservableObject
         finally
         {
             IsPairingBusy = false;
+            RefreshWirelessSessionStatus();
         }
     }
 
@@ -211,4 +337,27 @@ public partial class DeviceBarViewModel : ObservableObject
         var detail = string.Join(" ", parts);
         return string.IsNullOrWhiteSpace(detail) ? $"{prefix}." : $"{prefix}: {detail}";
     }
+}
+
+/// <summary>
+/// One discovered mDNS service row in the DeviceBar's reconnect surface (F005).
+/// </summary>
+public sealed class MdnsServiceRowViewModel
+{
+    public MdnsService Service { get; }
+    public string Label { get; }
+    public bool IsTrusted { get; }
+    public string SerialHashShort { get; }
+
+    public MdnsServiceRowViewModel(MdnsService service, string label, bool isTrusted, string serialHash)
+    {
+        Service = service;
+        Label = label;
+        IsTrusted = isTrusted;
+        SerialHashShort = serialHash;
+    }
+
+    public string Endpoint => Service.HostPort;
+    public string ServiceType => Service.ServiceType;
+    public string TrustLine => IsTrusted ? $"Trusted ({SerialHashShort})" : "Untrusted endpoint";
 }

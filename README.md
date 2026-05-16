@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.6.8-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.6.9-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -25,6 +25,10 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 Third-party app **private data** (banking, messengers, game saves, login sessions) does not transfer. Android's security model prevents reading `/data/data/<pkg>/` without root, and `adb backup` was effectively neutered in Android 12. For app-data migration, run Samsung Smart Switch alongside PhoneFork as a complementary step.
 
 Knox-bound data (Secure Folder, Samsung Wallet payment tokens, enterprise containers) is intentionally inaccessible by design — re-set those up on the destination.
+
+## Android developer verification (Sept 2026)
+
+Google's [developer verification](https://developer.android.com/developer-verification/guides/faq) requirement applies to **Play / sideload installs of unverified developers**. It does **not** apply to packages installed via ADB. PhoneFork's helper APK roadmap (v0.7.0) ships the helper through `adb install`, so the verification gate is not on the critical path. If you sideload the helper outside ADB you may be prompted by your launcher to verify the developer; that is normal.
 
 ## Install
 
