@@ -15,18 +15,18 @@ PhoneFork is the Windows-host migration tool Samsung Smart Switch should have be
 | Area | Current state |
 |---|---|
 | Repository | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`. Pre-launch on 2026-05-16: 0 stars, 0 open issues, 0 PRs, no tags yet — v0.6.9 release-readiness is queued under F107. |
-| Version | README, CHANGELOG, XAML title, and app manifest show **v0.7.0** after the helper-APK foundations ship. Roadmap header at 2026.05.16b. |
-| Recent history | v0.7.0 added the helper-APK Gradle scaffold, host-side `HelperAppService`/`AppProcessAgentService`/`ShizukuService`, provider-call audit scopes, backup-capability probe, open-archive spec, CONTRIBUTING.md, and CI/release workflows. v0.6.9 shipped the CVE-2026-0073 wireless gate, per-install ADB key, trusted-pair registry, mDNS reconnect, Samsung honesty pre-flight, and debloat dataset overrides. |
+| Version | README, CHANGELOG, XAML title, and app manifest show **v0.8.0** after the Smart Switch interop + backup interop + pre-flight foundations ship. Roadmap header at 2026.05.16b. |
+| Recent history | v0.8.0 added Smart Switch detection, sandbox parser shell, AppManager-compatible backup writer/reader, retention sweeper, pre-flight bundle, media integrity verify, ADB Burst Mode toggle, trusted-pair CLI. v0.7.0 shipped helper-APK Gradle scaffold, helper lifecycle, app_process JAR runner, Shizuku detection, provider-call audit, backup-capability probe, open-archive spec, CI/release workflows. v0.6.9 shipped the CVE-2026-0073 wireless gate, per-install ADB key, trusted-pair registry, mDNS reconnect, Samsung honesty pre-flight, debloat dataset overrides. |
 | Stack | C# 14 / .NET 10 (SDK 10.0.202), WPF, MVVM (CommunityToolkit.Mvvm 8.4.2), Spectre.Console.Cli 0.55.0, AdvancedSharpAdbClient 3.6.16, AlphaOmega.ApkReader 2.0.10, CliWrap 3.10.1, **Serilog 4.3.1** + Compact NDJSON, QRCoder 1.6.0, MaterialDesignThemes 5.3.2, HandyControl 3.5.1, JsonSchema.Net 7.3.0, **Microsoft.Xaml.Behaviors.Wpf 1.1.142**, xUnit Core tests. |
 | Build system | `PhoneFork.slnx`; projects: `src/PhoneFork.Core`, `src/PhoneFork.App`, `src/PhoneFork.Cli`, `tests/PhoneFork.Core.Tests`. Bundled `tools/adb.exe` + DLLs from platform-tools 37.0.0. |
 | Entry points | WPF: `src/PhoneFork.App/App.xaml.cs`; CLI: `src/PhoneFork.Cli/Program.cs`. |
 | Runtime target | Windows 10/11 with .NET 10 Desktop Runtime; Android 11+ devices over USB ADB or Android 11+ Wireless Debugging. |
 | Code size | ~110 first-party C#/XAML files under `src` + `tests` + helper-APK Kotlin; ~9,000 LOC. |
-| Top code surfaces | `CatppuccinMocha.xaml`, `DebloatService`, `MediaSyncService`, `DeviceBarViewModel`, `DebloatViewModel`, `WifiViewModel`, `SettingsViewModel`, `AppsViewModel`, `RolesViewModel`, `AppInstallerService`, `AdbPairingService`, `WirelessPolicy`, `TrustedPairRegistry`, `SamsungHonestyService`, `HelperAppService`, `AppProcessAgentService`, `ShizukuService`, `BackupCapabilityService`, `OpenArchiveManifest`. |
-| Shipped features | All v0.6.9 plus v0.7.0 helper-APK Gradle scaffold, host-side helper lifecycle (`phonefork helper install/uninstall/probe/residue`), `app_process` JAR runner, Shizuku state probe (`phonefork shizuku status`), provider-call audit scopes, backup-capability probe, open-archive manifest spec, CI/release workflows, CONTRIBUTING.md. |
+| Top code surfaces | All prior plus `SmartSwitchDetection`, `SandboxParser`, `AppManagerBackupWriter`/`Reader`, `BackupRetentionSweeper`, `PreflightService`, `MediaIntegrityService`, `AdbBurstModeService`. |
+| Shipped features | All v0.7.0 plus v0.8.0 Smart Switch detection (`phonefork smartswitch detect`), sandbox parser shell, AppManager-compatible backup writer/reader with checksum verification, retention sweeper (count/days/bytes), pre-flight bundle (Samsung honesty + CSC diff + OEM-unlock + Knox + posture), media integrity verify (size+mtime / CRC32 / SHA-256), ADB Burst Mode toggle (`phonefork burst-mode on/off`), trusted-pair CLI (`phonefork trusted list/forget`). |
 | Source markers | Source/test/docs scan found no TODO/FIXME/HACK/XXX/NotImplemented markers outside benign `[Obsolete]`-style enum docs. No stub functions in production code. |
 | Tracked issues | GitHub issues list empty. No PRs. No external community signal yet. |
-| Dependency state | `dotnet list package --vulnerable`: clean. Pending bumps after v0.7.0: QRCoder 1.6.0 → 1.8.0 (deferred), JsonSchema.Net 7.3.0 → 9.2.0 (deferred behind tests), Serilog.Sinks.File 6.0.0 → 7.0.0 (deferred), Spectre.Console 0.55.0 → 0.55.x-alpha (held; no stable cut). Test suite: **93/93 passing**. |
+| Dependency state | `dotnet list package --vulnerable`: clean. Pending bumps after v0.8.0: QRCoder 1.6.0 → 1.8.0 (deferred), JsonSchema.Net 7.3.0 → 9.2.0 (deferred behind tests), Serilog.Sinks.File 6.0.0 → 7.0.0 (deferred), Spectre.Console 0.55.0 → 0.55.x-alpha (held; no stable cut). Test suite: **113/113 passing**. |
 
 ### What It Does Today
 
@@ -299,24 +299,24 @@ Scale: Impact/Effort/Risk = 1 low to 5 high. Prevalence: T = table stakes, C = c
 
 **Why now:** this is the pivot from "ADB shell can do it" to "honest no-root coverage expansion." It unlocks the highest-value missing categories without lying about `/data/data`. AppManager's open issues #1970–#1974 confirm the same Shizuku + verification arc.
 
-### Next: v0.8.0 - Smart Switch Interop
+### Next: v0.8.0 - Smart Switch Interop (🟢 FOUNDATIONS SHIPPED 2026-05-16)
 
-1. Detect legacy MSI and Microsoft Store Smart Switch footprints (F024).
-2. Drive Smart Switch via FlaUI only for categories PhoneFork cannot reach (F025).
-3. Inspect existing Smart Switch backup folders and mobile-created `.bk` files (F028).
-4. Run `.bk` parsing in an AppContainer-restricted child process (F026, F027).
-5. Import readable categories into PhoneFork's selective apply views (F028).
+1. [x] Detect legacy MSI and Microsoft Store Smart Switch footprints (F024). — `SmartSwitchDetection` + CLI `phonefork smartswitch detect`.
+2. [ ] Drive Smart Switch via FlaUI only for categories PhoneFork cannot reach (F025). — Stub planned for v0.8.1 once a real UIA locator survey is done.
+3. [ ] Inspect existing Smart Switch backup folders and mobile-created `.bk` files (F028). — Backup folder detection ships in F024; reader follows the `.bk` parser binary.
+4. [x] Run `.bk` parsing in an AppContainer-restricted child process (F026, F027). — `SandboxParser` host-side launcher with timeout, env-cleared, no inherited handles. The `.bk` parser binary lands in v0.8.1.
+5. [ ] Import readable categories into PhoneFork's selective apply views (F028). — Follows the parser binary.
 
 **Why next:** Smart Switch remains the only path for some Samsung/Knox categories. PhoneFork should orchestrate it honestly rather than pretend to replace it.
 
-### Next: v0.9.0 - Backup Interop
+### Next: v0.9.0 - Backup Interop (🟢 PARTIALS SHIPPED 2026-05-16)
 
-1. Write and read AppManager-compatible backups (F029, F030).
-2. Add `.ab` legacy import for Android <= 11 archives (F031).
-3. Add Open Android Backup archive bridge for 7-Zip/open export compatibility (F032).
-4. Implement snapshot retention by count, days, and size (F033, F034).
-5. Emit Android cross-platform-transfer metadata where it maps cleanly (F035).
-6. Document Seedvault v0/v1 boundaries without overpromising (F036).
+1. [x] Write and read AppManager-compatible backups (F029, F030). — `AppManagerBackupWriter` / `AppManagerBackupReader` round-trip the v5 layout with SHA-256 checksum verification.
+2. [ ] Add `.ab` legacy import for Android <= 11 archives (F031). — Pending; nelenkov/android-backup-extractor reference.
+3. [ ] Add Open Android Backup archive bridge for 7-Zip/open export compatibility (F032). — Pending.
+4. [x] Implement snapshot retention by count, days, and size (F033, F034). — `BackupRetentionSweeper` + `RetentionPolicy`.
+5. [ ] Emit Android cross-platform-transfer metadata where it maps cleanly (F035). — Schema slot in `OpenArchiveManifest` already; bound to UI in v0.9.1.
+6. [ ] Document Seedvault v0/v1 boundaries without overpromising (F036). — Roadmap-note only; v0.9.1 README.
 
 **Why next:** interop turns PhoneFork from a one-shot migrator into a reusable backup asset manager.
 
