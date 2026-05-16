@@ -98,6 +98,26 @@ app.Configure(config =>
 
     config.AddCommand<HonestyCommand>("honesty")
         .WithDescription("Pre-flight scan of a source device for Samsung categories that won't transfer (Pass, Wallet, Secure Folder, Routines, etc.).");
+
+    config.AddBranch("helper", helper =>
+    {
+        helper.SetDescription("Lifecycle for the PhoneForkHelper companion APK (SMS, call log, contacts, Wi-Fi, wallpaper, ringtone, dictionary).");
+        helper.AddCommand<HelperInstallCommand>("install")
+            .WithDescription("Push and install PhoneForkHelper.apk onto a device.");
+        helper.AddCommand<HelperUninstallCommand>("uninstall")
+            .WithDescription("Uninstall PhoneForkHelper (idempotent).");
+        helper.AddCommand<HelperProbeCommand>("probe")
+            .WithDescription("Health-check every helper provider authority.");
+        helper.AddCommand<HelperResidueCommand>("residue")
+            .WithDescription("Verify the helper is gone after migration (F019).");
+    });
+
+    config.AddBranch("shizuku", shz =>
+    {
+        shz.SetDescription("Shizuku detection and runbook (F012).");
+        shz.AddCommand<ShizukuStatusCommand>("status")
+            .WithDescription("Detect Shizuku state on a device and print the runbook.");
+    });
 });
 
 return await app.RunAsync(args);
