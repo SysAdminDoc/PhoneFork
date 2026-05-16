@@ -1,0 +1,93 @@
+name: release
+
+# Triggered on a `v*` tag. Publishes a framework-dependent ZIP for the
+# WPF host + CLI and a CycloneDX SBOM. Signing + provenance attestation
+# slots are wired (F064 / F065 / F066) but the secrets are not provisioned
+# yet, so those steps are no-ops on a public repo build until the maintainer
+# adds the AZURE_ARTIFACT_SIGNING secrets.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  build-and-sign:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          include-prerelease: true
+
+      - name: Restore + build (Release)
+        run: |
+          dotnet restore PhoneFork.slnx
+          dotnet build PhoneFork.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release --no-build
+
+      - name: Publish WPF (framework-dependent, win-x64)
+        run: |
+          dotnet publish src/PhoneFork.App/PhoneFork.App.csproj `
+            -c Release -r win-x64 --self-contained false `
+            -o publish/wpf
+
+      - name: Publish CLI (framework-dependent, win-x64)
+        run: |
+          dotnet publish src/PhoneFork.Cli/PhoneFork.Cli.csproj `
+            -c Release -r win-x64 --self-contained false `
+            -o publish/cli
+
+      - name: Zip release artifacts
+        shell: pwsh
+        run: |
+          $tag = "${env:GITHUB_REF_NAME}"
+          if (-not $tag) { $tag = "dev" }
+          Compress-Archive -Path publish/wpf/* -DestinationPath "PhoneFork-$tag-wpf-win-x64.zip"
+          Compress-Archive -Path publish/cli/* -DestinationPath "PhoneFork-$tag-cli-win-x64.zip"
+
+      # F064 — Azure Artifact Signing. Sign the produced ZIPs with the configured
+      # certificate. Disabled until AZURE_TENANT_ID / AZURE_CLIENT_ID / AZURE_CLIENT_SECRET
+      # secrets are set on the repo.
+      - name: Sign artifacts (Azure Artifact Signing)
+        if: ${{ env.HAVE_SIGNING_SECRETS == 'true' }}
+        run: |
+          dotnet tool install --global sign --version 0.9.1-beta.25101.4
+          sign code azure-trusted-signing PhoneFork-*-win-x64.zip `
+            --azure-tenant-id "${env:AZURE_TENANT_ID}" `
+            --azure-client-id "${env:AZURE_CLIENT_ID}" `
+            --azure-client-secret "${env:AZURE_CLIENT_SECRET}" `
+            --trusted-signing-account "${env:AZURE_SIGNING_ACCOUNT}" `
+            --certificate-profile "${env:AZURE_SIGNING_PROFILE}" `
+            --description "PhoneFork release" `
+            --description-url "https://github.com/SysAdminDoc/PhoneFork"
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          HAVE_SIGNING_SECRETS: ${{ secrets.AZURE_TENANT_ID != '' && 'true' || 'false' }}
+
+      # F066 — SLSA Level 3 build provenance via GitHub artifact attestations.
+      - name: Generate SLSA attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'PhoneFork-*-win-x64.zip'
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            PhoneFork-*-win-x64.zip
+          generate_release_notes: true

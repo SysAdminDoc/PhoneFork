@@ -2,6 +2,44 @@
 
 All notable changes to PhoneFork.
 
+## v0.7.0 — 2026-05-16
+
+Helper companion APK foundations (F010, F011, F012, F019, F020, F021, F022, F023, F072).
+This release lays the v0.7.x groundwork: a Kotlin/Gradle helper-APK scaffold, the host-side
+push-and-run JAR pattern, Shizuku detection, helper lifecycle/probe/residue APIs, an audit
+scope for provider calls, a backup-capability probe, an open-archive spec, and CI/release
+workflows. No new tabs in the WPF UI yet — that lands as v0.7.1 once the provider bodies
+ship in the helper APK.
+
+### Added
+- `helper-apk/` — Gradle 8.7 / Kotlin 2.0 scaffold with `compileSdk=36`, `targetSdk=36`,
+  `minSdk=30`, applicationId `com.sysadmindoc.phonefork.helper`. ContentProvider stubs
+  for SMS, call log, contacts, Wi-Fi, wallpaper, ringtone, dictionary. Shell-UID gate
+  baked into `BaseHelperProvider` so only ADB-driven queries reach the providers.
+- `HelperAppService` (Core) — install / uninstall / health-probe / residue-check for
+  the PhoneForkHelper.apk. CLI: `phonefork helper {install|uninstall|probe|residue}`.
+- `AppProcessAgentService` (Core) — scrcpy-style push-and-run JAR runner against
+  `/data/local/tmp/phonefork-agent.jar` via `CLASSPATH=... app_process /`.
+- `ShizukuService` (Core) — detect Shizuku state (`NotInstalled` / `NotRunning` /
+  `Running`) and emit a step-by-step runbook. CLI: `phonefork shizuku status`.
+- `ProviderCallAudit` (Core) — Serilog `LogContext` scopes for each helper call,
+  picking up the existing SerialHashingEnricher so device IDs are hashed on disk.
+- `BackupCapabilityService` (Core) — per-app `dumpsys package` probe for
+  `allowBackup` / `dataExtractionRules` / `cross-platform-transfer`. Mapped to
+  `HonestyFinding` entries (F022).
+- `OpenArchiveManifest` (Core) — JSON-shaped spec for the open-export archive
+  layout (F023). Hashed serials only — never raw IDs.
+- `CONTRIBUTING.md` — first contributor guide (F072).
+- `.github/workflows/ci.yml` — restore/build/test/vuln-scan on every push (F067, F068).
+- `.github/workflows/release.yml` — tag-triggered publish with Azure Artifact Signing
+  hooks (F064/F065, gated by repo secrets) + SLSA build provenance (F066).
+
+### Tests
+- 85 → 93 Core tests. New coverage: HelperAppService constants, Shizuku runbook
+  per state, AppProcessAgent constants, BackupCapability finding mapping,
+  OpenArchiveManifest JSON round-trip + schema stability, ProviderCallAudit
+  scope idempotency.
+
 ## v0.6.9 — 2026-05-16
 
 Trust And Maintenance Gate. Wireless ADB is now governed by an explicit USB-first policy,
