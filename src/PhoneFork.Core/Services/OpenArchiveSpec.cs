@@ -33,6 +33,23 @@ public sealed record OpenArchiveManifest
 
     [JsonPropertyName("categories")] public IReadOnlyList<CategoryEntry> Categories { get; init; } = Array.Empty<CategoryEntry>();
     [JsonPropertyName("notes")] public IReadOnlyList<string> Notes { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Android 16 QPR2+ apps can opt into cross-platform transfer via
+    /// <c>&lt;cross-platform-transfer platform="ios"&gt;</c> in their backup_rules.xml.
+    /// PhoneFork echoes the same metadata in the archive manifest so a downstream
+    /// consumer can answer "did the source app participate in iOS interop" without
+    /// re-parsing per-app manifests (F035).
+    /// </summary>
+    [JsonPropertyName("crossPlatform")] public CrossPlatformMetadata? CrossPlatform { get; init; }
+}
+
+/// <summary>Per-archive iOS cross-platform-transfer posture (F035).</summary>
+public sealed record CrossPlatformMetadata
+{
+    [JsonPropertyName("iosCompatibleApps")] public IReadOnlyList<string> IosCompatibleApps { get; init; } = Array.Empty<string>();
+    [JsonPropertyName("schemaVersion")] public int SchemaVersion { get; init; } = 1;
+    [JsonPropertyName("notes")] public IReadOnlyList<string> Notes { get; init; } = Array.Empty<string>();
 }
 
 public sealed record ArchiveEndpointInfo
