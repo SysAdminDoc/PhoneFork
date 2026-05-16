@@ -92,6 +92,10 @@ public partial class DebloatViewModel : ObservableObject
         {
             Status = "Loading dataset…";
             var dataset = DebloatDataset.Load(_log);
+            // F102 — apply per-OS overrides for the destination's One UI / Android version
+            // so One UI 8.5 regressions (e.g. UAD-NG #1394 smartsuggestions) move out of the
+            // default Recommended profile before scanning.
+            dataset = dataset.WithOverridesFor(dstPhone.OneUiVersion, dstPhone.AndroidVersion);
             Status = "Scanning device packages…";
             var scanner = new DebloatScanner(_host.Client, _log, dataset);
             var candidates = await scanner.ScanAsync(dstData, ct);

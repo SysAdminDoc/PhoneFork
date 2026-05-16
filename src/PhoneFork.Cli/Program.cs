@@ -88,6 +88,16 @@ app.Configure(config =>
         .WithDescription("Connect to a paired wireless ADB endpoint.");
     config.AddCommand<DisconnectCommand>("disconnect")
         .WithDescription("Disconnect a wireless ADB endpoint (or all when omitted).");
+
+    config.AddBranch("mdns", mdns =>
+    {
+        mdns.SetDescription("Wireless ADB mDNS-SD service discovery and trust-aware reconnect.");
+        mdns.AddCommand<MdnsServicesCommand>("services")
+            .WithDescription("List wireless ADB services discovered on the LAN. Marks trusted endpoints.");
+    });
+
+    config.AddCommand<HonestyCommand>("honesty")
+        .WithDescription("Pre-flight scan of a source device for Samsung categories that won't transfer (Pass, Wallet, Secure Folder, Routines, etc.).");
 });
 
 return await app.RunAsync(args);

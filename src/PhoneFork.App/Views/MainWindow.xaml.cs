@@ -10,7 +10,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         SourceInitialized += (_, _) => TryApplyDarkTitleBar();
-        DataContext = new MainViewModel(App.Current.Devices, App.Current.AdbHost, App.Current.Log);
+        DataContext = new MainViewModel(
+            App.Current.Devices,
+            App.Current.AdbHost,
+            App.Current.Posture,
+            App.Current.WirelessPolicy,
+            App.Current.TrustedPairs,
+            App.Current.Log);
     }
 
     private void TryApplyDarkTitleBar()

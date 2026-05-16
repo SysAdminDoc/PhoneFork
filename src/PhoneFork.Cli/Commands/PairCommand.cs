@@ -14,12 +14,30 @@ public sealed class PairCommand : AsyncCommand<PairCommand.Settings>
 
         [CommandArgument(1, "<CODE>")] [Description("Six-digit pairing code shown on the phone.")]
         public required string Code { get; init; }
+
+        [CommandOption("--allow-unpatched")] [Description("Bypass the CVE-2026-0073 patch-level gate. PoC exploit is public; USB is safer.")]
+        public bool AllowUnpatched { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
     {
         var (_, _, log) = AdbBootstrap.Initialize();
         var adb = ResolveAdb();
+
+        var policy = new WirelessPolicy(log);
+        policy.OptInWireless();
+        if (s.AllowUnpatched)
+        {
+            policy.AllowUnpatchedOverride = true;
+            AnsiConsole.MarkupLine("[red]Warning:[/] --allow-unpatched is set. CVE-2026-0073 PoC exploit is public.");
+        }
+        var gate = policy.EvaluateHostPort(s.HostPort);
+        if (!gate.IsAllowed)
+        {
+            AnsiConsole.MarkupLine($"[red]Pair refused.[/] {Markup.Escape(gate.Reason)}");
+            return 3;
+        }
+
         var svc = new AdbPairingService(adb, log);
         AnsiConsole.MarkupLine($"[grey]adb pair {Markup.Escape(s.HostPort)} <code>[/]");
         var result = await svc.PairAsync(s.HostPort, s.Code, ct);
@@ -48,11 +66,29 @@ public sealed class ConnectCommand : AsyncCommand<ConnectCommand.Settings>
     {
         [CommandArgument(0, "<HOSTPORT>")] [Description("ip:port of the paired phone's wireless ADB endpoint.")]
         public required string HostPort { get; init; }
+
+        [CommandOption("--allow-unpatched")] [Description("Bypass the CVE-2026-0073 patch-level gate. PoC exploit is public; USB is safer.")]
+        public bool AllowUnpatched { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
     {
         var (_, _, log) = AdbBootstrap.Initialize();
+
+        var policy = new WirelessPolicy(log);
+        policy.OptInWireless();
+        if (s.AllowUnpatched)
+        {
+            policy.AllowUnpatchedOverride = true;
+            AnsiConsole.MarkupLine("[red]Warning:[/] --allow-unpatched is set. CVE-2026-0073 PoC exploit is public.");
+        }
+        var gate = policy.EvaluateHostPort(s.HostPort);
+        if (!gate.IsAllowed)
+        {
+            AnsiConsole.MarkupLine($"[red]Connect refused.[/] {Markup.Escape(gate.Reason)}");
+            return 3;
+        }
+
         var svc = new AdbPairingService(PairCommand.ResolveAdb(), log);
         var result = await svc.ConnectAsync(s.HostPort, ct);
         AnsiConsole.WriteLine(result.Output.Trim());
