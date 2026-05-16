@@ -2,6 +2,60 @@
 
 All notable changes to PhoneFork.
 
+## v0.8.0 — 2026-05-16
+
+Smart Switch interop + backup interop foundations + pre-flight bundle + media
+verify + ADB Burst Mode + trusted-pair CLI. This release primarily ships the
+plumbing that the WPF UI will surface in v0.8.1 and the helper APK provider
+bodies will use in v0.7.1; the host-side surfaces are tested in isolation here.
+
+### Added (Smart Switch — F024 / F025 / F027)
+- `SmartSwitchDetection` — probes the legacy MSI install (registry +
+  `Program Files (x86)`) and the Microsoft Store sandboxed package directory.
+  CLI: `phonefork smartswitch detect`.
+- `SandboxParser` — out-of-process parser launcher with stdout/stderr buffering,
+  a 30 s timeout, and an empty environment. Wires up the slot for the AppContainer-
+  hardened `.bk` parser binary that ships in v0.8.1.
+
+### Added (Backup interop — F029 / F030 / F033 / F034)
+- `AppManagerBackupSpec` / `Writer` / `Reader` — AppManager-compatible v5
+  on-disk layout (`base.apk` + `split_*.apk` + `meta.am.v5` + `checksums.txt`).
+  Writer SHA-256-hashes each APK and stores the device hash, never the raw
+  serial. Reader verifies every referenced checksum before returning a handle.
+- `BackupRetentionSweeper` + `RetentionPolicy` — count-based, time-based, and
+  total-byte-cap retention rules. Plan/apply split so the UI can preview which
+  backups would be removed before clicking Apply.
+
+### Added (Pre-flight — F037 / F043 / F044)
+- `PreflightService` aggregates the Samsung honesty probe, the security posture
+  (transport + patch level), CSC/locale/country diff (`persist.sys.sales_code`,
+  `ro.csc.country_code`, `persist.sys.locale`), the destination's OEM-Unlock
+  toggle status (One UI 8.5 removed it on S25/S26), and Knox warranty/flash-lock
+  state. Single record returned to the UI/CLI.
+
+### Added (Media integrity — F046 / F098)
+- `MediaIntegrityService` with three modes: Size+Mtime (fast, default during
+  incremental sync), CRC32 (mid-tier; via `cksum`/`crc32` shell), SHA-256
+  (trust-grade; via `sha256sum`). Host-side `Crc32()` covered by unit tests
+  against the IEEE 802.3 polynomial.
+
+### Added (ADB Burst Mode — F104)
+- `AdbBurstModeService` toggles the `ADB_BURST_MODE` environment variable for
+  newly-spawned ADB servers. Bundled platform-tools 37.0.0 supports the flag.
+  CLI: `phonefork burst-mode on|off`.
+
+### Added (Trusted-pair CLI)
+- `phonefork trusted list` / `phonefork trusted forget <hash>`. Operates on
+  hashes only — raw serials are never displayed or accepted.
+- New `TrustedPairRegistry.ForgetByHash` method.
+
+### Tests
+- 93 → 113 (+20). New coverage: AppManager backup write/read round-trip + tamper
+  detection, retention plan/apply under count/time/byte limits, CSC mismatch
+  flags, CRC32 polynomial implementation against known vectors, integrity report
+  cleanliness rules, burst-mode env-var toggle round-trip, trusted-pair removal
+  by hash, Smart Switch detection shape on any host.
+
 ## v0.7.0 — 2026-05-16
 
 Helper companion APK foundations (F010, F011, F012, F019, F020, F021, F022, F023, F072).
