@@ -2,6 +2,54 @@
 
 All notable changes to PhoneFork.
 
+## v0.6.9 — 2026-05-16
+
+Trust And Maintenance Gate. Wireless ADB is now governed by an explicit USB-first policy,
+patch-level gate, session timeout, per-install ADB key directory, and a hashed-serial
+trusted-pair registry. CVE-2026-0073 (zero-click RCE in wireless `adbd`, public PoC)
+is refused by default below patch level 2026-05-01.
+
+### Added
+- `SecurityPostureService` + `SecurityPosture` model. Classifies transport (USB vs TCP)
+  and parses `ro.build.version.security_patch`. Handles Samsung's `-N` Knox revision suffix.
+- `WirelessPolicy`: opt-in wireless session with configurable timeout, kill switch,
+  patch-level gate (refuses pre-2026-05-01 devices), explicit "Allow unpatched" override.
+- Per-install ADB key directory (F002). `AdbHostService` sets `HOME` to
+  `%LOCALAPPDATA%\PhoneFork\adb-home` before starting the server, so the user's global
+  `.android/adbkey` is no longer reused across PhoneFork installs.
+- `SerialHash` (12-hex-char SHA-256 prefix) + Serilog enricher that hashes
+  `device` / `*Serial` properties on the NDJSON audit log path (F006).
+- `TrustedPairRegistry` (F004): JSON store at `%LOCALAPPDATA%\PhoneFork\trusted-pairs.json`
+  with hashed serials, transport class, first/last seen, and last endpoint. Stores no raw IDs.
+- `adb mdns services` reconnect surface (F005) in the DeviceBar and as
+  `phonefork mdns services` in the CLI. Cross-references trusted-pair registry.
+- Samsung honesty pre-flight detector (`SamsungHonestyService`, F040, F108). Probes for
+  Samsung Pass, Wallet, Secure Folder, Routines, Notes, Account, Gallery/OneDrive.
+  Surfaced as `phonefork honesty --device <serial>`.
+- Debloat dataset override overlay (F102). `assets/debloat/overrides.json` carries
+  per-One-UI hot fixes (e.g. `com.samsung.android.smartsuggestions` flagged Unsafe on
+  One UI 8.5 per UAD-NG #1394). `DebloatDataset.WithOverridesFor(oneUi, android)`
+  applies the overlay; `DebloatViewModel` calls it before scanning.
+- README: Android developer-verification posture note (F008).
+
+### Improved
+- DeviceBar pairing panel now shows the wireless session state, expiry, and the
+  unpatched-override toggle. Pair/Connect refuse with structured reasons when the
+  policy or patch gate would block the action.
+- CLI `phonefork pair` and `phonefork connect` accept `--allow-unpatched` for parity
+  with the WPF override toggle.
+
+### Dependencies
+- Serilog 4.2.0 → 4.3.1.
+- Microsoft.Xaml.Behaviors.Wpf 1.1.135 → 1.1.142.
+- Spectre.Console / Spectre.Console.Cli held at 0.55.0 (no stable 0.55.x; only -alpha).
+
+### Tests
+- Core test suite grew 16 → 76. New coverage: WirelessPolicy decisions (USB-first,
+  patch-level gate, session timeout, kill switch, unpatched override), SerialHash
+  determinism + redaction, TrustedPairRegistry persistence + raw-serial absence,
+  mDNS services parser, DebloatDataset override matching, version predicate parsing.
+
 ## v0.6.8 — 2026-05-14
 
 ADB shell, local path, and migration reliability hardening.

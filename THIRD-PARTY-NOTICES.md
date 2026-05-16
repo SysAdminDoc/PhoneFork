@@ -27,9 +27,9 @@ These are redistributed verbatim from Google's `platform-tools` package per the 
 | HandyControl | 3.5.1 | MIT | https://github.com/HandyOrg/HandyControl |
 | JsonSchema.Net | 7.3.0 | MIT | https://github.com/gregsdennis/json-everything |
 | MaterialDesignThemes | 5.3.2 | MIT | https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit |
-| Microsoft.Xaml.Behaviors.Wpf | 1.1.135 | MIT | https://github.com/microsoft/XamlBehaviorsWpf |
+| Microsoft.Xaml.Behaviors.Wpf | 1.1.142 | MIT | https://github.com/microsoft/XamlBehaviorsWpf |
 | QRCoder | 1.6.0 | MIT | https://github.com/codebude/QRCoder |
-| Serilog | 4.2.0 | Apache-2.0 | https://github.com/serilog/serilog |
+| Serilog | 4.3.1 | Apache-2.0 | https://github.com/serilog/serilog |
 | Serilog.Formatting.Compact | 3.0.0 | Apache-2.0 | https://github.com/serilog/serilog-formatting-compact |
 | Serilog.Sinks.File | 6.0.0 | Apache-2.0 | https://github.com/serilog/serilog-sinks-file |
 | Spectre.Console | 0.55.0 | MIT | https://github.com/spectreconsole/spectre.console |

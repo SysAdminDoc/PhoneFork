@@ -14,9 +14,9 @@ public partial class MainViewModel : ObservableObject
     public WifiViewModel Wifi { get; }
     public RolesViewModel Roles { get; }
 
-    public MainViewModel(DeviceService devices, AdbHostService host, ILogger log)
+    public MainViewModel(DeviceService devices, AdbHostService host, SecurityPostureService posture, WirelessPolicy wireless, TrustedPairRegistry trusted, ILogger log)
     {
-        DeviceBar = new DeviceBarViewModel(devices, host, log);
+        DeviceBar = new DeviceBarViewModel(devices, host, posture, wireless, trusted, log);
         Apps = new AppsViewModel(devices, host, log);
         Media = new MediaViewModel(devices, host, log);
         Settings = new SettingsViewModel(devices, host, log);

@@ -55,17 +55,35 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0"
                                Text="Wireless ADB"
                                FontWeight="SemiBold"
                                Margin="0,0,0,4"/>
                     <TextBlock Grid.Row="1"
-                               Text="Pair from Android's Wireless debugging pairing screen, then connect using the wireless ADB endpoint shown on the main Wireless debugging screen."
+                               Text="USB is the default trust posture. Wireless ADB carries CVE-2026-0073 (zero-click RCE in adbd, working PoC published) so pairing is refused unless wireless mode is on and the device patch level is >= 2026-05-01."
                                Foreground="{StaticResource ForegroundMutedBrush}"
                                TextWrapping="Wrap"
-                               Margin="0,0,0,12"/>
-                    <Grid Grid.Row="2">
+                               Margin="0,0,0,8"/>
+                    <DockPanel Grid.Row="2" Margin="0,0,0,12">
+                        <Button Content="{Binding WirelessOptedIn, Converter={StaticResource WirelessToggleConv}}"
+                                Command="{Binding ToggleWirelessSessionCommand}"
+                                DockPanel.Dock="Left"
+                                AutomationProperties.Name="Toggle wireless ADB session"/>
+                        <CheckBox Content="Allow unpatched wireless (CVE-2026-0073 risk)"
+                                  IsChecked="{Binding AllowUnpatchedOverride, Mode=TwoWay}"
+                                  DockPanel.Dock="Right"
+                                  VerticalAlignment="Center"
+                                  Margin="12,0,0,0"
+                                  ToolTip="Bypass the patch-level gate. PoC exploit is public; only use on a trusted LAN with a phone you control."/>
+                        <TextBlock Text="{Binding WirelessSessionStatus}"
+                                   Foreground="{StaticResource ForegroundMutedBrush}"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   Margin="12,0,12,0"/>
+                    </DockPanel>
+                    <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.2*"/>
                             <ColumnDefinition Width="1.2*"/>
@@ -138,6 +156,58 @@
                                TextWrapping="Wrap"
                                Margin="0,8,0,0"/>
                 </Grid>
+            </Border>
+
+            <Border Style="{StaticResource SubtleCard}" Margin="0,0,0,12"
+                    Visibility="{Binding ShowWirelessPairing, Converter={StaticResource BoolToVis}}"
+                    AutomationProperties.Name="mDNS reconnect">
+                <StackPanel>
+                    <DockPanel Margin="0,0,0,8">
+                        <TextBlock DockPanel.Dock="Left"
+                                   Text="mDNS reconnect"
+                                   FontWeight="SemiBold"/>
+                        <Button DockPanel.Dock="Right"
+                                Content="Discover"
+                                Command="{Binding DiscoverMdnsCommand}"/>
+                    </DockPanel>
+                    <TextBlock Text="{Binding MdnsStatus}"
+                               Foreground="{StaticResource ForegroundMutedBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding MdnsServices}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource MochaSurface0Brush}"
+                                        BorderBrush="{StaticResource CardBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="10"
+                                        Margin="0,4,0,0">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right"
+                                                Content="Reconnect"
+                                                Command="{Binding DataContext.ReconnectMdnsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="8,0,0,0"/>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Endpoint}"
+                                                       Foreground="{StaticResource ForegroundMutedBrush}"
+                                                       FontSize="11"/>
+                                            <TextBlock Text="{Binding TrustLine}"
+                                                       Foreground="{StaticResource ForegroundMutedBrush}"
+                                                       FontSize="11"/>
+                                            <TextBlock Text="{Binding ServiceType}"
+                                                       Foreground="{StaticResource ForegroundMutedBrush}"
+                                                       FontSize="10"
+                                                       Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </Border>
 
             <ItemsControl ItemsSource="{Binding Cards}">

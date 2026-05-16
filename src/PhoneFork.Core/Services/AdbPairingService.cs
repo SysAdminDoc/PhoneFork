@@ -64,7 +64,52 @@ public sealed class AdbPairingService
     }
 
     /// <summary>
-    /// Parse a "WIFI:T:ADB;S:<svcname>;P:<code>;;" pairing QR string into (svcname, code).
+    /// Run <c>adb mdns services</c> and return the discovered LAN entries (F005).
+    /// </summary>
+    public async Task<IReadOnlyList<MdnsService>> ListMdnsServicesAsync(CancellationToken ct = default)
+    {
+        var result = await Cli.Wrap(_adbPath)
+            .WithArguments(new[] { "mdns", "services" })
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteBufferedAsync(ct);
+
+        var services = ParseMdnsServices(result.StandardOutput);
+        _log.Information("adb mdns services -> exit={Exit} services={Count}",
+            result.ExitCode, services.Count);
+        return services;
+    }
+
+    /// <summary>
+    /// Parses the line-based output of <c>adb mdns services</c>. Format per row:
+    /// <c>&lt;instance&gt;\t&lt;service&gt;\t&lt;host:port&gt;</c>. The first banner line
+    /// ("List of discovered mdns services") and blank lines are ignored.
+    /// </summary>
+    public static IReadOnlyList<MdnsService> ParseMdnsServices(string output)
+    {
+        if (string.IsNullOrWhiteSpace(output)) return Array.Empty<MdnsService>();
+
+        var services = new List<MdnsService>();
+        foreach (var raw in output.Split('\n'))
+        {
+            var line = raw.TrimEnd('\r').Trim();
+            if (line.Length == 0) continue;
+            if (line.StartsWith("List of", StringComparison.OrdinalIgnoreCase)) continue;
+
+            var fields = line.Split('\t', StringSplitOptions.None);
+            if (fields.Length < 3) continue;
+
+            var instance = fields[0].Trim();
+            var service = fields[1].Trim();
+            var endpoint = fields[2].Trim();
+            if (string.IsNullOrEmpty(endpoint)) continue;
+
+            services.Add(new MdnsService(instance, service, endpoint));
+        }
+        return services;
+    }
+
+    /// <summary>
+    /// Parse a "WIFI:T:ADB;S:&lt;svcname&gt;;P:&lt;code&gt;;;" pairing QR string into (svcname, code).
     /// </summary>
     public static (string ServiceName, string Code)? ParsePairingQr(string qrText)
     {
@@ -126,4 +171,16 @@ public sealed class AdbPairingService
         if (current.Length > 0)
             yield return current.ToString();
     }
+}
+
+/// <summary>
+/// One entry returned by <c>adb mdns services</c>.
+/// </summary>
+/// <param name="Instance">The mDNS instance name (typically the device serial / friendly name).</param>
+/// <param name="ServiceType">e.g. <c>_adb-tls-connect._tcp</c> or <c>_adb-tls-pairing._tcp</c>.</param>
+/// <param name="HostPort">The <c>host:port</c> tuple for connect/pair.</param>
+public sealed record MdnsService(string Instance, string ServiceType, string HostPort)
+{
+    public bool IsConnect => ServiceType.Contains("connect", StringComparison.OrdinalIgnoreCase);
+    public bool IsPairing => ServiceType.Contains("pairing", StringComparison.OrdinalIgnoreCase);
 }
