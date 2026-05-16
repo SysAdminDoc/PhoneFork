@@ -15,18 +15,18 @@ PhoneFork is the Windows-host migration tool Samsung Smart Switch should have be
 | Area | Current state |
 |---|---|
 | Repository | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`. Pre-launch on 2026-05-16: 0 stars, 0 open issues, 0 PRs, no tags yet — v0.6.9 release-readiness is queued under F107. |
-| Version | README, CHANGELOG, XAML title, and app manifest show **v0.6.9** after the Trust And Maintenance Gate ship. Roadmap header at 2026.05.16b. |
-| Recent history | v0.6.9 added CVE-2026-0073 wireless gate, per-install ADB key, trusted-pair registry with hashed serials, mDNS reconnect surface, Samsung honesty pre-flight, debloat dataset overrides, dependency bumps. Prior wave shipped v0.6.5–v0.6.8 (wireless ADB pair/connect, premium polish, hardening pass). |
+| Version | README, CHANGELOG, XAML title, and app manifest show **v0.7.0** after the helper-APK foundations ship. Roadmap header at 2026.05.16b. |
+| Recent history | v0.7.0 added the helper-APK Gradle scaffold, host-side `HelperAppService`/`AppProcessAgentService`/`ShizukuService`, provider-call audit scopes, backup-capability probe, open-archive spec, CONTRIBUTING.md, and CI/release workflows. v0.6.9 shipped the CVE-2026-0073 wireless gate, per-install ADB key, trusted-pair registry, mDNS reconnect, Samsung honesty pre-flight, and debloat dataset overrides. |
 | Stack | C# 14 / .NET 10 (SDK 10.0.202), WPF, MVVM (CommunityToolkit.Mvvm 8.4.2), Spectre.Console.Cli 0.55.0, AdvancedSharpAdbClient 3.6.16, AlphaOmega.ApkReader 2.0.10, CliWrap 3.10.1, **Serilog 4.3.1** + Compact NDJSON, QRCoder 1.6.0, MaterialDesignThemes 5.3.2, HandyControl 3.5.1, JsonSchema.Net 7.3.0, **Microsoft.Xaml.Behaviors.Wpf 1.1.142**, xUnit Core tests. |
 | Build system | `PhoneFork.slnx`; projects: `src/PhoneFork.Core`, `src/PhoneFork.App`, `src/PhoneFork.Cli`, `tests/PhoneFork.Core.Tests`. Bundled `tools/adb.exe` + DLLs from platform-tools 37.0.0. |
 | Entry points | WPF: `src/PhoneFork.App/App.xaml.cs`; CLI: `src/PhoneFork.Cli/Program.cs`. |
 | Runtime target | Windows 10/11 with .NET 10 Desktop Runtime; Android 11+ devices over USB ADB or Android 11+ Wireless Debugging. |
-| Code size | ~100 first-party C#/XAML files under `src` + `tests` (excluding `bin`/`obj` and generated `.g.cs`); ~8,000 LOC including XAML. |
-| Top code surfaces | `CatppuccinMocha.xaml`, `DebloatService`, `MediaSyncService`, `DeviceBarViewModel`, `DebloatViewModel`, `WifiViewModel`, `SettingsViewModel`, `AppsViewModel`, `RolesViewModel`, `AppInstallerService`, `AdbPairingService`, `WirelessPolicy`, `TrustedPairRegistry`, `SamsungHonestyService`. |
-| Shipped features | Apps, Media, Settings, Debloat (+ One UI 8.5 dataset overrides), Wi-Fi QR/CSC, Roles, Wireless ADB pair/connect/disconnect with USB-first policy + CVE-2026-0073 gate, mDNS reconnect, per-install ADB key, trusted-pair registry, hashed-serial NDJSON, Samsung honesty pre-flight, DeviceBar pair UI, shell/path hardening, first-run empty states, dark title bar. |
+| Code size | ~110 first-party C#/XAML files under `src` + `tests` + helper-APK Kotlin; ~9,000 LOC. |
+| Top code surfaces | `CatppuccinMocha.xaml`, `DebloatService`, `MediaSyncService`, `DeviceBarViewModel`, `DebloatViewModel`, `WifiViewModel`, `SettingsViewModel`, `AppsViewModel`, `RolesViewModel`, `AppInstallerService`, `AdbPairingService`, `WirelessPolicy`, `TrustedPairRegistry`, `SamsungHonestyService`, `HelperAppService`, `AppProcessAgentService`, `ShizukuService`, `BackupCapabilityService`, `OpenArchiveManifest`. |
+| Shipped features | All v0.6.9 plus v0.7.0 helper-APK Gradle scaffold, host-side helper lifecycle (`phonefork helper install/uninstall/probe/residue`), `app_process` JAR runner, Shizuku state probe (`phonefork shizuku status`), provider-call audit scopes, backup-capability probe, open-archive manifest spec, CI/release workflows, CONTRIBUTING.md. |
 | Source markers | Source/test/docs scan found no TODO/FIXME/HACK/XXX/NotImplemented markers outside benign `[Obsolete]`-style enum docs. No stub functions in production code. |
 | Tracked issues | GitHub issues list empty. No PRs. No external community signal yet. |
-| Dependency state | `dotnet list package --vulnerable`: clean. Pending bumps after v0.6.9: QRCoder 1.6.0 → 1.8.0 (deferred), JsonSchema.Net 7.3.0 → 9.2.0 (deferred behind tests), Serilog.Sinks.File 6.0.0 → 7.0.0 (deferred), Spectre.Console 0.55.0 → 0.55.x-alpha (held; no stable cut). Test suite: 76/76 passing. |
+| Dependency state | `dotnet list package --vulnerable`: clean. Pending bumps after v0.7.0: QRCoder 1.6.0 → 1.8.0 (deferred), JsonSchema.Net 7.3.0 → 9.2.0 (deferred behind tests), Serilog.Sinks.File 6.0.0 → 7.0.0 (deferred), Spectre.Console 0.55.0 → 0.55.x-alpha (held; no stable cut). Test suite: **93/93 passing**. |
 
 ### What It Does Today
 
@@ -286,16 +286,16 @@ Scale: Impact/Effort/Risk = 1 low to 5 high. Prevalence: T = table stakes, C = c
 
 **Why now:** wireless support already shipped, CVE-2026-0073's exploit is public, One UI 8.5 stable is rolling out, and Samsung's Pass/Wallet/Gallery transitions are happening live. Maintenance drift is also cheapest before helper APK work starts.
 
-### Now/Next: v0.7.0 - Helper Companion APK And JAR
+### Now/Next: v0.7.0 - Helper Companion APK And JAR (🟢 FOUNDATIONS SHIPPED 2026-05-16)
 
-1. `helper-apk/` Kotlin/Gradle scaffold, target SDK 36 initially (F010).
-2. Signed `PhoneForkHelper.apk` with provider authorities for SMS, call log, contacts, Wi-Fi, wallpaper, tones, and user dictionary (F010, F013, F014, F015, F016, F017, F018).
-3. `phonefork-agent.jar` push-and-run path using the scrcpy `CLASSPATH=... app_process / ...` pattern for read-side operations (F011).
-4. Shizuku detect/start guidance and helper binding for privileged Wi-Fi PSK reads (F012, F016).
-5. Helper install/uninstall/query lifecycle through `HelperAppService` (F019).
-6. Provider-call audit events and self-uninstall residue check (F021).
-7. Open archive export sketch (F023) and backup/D2D capability probe (F022).
-8. CI smoke for `apksigner verify --print-certs` (F020).
+1. [x] `helper-apk/` Kotlin/Gradle scaffold, target SDK 36 initially (F010). — `helper-apk/{settings,build}.gradle.kts`, app module, AndroidManifest.xml with all seven authorities, `BaseHelperProvider` with shell-UID gate.
+2. [ ] Signed `PhoneForkHelper.apk` with provider authorities for SMS, call log, contacts, Wi-Fi, wallpaper, tones, and user dictionary (F010, F013–F018). — Stubs only; provider bodies follow in v0.7.1+ once wire-protocol is locked.
+3. [x] `phonefork-agent.jar` push-and-run path using the scrcpy `CLASSPATH=... app_process / ...` pattern for read-side operations (F011). — Host-side `AppProcessAgentService`.
+4. [x] Shizuku detect/start guidance (F012). Privileged Wi-Fi PSK binding (F016) follows once the agent JAR ships. — `ShizukuService` + CLI `phonefork shizuku status`.
+5. [x] Helper install/uninstall/query lifecycle through `HelperAppService` (F019). — `HelperAppService.{InstallAsync,UninstallAsync,ProbeAllAsync,ResidueCheckAsync}` + CLI helper branch.
+6. [x] Provider-call audit events and self-uninstall residue check (F021). — `ProviderCallAudit` scopes + residue report.
+7. [x] Open archive export sketch (F023) and backup/D2D capability probe (F022). — `OpenArchiveManifest` + `BackupCapabilityService`.
+8. [~] CI smoke for `apksigner verify --print-certs` (F020). — Release workflow includes Azure Artifact Signing slot (gated by repo secrets) + SLSA build provenance attestation. `apksigner` step lands when the first signed helper APK is produced.
 
 **Why now:** this is the pivot from "ADB shell can do it" to "honest no-root coverage expansion." It unlocks the highest-value missing categories without lying about `/data/data`. AppManager's open issues #1970–#1974 confirm the same Shizuku + verification arc.
 
