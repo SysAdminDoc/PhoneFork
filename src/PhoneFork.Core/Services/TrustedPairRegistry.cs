@@ -101,10 +101,19 @@ public sealed class TrustedPairRegistry
     public bool Forget(string serial)
     {
         if (string.IsNullOrWhiteSpace(serial)) return false;
-        var hash = SerialHash.Of(serial);
+        return ForgetByHash(SerialHash.Of(serial));
+    }
+
+    /// <summary>
+    /// Remove an entry by its hash directly. Used by the CLI's
+    /// <c>phonefork trusted forget &lt;hash&gt;</c> when only the hash is known.
+    /// </summary>
+    public bool ForgetByHash(string hash)
+    {
+        if (string.IsNullOrWhiteSpace(hash)) return false;
         lock (_sync)
         {
-            if (!_byHash.Remove(hash)) return false;
+            if (!_byHash.Remove(hash.Trim().ToLowerInvariant())) return false;
             Save();
             return true;
         }
