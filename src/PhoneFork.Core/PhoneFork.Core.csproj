@@ -10,6 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="PhoneFork.Core.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Upstream UAD-NG / AppManagerNG dataset (5 buckets) + PhoneFork hot-fix overlay (overrides.json). -->
     <EmbeddedResource Include="..\..\assets\debloat\*.json">
       <Link>Assets\Debloat\%(Filename)%(Extension)</Link>
       <LogicalName>PhoneFork.Core.Assets.Debloat.%(Filename)%(Extension)</LogicalName>
@@ -22,7 +27,7 @@
     <PackageReference Include="CliWrap" Version="3.10.1" />
     <PackageReference Include="JsonSchema.Net" Version="7.3.0" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>

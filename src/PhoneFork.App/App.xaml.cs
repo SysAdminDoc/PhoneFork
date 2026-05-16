@@ -15,6 +15,9 @@ public partial class App : Application
     public ILogger Log { get; private set; } = null!;
     public AdbHostService AdbHost { get; private set; } = null!;
     public DeviceService Devices { get; private set; } = null!;
+    public SecurityPostureService Posture { get; private set; } = null!;
+    public WirelessPolicy WirelessPolicy { get; private set; } = null!;
+    public TrustedPairRegistry TrustedPairs { get; private set; } = null!;
 
     public static new App Current => (App)Application.Current;
 
@@ -53,6 +56,9 @@ public partial class App : Application
 
         Log.Information("Step: creating DeviceService");
         Devices = new DeviceService(AdbHost, Log);
+        Posture = new SecurityPostureService(AdbHost, Log);
+        WirelessPolicy = new WirelessPolicy(Log);
+        TrustedPairs = new TrustedPairRegistry(TrustedPairRegistry.DefaultPath(), Log);
         Log.Information("Step: refreshing devices");
         Devices.Refresh();
 
