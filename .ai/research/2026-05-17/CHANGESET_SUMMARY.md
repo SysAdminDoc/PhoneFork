@@ -214,3 +214,23 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R012 Dependency Maintenance
+
+- `src/PhoneFork.Core/PhoneFork.Core.csproj`: updated `JsonSchema.Net` to 9.2.1, `QRCoder` to 1.8.0, and `Serilog.Sinks.File` to 7.0.0.
+- `src/PhoneFork.App/PhoneFork.App.csproj`: updated `QRCoder` to 1.8.0.
+- `src/PhoneFork.Cli/PhoneFork.Cli.csproj`: updated `Spectre.Console` to 0.55.2 while leaving `Spectre.Console.Cli` at the current stable 0.55.0.
+- `tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj`: updated `coverlet.collector` to 10.0.0 and `Microsoft.NET.Test.Sdk` to 18.5.1.
+- `tests/PhoneFork.Core.Tests/SchemaCompatibilityTests.cs`: added Draft 2020-12 validation coverage for the open archive manifest under JsonSchema.Net 9.2.1.
+- `src/PhoneFork.Core/Logging/AuditLogger.cs` and `tests/PhoneFork.Core.Tests/AuditLoggerTests.cs`: added a testable log-directory overload and audit-log smoke coverage for compact JSON output and serial hashing under Serilog.Sinks.File 7.0.0.
+- `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, `SECURITY_AND_DEPENDENCY_REVIEW.md`, and `SOURCE_REGISTER.md`: documented the completed R012 slice and xUnit v3 deferral.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 146 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --outdated`: passed; no updates reported.
+- `dotnet list PhoneFork.slnx package --deprecated`: passed with only the known `xunit` legacy notice.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.
