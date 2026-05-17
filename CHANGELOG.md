@@ -28,6 +28,10 @@ All notable changes to PhoneFork.
   GitHub provenance/SBOM attestations, and release-note trust text. When Azure
   Artifact Signing secrets are present, the workflow signs Windows EXE/DLL
   payloads before ZIP packaging and verifies their Authenticode status.
+- Dependency maintenance updated QRCoder, Spectre.Console, JsonSchema.Net,
+  Serilog.Sinks.File, coverlet.collector, and Microsoft.NET.Test.Sdk. New
+  schema and audit-log tests cover the higher-risk JsonSchema.Net and file sink
+  major upgrades; xUnit v3 remains tracked but deferred.
 
 ## v0.9.0-pre — 2026-05-17
 

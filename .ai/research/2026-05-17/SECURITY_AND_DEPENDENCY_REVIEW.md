@@ -15,13 +15,14 @@ Findings:
 - No vulnerable NuGet packages were reported.
 - App, CLI, and Core had no deprecated package reports.
 - Tests use `xunit` 2.9.3, which NuGet marks as legacy with `xunit.v3` as the alternative.
-- Outdated candidates:
+- R012 applied all non-xUnit outdated candidates:
   - QRCoder 1.6.0 -> 1.8.0.
   - Spectre.Console 0.55.0 -> 0.55.2.
   - JsonSchema.Net 7.3.0 -> 9.2.1.
   - Serilog.Sinks.File 6.0.0 -> 7.0.0.
   - coverlet.collector 6.0.4 -> 10.0.0.
   - Microsoft.NET.Test.Sdk 18.0.1 -> 18.5.1.
+- Post-update `dotnet list PhoneFork.slnx package --outdated` reports no package updates.
 
 Operational note:
 
@@ -130,9 +131,9 @@ Recommendations:
 
 ## Dependency Upgrade Plan
 
-1. Patch-level/low-risk: Spectre.Console 0.55.2 and QRCoder 1.8.0.
-2. Test infrastructure: Microsoft.NET.Test.Sdk 18.5.1 and coverlet.collector 10.0.0.
-3. Behavior-change packages: JsonSchema.Net 9.2.1 with schema compatibility tests and Serilog.Sinks.File 7.0.0 with log rolling checks.
+1. Completed: Spectre.Console 0.55.2 and QRCoder 1.8.0.
+2. Completed: Microsoft.NET.Test.Sdk 18.5.1 and coverlet.collector 10.0.0.
+3. Completed: JsonSchema.Net 9.2.1 with schema compatibility coverage and Serilog.Sinks.File 7.0.0 with audit-log write/hash coverage.
 4. Deferred: xUnit v3 migration after release blockers are handled.
 
 ## Security Roadmap Links

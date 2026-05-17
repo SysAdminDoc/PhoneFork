@@ -59,7 +59,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Signing secrets are intentionally not provisioned.
 - Release readiness notes live in `docs/release-readiness.md`; the first prerelease path is clearly unsigned unless Azure Artifact Signing secrets are provisioned.
 - Version consistency is guarded by `scripts/Test-VersionConsistency.ps1` and CI.
-- Current dependency scan is clean for vulnerabilities, but several packages have current upgrades and test `xunit` is flagged as legacy.
+- Current dependency scan is clean for vulnerabilities and outdated package reports after R012; test `xunit` is still flagged legacy and the xUnit v3 migration remains deferred.
 - Hardware validation was not available in this research session.
 
 ## High-Value Guardrails

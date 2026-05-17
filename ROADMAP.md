@@ -320,6 +320,11 @@ Sources: L19, L37, S15, S16, S17, S18, S20, S21, S22.
 ### R012 - Dependency maintenance window
 
 Priority: P1. Impact: 3. Effort: 3. Risk: 3.
+Status: Completed 2026-05-17. QRCoder, Spectre.Console, JsonSchema.Net,
+Serilog.Sinks.File, coverlet.collector, and Microsoft.NET.Test.Sdk were updated
+under build/test. JsonSchema.Net 9.2.1 is covered by a Draft 2020-12 open-archive
+manifest compatibility test, Serilog.Sinks.File 7.0.0 is covered by an audit-log
+write/hash smoke test, and xUnit v3 remains explicitly deferred.
 
 Upgrade low-risk patch dependencies first, then major behavior-change packages
 under tests. Treat `JsonSchema.Net` and test infrastructure changes as separate
