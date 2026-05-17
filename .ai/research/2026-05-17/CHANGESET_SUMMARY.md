@@ -266,3 +266,21 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R015 Samsung / One UI Settings Corpus
+
+- `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`: added reviewed safe, review-only, blocked, and unknown classification for Android/Samsung settings keys, including display, sound, AOD, Edge Panel, navigation, sensitive service, credential, Knox, and wallet/payment groups.
+- `src/PhoneFork.Core/Services/SettingsApplyService.cs`: settings apply now defaults to safe corpus keys only; blocked keys remain blocked and CLI-only `includeUncataloguedSettings` can opt into non-blocked review/unknown keys.
+- `src/PhoneFork.Cli/Commands/SettingsDiffCommand.cs` and `SettingsApplyCommand.cs`: read-only diff reports safety counts/details with `--show-safety`; apply exposes `--include-uncatalogued-settings`.
+- `src/PhoneFork.App/ViewModels/SettingsRowViewModel.cs`, `SettingsViewModel.cs`, and `src/PhoneFork.App/Views/SettingsView.xaml`: WPF settings diff shows safety/category columns, selects only safe changed keys by default, and filters "applicable" to safe keys.
+- `tests/PhoneFork.Core.Tests/DifferTests.cs`: added safe, blocked, unknown, and summary coverage for the corpus.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R015 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 158 tests.
+- `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- settings diff --src scratch\r015\src.json --dst scratch\r015\dst.json --show-safety`: passed against synthetic snapshots; reported one safe, one blocked, and one unknown key.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

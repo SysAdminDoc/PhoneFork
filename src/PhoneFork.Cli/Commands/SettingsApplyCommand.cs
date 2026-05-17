@@ -32,6 +32,10 @@ public sealed class SettingsApplyCommand : AsyncCommand<SettingsApplyCommand.Set
         [CommandOption("--allow-multi-user")]
         [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
         public bool AllowMultiUser { get; init; }
+
+        [CommandOption("--include-uncatalogued-settings")]
+        [Description("Apply non-blocked settings outside the reviewed Samsung/One UI safe corpus. Off by default.")]
+        public bool IncludeUncataloguedSettings { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -65,7 +69,8 @@ public sealed class SettingsApplyCommand : AsyncCommand<SettingsApplyCommand.Set
         var apply = new SettingsApplyService(host.Client, log);
         var result = await apply.ApplyAsync(dst, entries, s.DryRun,
             new Progress<string>(msg => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(msg)}[/]")), ct,
-            allowMultiUser: s.AllowMultiUser);
+            allowMultiUser: s.AllowMultiUser,
+            includeUncataloguedSettings: s.IncludeUncataloguedSettings);
 
         AnsiConsole.MarkupLine($"[green]applied[/] {result.Applied}, [grey]skipped[/] {result.Skipped}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
         if (result.Failed > 0)

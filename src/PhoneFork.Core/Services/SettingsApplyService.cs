@@ -60,7 +60,8 @@ public sealed class SettingsApplyService
         bool dryRun,
         IProgress<string>? progress = null,
         CancellationToken ct = default,
-        bool allowMultiUser = false)
+        bool allowMultiUser = false,
+        bool includeUncataloguedSettings = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         if (!dryRun)
@@ -77,6 +78,17 @@ public sealed class SettingsApplyService
             {
                 skipped++;
                 _log.Information("Skip locked/dangerous {Ns}/{Key}", entry.Namespace, entry.Key);
+                continue;
+            }
+
+            var safety = SamsungSettingsCorpus.Assess(entry);
+            var canApply = safety.Status == SettingsSafetyStatus.Safe
+                || (includeUncataloguedSettings && safety.Status is SettingsSafetyStatus.Review or SettingsSafetyStatus.Unknown);
+            if (!canApply)
+            {
+                skipped++;
+                _log.Information("Skip {Safety} setting {Ns}/{Key}: {Reason}",
+                    safety.Status, entry.Namespace, entry.Key, safety.Rationale);
                 continue;
             }
 
