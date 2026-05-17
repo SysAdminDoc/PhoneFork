@@ -16,13 +16,16 @@ namespace PhoneFork.Core.Services;
 public sealed record PreflightReport(
     HonestyReport SamsungHonesty,
     MessageTransitionReport Messages,
+    GalleryOneDriveReport GalleryOneDrive,
     SecurityPosture SourcePosture,
     SecurityPosture DestinationPosture,
     CscPosture? Csc,
     bool DestinationOemUnlockAvailable,
     string? KnoxState)
 {
-    public IEnumerable<HonestyFinding> AllFindings => SamsungHonesty.Findings.Concat(Messages.Findings);
+    public IEnumerable<HonestyFinding> AllFindings => SamsungHonesty.Findings
+        .Concat(Messages.Findings)
+        .Concat(GalleryOneDrive.Findings);
     public bool HasBlockers => AllFindings.Any(f => f.Level == HonestyLevel.Blocker);
     public int WarningCount => AllFindings.Count(f => f.Level == HonestyLevel.Warning);
     public int BlockerCount => AllFindings.Count(f => f.Level == HonestyLevel.Blocker);
@@ -71,10 +74,12 @@ public sealed class PreflightService
         var csc = await ProbeCscAsync(source, destination, ct);
         var messages = await new MessageTransitionService(_client, _log)
             .ProbeAsync(source, csc?.SourceCountry, ct);
+        var galleryOneDrive = await new GalleryOneDriveService(_client, _log)
+            .ProbeAsync(source, ct);
         var oemUnlock = await ProbeOemUnlockAsync(destination, ct);
         var knox = await ProbeKnoxAsync(destination, ct);
 
-        return new PreflightReport(samsungHonesty, messages, srcPosture, dstPosture, csc,
+        return new PreflightReport(samsungHonesty, messages, galleryOneDrive, srcPosture, dstPosture, csc,
             DestinationOemUnlockAvailable: oemUnlock, KnoxState: knox);
     }
 

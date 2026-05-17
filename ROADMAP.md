@@ -228,6 +228,13 @@ Sources: S08, L13, L16, G20.
 ### R008 - Gallery and OneDrive cutoff assistant
 
 Priority: P1. Impact: 4. Effort: 2. Risk: 2.
+Status: Completed 2026-05-17. The pre-flight bundle now has a dedicated
+Gallery/OneDrive report that detects Samsung Gallery, OneDrive, Samsung account,
+Samsung Cloud package indicators, ADB-visible OneDrive account state,
+ADB-visible media permission, and a required manual OneDrive storage-quota
+check. The stale April cutoff warning was removed in favor of Microsoft's
+September 30, 2026 cutoff and the note that existing OneDrive files remain
+available outside Samsung Gallery.
 
 Update the existing Samsung honesty/pre-flight logic to use Microsoft's
 September 30, 2026 direct-sync cutoff and guide users toward OneDrive camera
