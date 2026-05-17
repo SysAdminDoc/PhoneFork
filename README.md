@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.8.0-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.9.0--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -17,7 +17,7 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 | **Media** | DCIM, Pictures, Movies, Download, Documents, Music, Ringtones, Notifications, Alarms | Incremental manifest diff + `adb pull/push` |
 | **Settings** | AOSP `secure`/`system`/`global` + Samsung One UI keys (AOD, edge panels, refresh rate, font scale, status-bar tweaks) | `settings list` snapshot diff + cherry-picked `settings put` |
 | **Debloat** | Apply [AppManagerNG](https://github.com/SysAdminDoc/AppManagerNG)'s 5,481-entry curated bloat list | `pm disable-user --user 0` (reversible) |
-| **Wi-Fi** | Saved networks + PSKs (via optional Shizuku helper) or QR-bridge fallback | `WifiManager.getPrivilegedConfiguredNetworks` over Shizuku, or `WIFI:T=WPA;S=…;P=…;;` QR |
+| **Wi-Fi** | Saved-network visibility where Android permits + QR-bridge fallback; helper-assisted PSK export is planned | `cmd wifi` / shell probes where available, or `WIFI:T=WPA;S=…;P=…;;` QR |
 | **Roles** | Default dialer, SMS, browser, launcher, assistant | `cmd role add-role-holder` |
 
 ## What it cannot do (and why)
@@ -28,11 +28,11 @@ Knox-bound data (Secure Folder, Samsung Wallet payment tokens, enterprise contai
 
 ## Android developer verification (Sept 2026)
 
-Google's [developer verification](https://developer.android.com/developer-verification/guides/faq) requirement applies to **Play / sideload installs of unverified developers**. It does **not** apply to packages installed via ADB. PhoneFork's helper APK roadmap (v0.7.0) ships the helper through `adb install`, so the verification gate is not on the critical path. If you sideload the helper outside ADB you may be prompted by your launcher to verify the developer; that is normal.
+Google's [developer verification](https://developer.android.com/developer-verification/guides/faq) requirement applies to **Play / sideload installs of unverified developers**. It does **not** apply to packages installed via ADB. PhoneFork's planned helper APK path uses `adb install`, so the verification gate is not on the critical path. If you sideload the helper outside ADB you may be prompted by your launcher to verify the developer; that is normal.
 
 ## Install
 
-Download the latest release: [Releases](https://github.com/SysAdminDoc/PhoneFork/releases) — `PhoneFork-vX.Y.Z.zip`. Extract, double-click `PhoneFork.exe`. No installer.
+No tagged release has been published yet. Until the first release appears under [Releases](https://github.com/SysAdminDoc/PhoneFork/releases), build from source with the commands below.
 
 Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)) — the zip is framework-dependent (~10 MB).
 
