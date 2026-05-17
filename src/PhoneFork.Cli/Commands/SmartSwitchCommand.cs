@@ -10,7 +10,7 @@ namespace PhoneFork.Cli.Commands;
 /// </summary>
 public sealed class SmartSwitchDetectCommand : Command
 {
-    public override int Execute(CommandContext context)
+    protected override int Execute(CommandContext context, CancellationToken cancellationToken)
     {
         var result = SmartSwitchDetection.Probe();
         var label = result.Install switch
