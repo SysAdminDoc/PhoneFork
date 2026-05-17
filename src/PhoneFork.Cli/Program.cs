@@ -13,6 +13,8 @@ app.Configure(config =>
         apps.SetDescription("App enumeration and migration.");
         apps.AddCommand<AppsListCommand>("list")
             .WithDescription("Enumerate -3 user apps on a device.");
+        apps.AddCommand<AppsReportCommand>("report")
+            .WithDescription("Explain per-app APK, private-data, OBB/external-data, and provenance transfer posture.");
         apps.AddCommand<AppsMigrateCommand>("migrate")
             .WithDescription("Pull APKs+splits from a source device and install on a destination device.");
     });

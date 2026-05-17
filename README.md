@@ -64,6 +64,7 @@ builds.
 ```bash
 phonefork devices                          # list connected
 phonefork apps list --device R5CY34G070L   # enumerate user apps
+phonefork apps report --device <serial> [--json]
 phonefork apps migrate --from <src> --to <dst> [--dry-run]
 phonefork media sync   --from <src> --to <dst> [--checkpoint path] [--report path]
 phonefork settings dump --device <serial> --out settings.json
@@ -75,6 +76,10 @@ phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
 ```
+
+`apps report` explains per-app APK installability, private-data limits,
+OBB/external-data payloads, and source/provenance posture so a user can see
+what PhoneFork can and cannot transfer before wiping the source.
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 

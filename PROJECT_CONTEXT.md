@@ -40,7 +40,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 
 ## Shipped Capability Summary
 
-- Apps: enumerates third-party packages, pulls all split APK paths, stages safely on Windows, and installs via session-based multi-APK install with Play attribution.
+- Apps: enumerates third-party packages, pulls all split APK paths, stages safely on Windows, logs pulled APK byte counts and SHA-256 hashes, installs via session-based multi-APK install with Play attribution, and can report per-app APK/private-data/OBB transfer posture through the CLI.
 - Media: manifests `/sdcard` categories, diffs source/destination, syncs pull-then-push, preserves mtime, supports delete/update/conflict policy, writes resumable checkpoints and evidence reports, emits huge-file/Quick Share advisories, and has size+mtime/CRC32/SHA-256 integrity verification primitives.
 - Settings: snapshots AOSP namespaces, diffs them, applies selected values behind a safety blocklist.
 - Debloat: embeds a 5,481-entry dataset, disables packages only, writes rollback snapshots, applies source-backed OEM/One UI override metadata, and lets CLI scans/applies load checksummed out-of-band overlay feeds.
@@ -103,6 +103,7 @@ Useful smoke commands when a device or host UI is available:
 
 ```powershell
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- devices
+dotnet run --project src\PhoneFork.Cli -c Release --no-build -- apps report --device <serial> --json
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- wifi qr --ssid AuditTest --psk abc123 -o scratch\audit-test.png
 dotnet run --project src\PhoneFork.App -c Release --no-build

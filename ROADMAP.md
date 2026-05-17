@@ -343,7 +343,7 @@ Sources: L27-L29.
 
 | ID | Initiative | Sources |
 |---|---|---|
-| R013 | Package integrity, installer/source provenance, OBB/external-data discovery, and per-app "what can/cannot transfer" reports. | L13, G04, G05 |
+| R013 | Completed 2026-05-17: package integrity, installer/source provenance, OBB/external-data discovery, and per-app "what can/cannot transfer" reports through `phonefork apps report`. | L13, L39, G04, G05 |
 | R014 | Multi-user and work-profile awareness before destructive package or settings actions. | L13, G06, G08 |
 | R015 | Samsung/One UI safe settings corpus with read-only comparison before apply. | L13, L21, G07 |
 | R016 | Local migration receipts with devices, categories, versions, counts, failures, warnings, and rollback snapshot locations. | L13, L19, S18 |

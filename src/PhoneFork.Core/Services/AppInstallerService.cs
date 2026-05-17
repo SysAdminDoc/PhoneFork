@@ -134,6 +134,9 @@ public sealed class AppInstallerService
             progress?.Report($"Pulling {app.PackageName}/{name}...");
             _log.Information("Pull {Pkg} {Remote} -> {Local}", app.PackageName, remote, local);
             await PullAsync(source, remote, local, ct);
+            var artifact = await PackageFileIntegrity.FromFileAsync(remote, local, ct);
+            _log.Information("Pulled APK artifact {Pkg} {Remote} -> {Local} bytes={Bytes} sha256={Sha256}",
+                app.PackageName, artifact.RemotePath, artifact.LocalPath, artifact.Bytes, artifact.Sha256);
             localFiles.Add(local);
         }
 
