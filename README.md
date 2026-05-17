@@ -38,6 +38,10 @@ Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.co
 
 The bundled `tools/adb.exe` ships with the app — no Android SDK needed on your PC.
 
+Release ZIPs are unsigned until Azure Artifact Signing secrets are provisioned.
+Unsigned prereleases, when published, will include an `ARTIFACT-TRUST.txt` note
+and may trigger Windows SmartScreen warnings.
+
 ## Usage
 
 1. Plug **both** phones in via USB. Accept the "Allow USB debugging?" prompt on each.
@@ -71,6 +75,13 @@ dotnet run --project src/PhoneFork.App
 ```
 
 Requires **.NET 10 SDK** (10.0.202+).
+
+Local publish smoke:
+
+```bash
+dotnet publish src/PhoneFork.App/PhoneFork.App.csproj -c Release -r win-x64 --self-contained false -o artifacts/publish/wpf
+dotnet publish src/PhoneFork.Cli/PhoneFork.Cli.csproj -c Release -r win-x64 --self-contained false -o artifacts/publish/cli
+```
 
 ## Tech
 

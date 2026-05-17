@@ -1,10 +1,10 @@
 name: release
 
-# Triggered on a `v*` tag. Publishes a framework-dependent ZIP for the
-# WPF host + CLI and a CycloneDX SBOM. Signing + provenance attestation
-# slots are wired (F064 / F065 / F066) but the secrets are not provisioned
-# yet, so those steps are no-ops on a public repo build until the maintainer
-# adds the AZURE_ARTIFACT_SIGNING secrets.
+# Triggered on a `v*` tag. Publishes framework-dependent ZIPs for the WPF host
+# and CLI. Signing + provenance attestation slots are wired (F064 / F065 / F066),
+# but signing is skipped until the maintainer provisions Azure Artifact Signing
+# secrets. The workflow always publishes ARTIFACT-TRUST.txt so unsigned releases
+# are explicit.
 
 on:
   push:
@@ -19,6 +19,8 @@ permissions:
 jobs:
   build-and-sign:
     runs-on: windows-latest
+    env:
+      HAVE_SIGNING_SECRETS: ${{ secrets.AZURE_TENANT_ID != '' && secrets.AZURE_CLIENT_ID != '' && secrets.AZURE_CLIENT_SECRET != '' && secrets.AZURE_SIGNING_ACCOUNT != '' && secrets.AZURE_SIGNING_PROFILE != '' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -77,7 +79,28 @@ jobs:
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
           AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
-          HAVE_SIGNING_SECRETS: ${{ secrets.AZURE_TENANT_ID != '' && 'true' || 'false' }}
+
+      - name: Write artifact trust note
+        shell: pwsh
+        run: |
+          if ($env:HAVE_SIGNING_SECRETS -eq "true") {
+            $lines = @(
+              "PhoneFork release artifact trust",
+              "",
+              "Status: ZIP artifacts were submitted to Azure Artifact Signing in this workflow.",
+              "Verify: use signtool verify /v /debug /pa against downloaded artifacts where applicable.",
+              "Provenance: GitHub artifact attestation is generated for PhoneFork-*-win-x64.zip."
+            )
+          } else {
+            $lines = @(
+              "PhoneFork release artifact trust",
+              "",
+              "Status: ZIP artifacts are UNSIGNED. Azure Artifact Signing secrets were not configured for this run.",
+              "Expected Windows behavior: SmartScreen or Defender may warn until signed releases are available.",
+              "Provenance: GitHub artifact attestation is generated for PhoneFork-*-win-x64.zip."
+            )
+          }
+          $lines | Set-Content -Path ARTIFACT-TRUST.txt -Encoding UTF8
 
       # F066 — SLSA Level 3 build provenance via GitHub artifact attestations.
       - name: Generate SLSA attestation
@@ -90,4 +113,5 @@ jobs:
         with:
           files: |
             PhoneFork-*-win-x64.zip
+            ARTIFACT-TRUST.txt
           generate_release_notes: true
