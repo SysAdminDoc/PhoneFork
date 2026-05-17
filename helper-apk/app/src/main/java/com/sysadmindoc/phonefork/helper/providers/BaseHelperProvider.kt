@@ -14,15 +14,15 @@ import android.os.Process
  *  - a friendly "this is the helper" health probe at <authority>/health
  *  - a strict UID gate so only the shell UID (driven by ADB from the Windows host)
  *    can query/insert. Anything else returns an empty cursor.
- *  - a JSON envelope helper so each provider emits `MatrixCursor(["json"])` rows.
+ *  - a v1 JSON envelope helper so each provider emits `MatrixCursor(["json"])` rows.
  *
  *  Bodies for individual categories (SMS, call log, contacts, Wi-Fi, etc.) live
  *  in their dedicated subclasses; this base only encodes the cross-cutting rules.
  */
 abstract class BaseHelperProvider : ContentProvider() {
 
-    /** Logical name used in error messages — not exposed to the host. */
-    protected abstract val authorityName: String
+    /** Logical name used in error messages and v1 envelopes. */
+    internal abstract val authorityName: String
 
     /**
      * Allow-list of UIDs that may call into this provider. The shell UID (2000) covers
@@ -48,7 +48,9 @@ abstract class BaseHelperProvider : ContentProvider() {
 
         // Reserved health endpoint: any provider answers /health with a one-row JSON status.
         if (uri.lastPathSegment == "health") {
-            return jsonCursor("""{"authority":"$authorityName","ok":true}""")
+            return jsonCursor(
+                """{"schema":"phonefork.helper.v1","authority":"$authorityName","status":"ok","mode":"health","count":0,"items":[],"capabilities":{"query":true},"ok":true}"""
+            )
         }
 
         return onQuery(uri, projection, selection, selectionArgs, sortOrder)
@@ -74,20 +76,23 @@ abstract class BaseHelperProvider : ContentProvider() {
         return onDelete(uri, selection, selectionArgs)
     }
 
-    // Subclasses fill these in once the host wire-protocol is finalized.
+    // Subclasses override these for category bodies. The default remains a
+    // versioned error envelope so accidental new providers are explicit.
     protected open fun onQuery(
         uri: Uri,
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?
-    ): Cursor? = jsonCursor("""{"authority":"$authorityName","status":"not-implemented"}""")
+    ): Cursor? = jsonCursor(
+        """{"schema":"phonefork.helper.v1","authority":"$authorityName","status":"error","mode":"query","count":0,"items":[],"error":{"code":"not-implemented","message":"Provider body is not implemented."}}"""
+    )
 
     protected open fun onInsert(uri: Uri, values: ContentValues?): Uri? = null
     protected open fun onUpdate(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int = 0
     protected open fun onDelete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = 0
 
-    protected fun jsonCursor(jsonRow: String): Cursor {
+    internal fun jsonCursor(jsonRow: String): Cursor {
         val cursor = MatrixCursor(arrayOf("json"))
         cursor.addRow(arrayOf(jsonRow))
         return cursor

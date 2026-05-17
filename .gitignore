@@ -53,3 +53,6 @@ helper-apk/app/build/
 helper-apk/local.properties
 helper-apk/*.jks
 helper-apk/keystore.properties
+assets/helper/*.apk
+assets/helper/*.metadata.txt
+assets/helper/*.sha256
