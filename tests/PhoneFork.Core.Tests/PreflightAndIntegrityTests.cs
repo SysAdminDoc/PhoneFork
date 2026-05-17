@@ -23,6 +23,53 @@ public class CscPostureTests
     }
 }
 
+public class MessageTransitionTests
+{
+    [Fact]
+    public void UsSamsungMessagesDefaultBlocksHelperSmsUntilGoogleTransition()
+    {
+        var report = MessageTransitionService.Assess(
+            MessageTransitionService.SamsungMessagesPackage,
+            samsungMessagesInstalled: true,
+            googleMessagesInstalled: true,
+            sourceCountry: "US");
+
+        Assert.False(report.CanUseHelperSms);
+        Assert.True(report.IsUsMarket);
+        Assert.Contains(report.Findings, f => f.Id == "samsung-messages-us-transition"
+                                             && f.Level == HonestyLevel.Warning
+                                             && f.Detail.Contains("July 2026")
+                                             && f.Detail.Contains("24 hours"));
+    }
+
+    [Fact]
+    public void GoogleMessagesDefaultClearsHelperSmsGate()
+    {
+        var report = MessageTransitionService.Assess(
+            MessageTransitionService.GoogleMessagesPackage,
+            samsungMessagesInstalled: true,
+            googleMessagesInstalled: true,
+            sourceCountry: "US");
+
+        Assert.True(report.CanUseHelperSms);
+        Assert.Contains(report.Findings, f => f.Id == "sms-default-google");
+    }
+
+    [Fact]
+    public void MissingDefaultSmsRoleKeepsHelperSmsGateClosed()
+    {
+        var report = MessageTransitionService.Assess(
+            defaultSmsPackage: null,
+            samsungMessagesInstalled: false,
+            googleMessagesInstalled: false,
+            sourceCountry: "CA");
+
+        Assert.False(report.CanUseHelperSms);
+        Assert.Contains(report.Findings, f => f.Id == "sms-default-missing"
+                                             && f.Level == HonestyLevel.Warning);
+    }
+}
+
 public class IntegrityModeTests
 {
     [Theory]

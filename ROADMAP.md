@@ -206,6 +206,11 @@ Sources: L13, G04, G15, G16, G23, S04.
 ### R007 - Samsung Messages and Google Messages transition assistant
 
 Priority: P1. Impact: 4. Effort: 3. Risk: 3.
+Status: Completed 2026-05-17. The Core pre-flight bundle now detects the
+default SMS role, Samsung Messages, Google Messages, US-market transition
+posture, the July 2026 retirement note, Samsung's up-to-24-hour transfer
+caveat, and whether helper SMS work is gated until the default-app state is
+clear. WPF Operations shows the messages transition summary and findings.
 
 Add a pre-flight card that detects Samsung Messages/Google Messages/default SMS
 role, warns US users about July 2026 discontinuation, and recommends the safest

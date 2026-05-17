@@ -115,6 +115,8 @@
                     <TextBlock Text="Pre-flight and integrity summary" FontSize="15" FontWeight="SemiBold"/>
                     <TextBlock Text="{Binding PreflightLine}" Foreground="{StaticResource ForegroundMutedBrush}"
                                TextWrapping="Wrap" Margin="0,3,0,10"/>
+                    <TextBlock Text="{Binding MessagesLine}" Foreground="{StaticResource ForegroundMutedBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,10"/>
                     <TextBlock Text="{Binding MediaIntegrityLine}" Foreground="{StaticResource ForegroundMutedBrush}"
                                TextWrapping="Wrap"/>
                 </StackPanel>
