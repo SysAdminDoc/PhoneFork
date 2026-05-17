@@ -43,7 +43,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Apps: enumerates third-party packages, pulls all split APK paths, stages safely on Windows, and installs via session-based multi-APK install with Play attribution.
 - Media: manifests `/sdcard` categories, diffs source/destination, syncs pull-then-push, preserves mtime, supports delete/update/conflict policy, writes resumable checkpoints and evidence reports, emits huge-file/Quick Share advisories, and has size+mtime/CRC32/SHA-256 integrity verification primitives.
 - Settings: snapshots AOSP namespaces, diffs them, applies selected values behind a safety blocklist.
-- Debloat: embeds a 5,481-entry dataset, disables packages only, writes rollback snapshots, and applies a One UI override overlay.
+- Debloat: embeds a 5,481-entry dataset, disables packages only, writes rollback snapshots, applies source-backed OEM/One UI override metadata, and lets CLI scans/applies load checksummed out-of-band overlay feeds.
 - Wi-Fi: enumerates SSIDs where shell permits, renders QR PNG/SVG, and surfaces CSC mismatch.
 - Roles and permissions: snapshots and applies AOSP default roles, runtime permissions, and appops.
 - Wireless ADB: supports Android 11+ pairing/connect/disconnect, mDNS discovery, per-install ADB home, patch-level gate for CVE-2026-0073, trusted-pair registry with hashed serials, session timeout, and kill switch.

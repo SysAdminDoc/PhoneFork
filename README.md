@@ -65,7 +65,7 @@ phonefork apps migrate --from <src> --to <dst> [--dry-run]
 phonefork media sync   --from <src> --to <dst> [--checkpoint path] [--report path]
 phonefork settings dump --device <serial> --out settings.json
 phonefork settings apply --device <serial> --plan plan.json
-phonefork debloat apply --device <serial> --profile aggressive
+phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed feed.json --overlay-sha256 <sha256>]
 phonefork backup inspect <path> [--json]
 phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
 phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run]
@@ -74,6 +74,11 @@ phonefork connect <ip:connect-port>
 ```
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
+
+Debloat overlay feeds are optional JSON hotfixes for OEM/package safety
+changes. They must be verified with `--overlay-sha256` or a sibling
+`.sha256` file; without an overlay, PhoneFork uses the embedded offline
+AppManagerNG/UAD-NG dataset and bundled source-backed overrides.
 
 ## Build from source
 
