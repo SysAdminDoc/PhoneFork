@@ -11,7 +11,7 @@ namespace PhoneFork.Cli.Commands;
 /// </summary>
 public sealed class TrustedListCommand : Command
 {
-    public override int Execute(CommandContext context)
+    protected override int Execute(CommandContext context, CancellationToken cancellationToken)
     {
         var log = PhoneFork.Core.Logging.AuditLogger.Create();
         var reg = new TrustedPairRegistry(TrustedPairRegistry.DefaultPath(), log);
@@ -46,7 +46,7 @@ public sealed class TrustedForgetCommand : Command<TrustedForgetCommand.Settings
         public required string Hash { get; init; }
     }
 
-    public override int Execute(CommandContext context, Settings s)
+    protected override int Execute(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
         var log = PhoneFork.Core.Logging.AuditLogger.Create();
         var reg = new TrustedPairRegistry(TrustedPairRegistry.DefaultPath(), log);
@@ -81,7 +81,7 @@ public sealed class BurstModeCommand : Command<BurstModeCommand.Settings>
         public required string State { get; init; }
     }
 
-    public override int Execute(CommandContext context, Settings s)
+    protected override int Execute(CommandContext context, Settings s, CancellationToken cancellationToken)
     {
         var log = PhoneFork.Core.Logging.AuditLogger.Create();
         var svc = new AdbBurstModeService(log);
