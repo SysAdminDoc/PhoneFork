@@ -35,8 +35,8 @@ public sealed class HelperInstallCommand : AsyncCommand<HelperInstallCommand.Set
         {
             AnsiConsole.MarkupLine(
                 $"[red]Helper APK not found:[/] {Markup.Escape(apk)}. " +
-                "Build with `cd helper-apk; ./gradlew assembleRelease` and sign with apksigner, " +
-                "then place at assets/helper/PhoneForkHelper.apk.");
+                "Build and sign the helper APK, then stage it with " +
+                "`scripts/Stage-HelperApk.ps1 -ApkPath <signed-apk>`.");
             return 2;
         }
 

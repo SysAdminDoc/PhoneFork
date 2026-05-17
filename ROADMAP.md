@@ -35,8 +35,8 @@ Guardrails:
 | Version | `CHANGELOG.md` is at `v0.9.0-pre`; README badge, WPF title, and manifest were synced during this research pass. Sources: L04, L05. |
 | Repo | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`, no tags/releases/issues/PRs at reconnaissance time. Source: L03. |
 | Host stack | .NET 10, WPF, MVVM, Spectre CLI, AdvancedSharpAdbClient, bundled platform-tools. Sources: L08-L13, L26. |
-| Helper APK | Gradle/Kotlin scaffold exists, targetSdk 36, providers are still stubs returning `status:not-implemented`. Sources: L14-L17. |
-| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI is tree-only; release workflow has signing and attestation slots but no published release. Sources: L18, L19. |
+| Helper APK | Gradle/Kotlin helper targets SDK 36 and now emits `phonefork.helper.v1` JSON envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary. Restore writes remain guarded/disabled. Sources: L14-L17. |
+| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI now assembles debug/release APKs, verifies metadata/signature, and uploads staged helper artifacts; release workflow still has signing and attestation slots but no published release. Sources: L18, L19. |
 | Dependency state | No vulnerable NuGet packages found; `xunit` 2.9.3 is flagged legacy; several package updates are available. Sources: L27-L29. |
 | Research artifacts | Canonical project context and dated research set live in `PROJECT_CONTEXT.md` and `.ai/research/2026-05-17/`. |
 
@@ -73,6 +73,9 @@ Guardrails:
 ### R001 - Implement the Helper APK provider contract
 
 Priority: P0. Impact: 5. Effort: 5. Risk: 4.
+Status: Completed 2026-05-17. Restore write bodies are deliberately disabled
+behind guarded restore endpoints until the host has a full destructive-action
+confirmation workflow.
 
 Implement real provider bodies for SMS, call log, contacts, Wi-Fi metadata,
 wallpaper, ringtones, and user dictionary behind the current shell/system UID
@@ -94,6 +97,8 @@ Sources: L15-L17, G20, G02, G03.
 ### R002 - Build and verify the helper APK in CI
 
 Priority: P0. Impact: 4. Effort: 3. Risk: 3.
+Status: Completed 2026-05-17 for CI build/metadata verification and verified
+host staging. Release signing remains tracked under R004/R011.
 
 Replace tree-only helper APK CI with a real `assembleRelease` or reproducible
 equivalent. If Gradle wrapper jars remain intentionally untracked, document and

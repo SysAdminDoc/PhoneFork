@@ -37,6 +37,67 @@ public class HelperAppServiceConstantsTests
         var leftovers = new HelperResidueReport(HelperInstalled: false, TempFilesLeft: new[] { "phonefork-agent.jar" });
         Assert.False(leftovers.IsClean);
     }
+
+    [Fact]
+    public void ProviderContractExtractsJsonFromContentQueryOutput()
+    {
+        var output = """Row: 0 json={"schema":"phonefork.helper.v1","authority":"sms","status":"ok","mode":"health","count":0,"items":[]}""";
+        var json = HelperProviderContract.ExtractJsonFromContentQuery(output);
+        Assert.NotNull(json);
+        Assert.StartsWith("{\"schema\"", json);
+    }
+
+    [Fact]
+    public void ProviderContractTreatsEmptyOutputAsDeniedOrMissing()
+    {
+        Assert.Null(HelperProviderContract.ExtractJsonFromContentQuery(""));
+        Assert.False(HelperProviderContract.TryParseEnvelope(null, out var envelope));
+        Assert.Null(envelope);
+    }
+
+    [Fact]
+    public void ProviderContractRejectsMalformedJson()
+    {
+        Assert.Throws<FormatException>(() => HelperProviderContract.ParseEnvelope("{not-json"));
+    }
+
+    [Fact]
+    public void ProviderContractParsesEmptyResultEnvelope()
+    {
+        var env = HelperProviderContract.ParseEnvelope(
+            """{"schema":"phonefork.helper.v1","authority":"contacts","status":"ok","mode":"export","count":0,"items":[],"capabilities":{"canRead":true},"warnings":[]}""");
+
+        Assert.True(env.IsOk);
+        Assert.Equal("contacts", env.Authority);
+        Assert.Equal(0, env.Count);
+        Assert.Equal(System.Text.Json.JsonValueKind.Array, env.Items.ValueKind);
+        Assert.Equal(0, env.Items.GetArrayLength());
+    }
+
+    [Fact]
+    public void ProviderContractParsesPaginationAndCapabilities()
+    {
+        var env = HelperProviderContract.ParseEnvelope(
+            """{"schema":"phonefork.helper.v1","authority":"wifi","status":"ok","mode":"capability","count":1,"nextOffset":500,"items":[{"ssid":"lab"}],"capabilities":{"canReadPsk":false,"requiresShizukuOrPrivilegedApiForPsk":true},"warnings":["psks unavailable"]}""");
+
+        Assert.Equal(500, env.NextOffset);
+        Assert.False(env.Capabilities.GetProperty("canReadPsk").GetBoolean());
+        Assert.True(env.Capabilities.GetProperty("requiresShizukuOrPrivilegedApiForPsk").GetBoolean());
+        Assert.Equal("psks unavailable", Assert.Single(env.Warnings));
+    }
+
+    [Fact]
+    public void ProviderContractBuildsKnownAuthorityUri()
+    {
+        var uri = HelperProviderContract.BuildQueryUri("sms", limit: 100, offset: 200);
+        Assert.Equal("content://com.sysadmindoc.phonefork.helper.sms?limit=100&offset=200", uri);
+    }
+
+    [Fact]
+    public void ProviderContractRejectsUnknownAuthority()
+    {
+        Assert.Throws<ArgumentException>(() => HelperProviderContract.BuildQueryUri("unknown"));
+    }
 }
 
 public class ShizukuRunbookTests
