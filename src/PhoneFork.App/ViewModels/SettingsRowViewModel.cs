@@ -11,6 +11,9 @@ public partial class SettingsRowViewModel : ObservableObject
     public SettingsDiffOutcome Outcome { get; }
     public string SourceValue { get; }
     public string DestValue { get; }
+    public SettingsSafetyStatus Safety { get; }
+    public string SafetyCategory { get; }
+    public string SafetyDetail { get; }
 
     [ObservableProperty] private bool _isSelected;
 
@@ -21,11 +24,18 @@ public partial class SettingsRowViewModel : ObservableObject
         Outcome = entry.Outcome;
         SourceValue = entry.SourceValue ?? "";
         DestValue = entry.DestValue ?? "";
-        // Default-selected only for "Different" — OnlyOnSource is opt-in by user.
-        _isSelected = entry.Outcome == SettingsDiffOutcome.Different;
+        var assessment = SamsungSettingsCorpus.Assess(entry);
+        Safety = assessment.Status;
+        SafetyCategory = assessment.Category;
+        SafetyDetail = assessment.Rationale;
+        // Default-selected only for safe "Different" keys — source-only and uncatalogued keys are opt-in/CLI-only.
+        _isSelected = entry.Outcome == SettingsDiffOutcome.Different && IsSafeToApply;
     }
 
+    public bool IsSafeToApply => Safety == SettingsSafetyStatus.Safe;
+
     public string NamespaceText => Namespace.ToString().ToLowerInvariant();
+    public string SafetyText => Safety.ToString().ToLowerInvariant();
     public string OutcomeText => Outcome switch
     {
         SettingsDiffOutcome.Different => "different",

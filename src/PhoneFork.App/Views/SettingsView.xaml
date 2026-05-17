@@ -46,6 +46,12 @@
                     <Run Text="   " />
                     <Run Text="Only on src: " Foreground="{StaticResource ForegroundMutedBrush}"/>
                     <Run Text="{Binding TotalOnlyOnSource}" FontWeight="SemiBold" Foreground="{StaticResource MochaBlueBrush}"/>
+                    <Run Text="   " />
+                    <Run Text="Safe: " Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <Run Text="{Binding TotalSafe}" FontWeight="SemiBold" Foreground="{StaticResource MochaGreenBrush}"/>
+                    <Run Text="   " />
+                    <Run Text="Review: " Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <Run Text="{Binding TotalNeedsReview}" FontWeight="SemiBold" Foreground="{StaticResource MochaYellowBrush}"/>
                 </TextBlock>
             </DockPanel>
         </Border>
@@ -62,6 +68,8 @@
                         <DataGridTextColumn Header="Ns"      Binding="{Binding NamespaceText}" Width="70"  IsReadOnly="True"/>
                         <DataGridTextColumn Header="Key"     Binding="{Binding Key}"           Width="2.5*" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Outcome" Binding="{Binding OutcomeText}"   Width="90"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Safety"  Binding="{Binding SafetyText}"    Width="90"  IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Category" Binding="{Binding SafetyCategory}" Width="150" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Source value" Binding="{Binding SourceValue}" Width="2*" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Dest value"   Binding="{Binding DestValue}"   Width="2*" IsReadOnly="True"/>
                     </DataGrid.Columns>
@@ -71,7 +79,7 @@
                         Visibility="{Binding HasRows, Converter={StaticResource InverseBoolToVis}}">
                     <StackPanel Width="440">
                         <TextBlock Text="Scan settings before applying" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Dangerous system keys are blocked by the apply service; different rows are selected by default and source-only rows stay opt-in."
+                        <TextBlock Text="Only reviewed safe settings are selected by default. Review, blocked, and unknown keys stay out of WPF apply."
                                    Foreground="{StaticResource ForegroundMutedBrush}"
                                    TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
                     </StackPanel>

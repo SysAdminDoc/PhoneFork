@@ -40,6 +40,10 @@ All notable changes to PhoneFork.
   runtime-permission, appop, and backup-install writes now probe Android user
   topology first and refuse non-primary-user-only devices unless the CLI caller
   explicitly passes `--allow-multi-user`.
+- Samsung/One UI settings safety corpus: settings diff now reports safe,
+  review-only, blocked, and unknown keys; settings apply defaults to reviewed
+  safe keys only, with a CLI-only `--include-uncatalogued-settings` escape hatch
+  for non-blocked keys.
 
 ## v0.9.0-pre — 2026-05-17
 

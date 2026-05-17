@@ -25,6 +25,8 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _filter = "";
     [ObservableProperty] private int _totalDifferent;
     [ObservableProperty] private int _totalOnlyOnSource;
+    [ObservableProperty] private int _totalSafe;
+    [ObservableProperty] private int _totalNeedsReview;
     [ObservableProperty] private int _totalSelected;
     [ObservableProperty] private bool _dryRun;
     [ObservableProperty] private bool _hasRows;
@@ -49,7 +51,7 @@ public partial class SettingsViewModel : ObservableObject
     private bool FilterPredicate(object o)
     {
         if (o is not SettingsRowViewModel row) return false;
-        if (ShowOnlyApplicable && row.Outcome != SettingsDiffOutcome.Different && row.Outcome != SettingsDiffOutcome.OnlyOnSource)
+        if (ShowOnlyApplicable && (!row.IsSafeToApply || (row.Outcome != SettingsDiffOutcome.Different && row.Outcome != SettingsDiffOutcome.OnlyOnSource)))
             return false;
         if (!string.IsNullOrEmpty(Filter)
             && !row.Key.Contains(Filter, StringComparison.OrdinalIgnoreCase)
@@ -91,8 +93,10 @@ public partial class SettingsViewModel : ObservableObject
             FilteredRows.Refresh();
             TotalDifferent = Rows.Count(r => r.Outcome == SettingsDiffOutcome.Different);
             TotalOnlyOnSource = Rows.Count(r => r.Outcome == SettingsDiffOutcome.OnlyOnSource);
+            TotalSafe = Rows.Count(r => r.IsSafeToApply && r.Outcome is SettingsDiffOutcome.Different or SettingsDiffOutcome.OnlyOnSource);
+            TotalNeedsReview = Rows.Count(r => !r.IsSafeToApply && r.Outcome is SettingsDiffOutcome.Different or SettingsDiffOutcome.OnlyOnSource);
             RefreshSelectionState();
-            Status = $"Plan ready: {TotalDifferent} different + {TotalOnlyOnSource} only-on-source. {plan.Namespaces.Sum(n => n.Count(SettingsDiffOutcome.Same))} keys already aligned.";
+            Status = $"Plan ready: {TotalSafe} safe keys, {TotalNeedsReview} review/blocked/unknown keys. {plan.Namespaces.Sum(n => n.Count(SettingsDiffOutcome.Same))} keys already aligned.";
         }
         catch (Exception ex)
         {
@@ -143,7 +147,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private void SelectAll()
     {
-        foreach (var r in Rows) if (r.Outcome != SettingsDiffOutcome.Same && r.Outcome != SettingsDiffOutcome.OnlyOnDest) r.IsSelected = true;
+        foreach (var r in Rows) if (r.IsSafeToApply && r.Outcome != SettingsDiffOutcome.Same && r.Outcome != SettingsDiffOutcome.OnlyOnDest) r.IsSelected = true;
         RefreshSelectionState();
     }
 
