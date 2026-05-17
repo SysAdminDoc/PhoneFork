@@ -134,3 +134,17 @@ Verification:
 - `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
 - `gh release view v0.9.0-pre --repo SysAdminDoc/PhoneFork`: confirmed `prerelease=true` and expected assets.
 - `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json`: passed against a synthetic AppManager-compatible backup directory.
+
+## Continuation Implementation - R007 Messages Transition
+
+- `src/PhoneFork.Core/Services/MessageTransitionService.cs`: added Samsung Messages / Google Messages package detection, default SMS role assessment, US-market July 2026 transition warnings, Samsung's up-to-24-hour transfer caveat, and helper SMS gating.
+- `src/PhoneFork.Core/Services/PreflightService.cs`: includes messages transition findings in the pre-flight bundle.
+- `src/PhoneFork.App/ViewModels/OperationsViewModel.cs` and `src/PhoneFork.App/Views/OperationsView.xaml`: surface the messages transition summary and include message findings in the WPF Operations pre-flight output.
+- `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs`: added pure assessment coverage for Samsung-default, Google-default, and missing-default SMS states.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R007 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 132 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
