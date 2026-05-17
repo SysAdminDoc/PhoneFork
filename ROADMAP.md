@@ -36,8 +36,8 @@ Guardrails:
 | Repo | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`; first unsigned prerelease `v0.9.0-pre` is published with WPF/CLI ZIPs and `ARTIFACT-TRUST.txt`. Sources: L03, L31. |
 | Host stack | .NET 10, WPF, MVVM, Spectre CLI, AdvancedSharpAdbClient, bundled platform-tools. Sources: L08-L13, L26. |
 | Helper APK | Gradle/Kotlin helper targets SDK 36 and now emits `phonefork.helper.v1` JSON envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary. Restore writes remain guarded/disabled. Sources: L14-L17. |
-| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI now assembles debug/release APKs, verifies metadata/signature, and uploads staged helper artifacts; release workflow has published the unsigned `v0.9.0-pre` prerelease and still has signing/attestation slots for signed releases. Sources: L18, L19, L31. |
-| Dependency state | No vulnerable NuGet packages found; `xunit` 2.9.3 is flagged legacy; several package updates are available. Sources: L27-L29. |
+| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI now assembles debug/release APKs, verifies metadata/signature, and uploads staged helper artifacts; release workflow has published the unsigned `v0.9.0-pre` prerelease and future tag builds emit SBOM/checksums, release notes, provenance/SBOM attestations, and optional Artifact Signing. Sources: L18, L19, L31, L37. |
+| Dependency state | No vulnerable or outdated NuGet packages found after R012; `xunit` 2.9.3 remains flagged legacy and xUnit v3 is intentionally deferred. Sources: L27-L29, L38. |
 | Research artifacts | Canonical project context and dated research set live in `PROJECT_CONTEXT.md` and `.ai/research/2026-05-17/`. |
 
 ## Research Deltas That Changed The Plan
