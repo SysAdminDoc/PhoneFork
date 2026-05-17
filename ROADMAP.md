@@ -140,10 +140,9 @@ Sources: L12, L13, L04, M01, M02.
 ### R004 - Release-readiness correction pass
 
 Priority: P0. Impact: 4. Effort: 2. Risk: 2.
-Status: Blocked after local readiness work on 2026-05-17. Local publish
-docs/workflow trust notes are wired and publish outputs verify locally. Public
-tag/release remains blocked pending current screenshots and an explicit signed
-vs unsigned prerelease decision.
+Status: In progress. Local publish docs/workflow trust notes are wired,
+screenshots are captured, and publish outputs verify locally. Proceeding with a
+clearly unsigned prerelease because signing secrets are not provisioned.
 
 The repo has release workflow scaffolding but no tags or releases. Before the
 first public release, produce screenshots, verify publish outputs locally, and
@@ -163,6 +162,9 @@ Sources: L03, L04, L19, S15, S16, S18.
 ### R005 - Add a version and documentation consistency gate
 
 Priority: P0. Impact: 3. Effort: 2. Risk: 1.
+Status: Completed 2026-05-17. `scripts/Test-VersionConsistency.ps1` checks the
+changelog top version, README badge, WPF title/header, app manifest numeric
+identity, helper APK versionName, and release workflow `v*` tag trigger.
 
 The repo had three visible stale version strings. Add a small verification
 script or test that compares changelog top version, README badge, app title,

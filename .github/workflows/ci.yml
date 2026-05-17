@@ -29,6 +29,9 @@ jobs:
       - name: Restore
         run: dotnet restore PhoneFork.slnx
 
+      - name: Version consistency
+        run: pwsh scripts/Test-VersionConsistency.ps1
+
       - name: Build (Release)
         run: dotnet build PhoneFork.slnx -c Release --no-restore
 

@@ -2,11 +2,13 @@
 
 All notable changes to PhoneFork.
 
-## v0.9.0-pre — 2026-05-16
+## v0.9.0-pre — 2026-05-17
 
 Backup format detection layer (F031, F032) + Android `<cross-platform-transfer>`
 metadata in the open archive manifest (F035). All sniffer paths are read-only;
-real extraction/decryption follows in v0.9.1.
+real extraction/decryption follows in v0.9.1. The 2026-05-17 continuation adds
+the helper provider contract, WPF Operations surface, release-readiness gate,
+and version-consistency check for the first unsigned prerelease.
 
 ### Added
 - `AndroidBackupReader.Sniff()` — parses the legacy `adb backup` archive header
@@ -15,11 +17,25 @@ real extraction/decryption follows in v0.9.1.
   directory (`*.7z` + optional sidecar JSON / txt).
 - `CrossPlatformMetadata` on `OpenArchiveManifest` — carries the per-archive
   list of apps that opted into Android 16 QPR2+ iOS interop.
+- PhoneForkHelper providers now emit `phonefork.helper.v1` JSON envelopes for
+  SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata,
+  ringtone defaults, and user dictionary rows.
+- WPF Operations tab for helper install/probe/uninstall, Shizuku checks, Smart
+  Switch detection, backup interop inspection, pre-flight bundles, media
+  size/mtime verification, trusted-pair visibility, and ADB Burst Mode.
+- `scripts/Stage-HelperApk.ps1` verifies helper package metadata and signature
+  before host packaging consumes `assets/helper/PhoneForkHelper.apk`.
+- `scripts/Test-VersionConsistency.ps1` compares changelog, README badge, WPF
+  title/header, app manifest, helper APK versionName, and release tag trigger.
+- `docs/release-readiness.md` and `ARTIFACT-TRUST.txt` workflow output document
+  unsigned prerelease behavior and future Artifact Signing expectations.
 
 ### Tests
-- 113 → 122 (+9). New coverage: AB header sniffer (plain, compressed/encrypted,
+- 113 → 129 (+16). New coverage: AB header sniffer (plain, compressed/encrypted,
   non-AB, missing file), OAB archive detection with both sidecar shapes,
-  cross-platform metadata JSON serialization, optional manifest field.
+  cross-platform metadata JSON serialization, optional manifest field, helper
+  provider JSON extraction/parsing, malformed/empty helper responses,
+  pagination, capabilities, and URI construction.
 
 ## v0.8.0 — 2026-05-16
 
