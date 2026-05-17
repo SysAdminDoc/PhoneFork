@@ -113,3 +113,24 @@ Verification:
 - `dotnet publish src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\cli`: passed.
 - Confirmed `artifacts\publish\wpf\PhoneFork.exe`, `artifacts\publish\wpf\tools\adb.exe`, `artifacts\publish\cli\phonefork.exe`, and `artifacts\publish\cli\tools\adb.exe` exist.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+Release publication:
+
+- Created and pushed annotated tag `v0.9.0-pre` after the local readiness gate.
+- GitHub Actions release workflow completed successfully for `v0.9.0-pre`.
+- Verified the release is marked as a prerelease and contains `ARTIFACT-TRUST.txt`, `PhoneFork-v0.9.0-pre-cli-win-x64.zip`, and `PhoneFork-v0.9.0-pre-wpf-win-x64.zip`.
+
+## Continuation Implementation - R006 Backup Interop
+
+- `src/PhoneFork.Cli/Program.cs` and `src/PhoneFork.Cli/Commands/BackupCommands.cs`: added `phonefork backup inspect`, `backup export-appmanager`, and `backup install-appmanager` command surfaces.
+- `src/PhoneFork.Core/Services/AppManagerBackupReader.cs`: added resolved local APK paths from verified AppManager backup metadata.
+- `src/PhoneFork.Core/Services/AppInstallerService.cs`: factored shared local APK-set install logic and added `InstallLocalBackupAsync` for AppManager-compatible backup import.
+- `tests/PhoneFork.Core.Tests/BackupInteropTests.cs`: covered resolved APK path output for the reader handle.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, `docs/release-readiness.md`, and `SOURCE_REGISTER.md`: documented the published prerelease and CLI-first backup export/install workflow.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
+- `gh release view v0.9.0-pre --repo SysAdminDoc/PhoneFork`: confirmed `prerelease=true` and expected assets.
+- `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json`: passed against a synthetic AppManager-compatible backup directory.

@@ -28,6 +28,17 @@ app.Configure(config =>
             .WithDescription("Incremental sync of /sdcard media between two devices.");
     });
 
+    config.AddBranch("backup", backup =>
+    {
+        backup.SetDescription("Backup archive inspection plus AppManager-compatible APK backup export/import.");
+        backup.AddCommand<BackupInspectCommand>("inspect")
+            .WithDescription("Inspect AppManager, legacy Android .ab, and Open Android Backup material.");
+        backup.AddCommand<BackupExportAppManagerCommand>("export-appmanager")
+            .WithDescription("Export user APKs/splits from a device into AppManager-compatible backup directories.");
+        backup.AddCommand<BackupInstallAppManagerCommand>("install-appmanager")
+            .WithDescription("Verify and install a single AppManager-compatible backup directory onto a destination device.");
+    });
+
     config.AddBranch("settings", settings =>
     {
         settings.SetDescription("System settings snapshot, diff, and selective apply.");
