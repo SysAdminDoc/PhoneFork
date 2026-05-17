@@ -181,3 +181,20 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R010 Debloat Safety Feed
+
+- `src/PhoneFork.Core/Services/DebloatDataset.cs`: added OEM/action/risk/source/review/expiry-aware override matching, checksum-enforced external feed loading, sidecar SHA-256 support, and a per-device resolver that applies embedded plus optional feed overrides after probing One UI, Android, and manufacturer properties.
+- `assets/debloat/overrides.json`: expanded bundled hotfix rows with OEM, action, risk, source URL, review date, and expiry metadata.
+- `src/PhoneFork.Cli/Commands/DebloatListCommand.cs` and `src/PhoneFork.Cli/Commands/DebloatApplyCommand.cs`: added `--overlay-feed` and `--overlay-sha256` for verified out-of-band feeds.
+- `src/PhoneFork.App/ViewModels/DebloatViewModel.cs`: routes WPF scans through the shared per-device dataset resolver so embedded overrides use the same device fingerprint logic as the CLI.
+- `tests/PhoneFork.Core.Tests/DebloatOverrideTests.cs`: covers OEM predicates, required checksums, sidecar checksums, mismatch fail-closed behavior, feed-added packages, and expired override suppression.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R010 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 144 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

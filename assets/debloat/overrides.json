@@ -1,20 +1,30 @@
 {
   "$schema": "phonefork-debloat-overrides-v1",
-  "comment": "Hot-fix overlay for the AppManagerNG / UAD-NG dataset (F102). One entry per package whose safety classification needs to differ from the upstream dataset on a specific One UI / Android version. Reference: UAD-NG issue tracker. Updated in-place between releases.",
+  "generatedAt": "2026-05-17",
+  "source": "https://github.com/SysAdminDoc/PhoneFork/blob/main/assets/debloat/overrides.json",
+  "comment": "Hot-fix overlay for the AppManagerNG / UAD-NG dataset (F102). One entry per package whose safety classification needs to differ from the upstream dataset on a specific OEM / One UI / Android version. Reference: UAD-NG issue tracker. Updated in-place between releases.",
   "overrides": [
     {
       "packageId": "com.samsung.android.smartsuggestions",
+      "oem": "samsung",
       "oneUi": ">=8.5",
-      "tier": "Unsafe",
+      "action": "Unsafe",
+      "risk": "Breaks Mobile Networks settings on affected One UI 8.5 devices",
       "warning": "On One UI 8.5 (S26 / S25 / Z Fold 7 / Z Flip 7 and any device updated to One UI 8) disabling this package breaks Mobile Networks settings on at least Galaxy A57. Reference: UAD-NG issue #1394.",
-      "source": "https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues"
+      "source": "https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/issues/1394",
+      "reviewAfter": "2026-07-01",
+      "expiresAt": "2026-12-31"
     },
     {
       "packageId": "com.samsung.android.intelligenceservice2",
+      "oem": "samsung",
       "oneUi": ">=8.5",
-      "tier": "Unsafe",
+      "action": "Unsafe",
+      "risk": "Can disable Galaxy AI features the user explicitly opted into",
       "warning": "On One UI 8.5+, Samsung Galaxy AI features bind to intelligenceservice2; disabling can disable Galaxy AI features the user has explicitly opted into.",
-      "source": "manual S25/S26 audit, 2026-05-16"
+      "source": "https://github.com/SysAdminDoc/PhoneFork/blob/main/assets/debloat/overrides.json",
+      "reviewAfter": "2026-07-01",
+      "expiresAt": "2026-12-31"
     }
   ]
 }

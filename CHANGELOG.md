@@ -20,6 +20,10 @@ All notable changes to PhoneFork.
   records skipped/retried/failed/deferred entries, samples throughput/ETA in
   progress, warns on huge files, and can defer single-large-file runs to Quick
   Share when requested.
+- Debloat scanning and apply now accept checksummed out-of-band override feeds
+  so OEM/package safety changes can be patched with source URLs, risk notes,
+  review/expiry dates, and action overrides while retaining the embedded
+  offline dataset.
 
 ## v0.9.0-pre — 2026-05-17
 
