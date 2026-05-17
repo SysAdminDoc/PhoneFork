@@ -263,10 +263,45 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
         if (result.Success)
         {
             AnsiConsole.MarkupLine($"[green]installed[/] {Markup.Escape(result.PackageName)} ({result.Duration.TotalSeconds:F1}s)");
+            var receiptPath = await WriteInstallReceiptAsync(log, destination, handle.Meta.PackageName, localApks.Count, result, settings, ct);
+            AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
             return 0;
         }
 
         AnsiConsole.MarkupLine($"[red]install failed[/] {Markup.Escape(result.PackageName)}: {Markup.Escape(result.Error ?? "(unknown)")}");
+        var failedReceiptPath = await WriteInstallReceiptAsync(log, destination, handle.Meta.PackageName, localApks.Count, result, settings, ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(failedReceiptPath)}");
         return 2;
+    }
+
+    private static async Task<string> WriteInstallReceiptAsync(
+        Serilog.ILogger log,
+        AdvancedSharpAdbClient.Models.DeviceData destination,
+        string packageName,
+        int apkCount,
+        InstallResult result,
+        Settings settings,
+        CancellationToken ct)
+    {
+        var backupArtifact = new MigrationReceiptArtifact("appmanager-backup", settings.Backup);
+        return await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "backup-install-appmanager",
+                dryRun: settings.DryRun,
+                devices: new[] { MigrationReceiptService.Device("destination", destination) },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "apps",
+                        planned: 1,
+                        succeeded: result.Success ? 1 : 0,
+                        skipped: 0,
+                        failed: result.Success ? 0 : 1,
+                        failureDetails: result.Success ? null : new[] { $"{packageName}: {result.Error ?? "(unknown)"}" },
+                        artifacts: new[] { backupArtifact }),
+                },
+                warnings: new[] { $"Installed from AppManager-compatible backup with {apkCount} APK file(s)." },
+                artifacts: new[] { backupArtifact }),
+            ct);
     }
 }

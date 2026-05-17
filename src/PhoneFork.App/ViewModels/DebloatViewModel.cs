@@ -148,9 +148,30 @@ public partial class DebloatViewModel : ObservableObject
                 var match = result.Results.FirstOrDefault(x => x.PackageId == r.PackageId);
                 r.Status = match?.Success == true ? (DryRun ? "would disable" : "disabled") : $"failed: {match?.Output}";
             }
+            var artifacts = string.IsNullOrWhiteSpace(result.SnapshotPath)
+                ? Array.Empty<MigrationReceiptArtifact>()
+                : new[] { new MigrationReceiptArtifact("rollback-snapshot", result.SnapshotPath) };
+            var receiptPath = await new MigrationReceiptService(_log).WriteAsync(
+                MigrationReceiptService.Create(
+                    operation: "wpf-debloat-apply",
+                    dryRun: DryRun,
+                    devices: new[] { MigrationReceiptService.Device("destination", dstData) },
+                    categories: new[]
+                    {
+                        MigrationReceiptService.Category(
+                            "debloat",
+                            planned: picked.Count,
+                            succeeded: result.Disabled,
+                            skipped: result.AlreadyDisabled,
+                            failed: result.Failed,
+                            failureDetails: result.Results.Where(r => !r.Success).Select(r => $"{r.PackageId}: {r.Output}"),
+                            artifacts: artifacts),
+                    },
+                    artifacts: artifacts),
+                ct);
             Status = DryRun
                 ? $"Dry-run: would disable {result.Disabled}, already disabled {result.AlreadyDisabled}, would fail {result.Failed}. No changes written."
-                : $"Disabled {result.Disabled}, already disabled {result.AlreadyDisabled}, failed {result.Failed} in {result.Elapsed.TotalSeconds:F1}s. Snapshot: {result.SnapshotPath}";
+                : $"Disabled {result.Disabled}, already disabled {result.AlreadyDisabled}, failed {result.Failed} in {result.Elapsed.TotalSeconds:F1}s. Snapshot: {result.SnapshotPath}. Receipt: {receiptPath}";
         }
         catch (Exception ex)
         {

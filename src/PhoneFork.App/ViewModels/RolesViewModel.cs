@@ -87,6 +87,7 @@ public partial class RolesViewModel : ObservableObject
     {
         var dstPhone = _devices.RoleHolder(DeviceRole.Destination);
         if (dstPhone is null) return;
+        var srcPhone = _devices.RoleHolder(DeviceRole.Source);
         var dstData = _host.GetDevices().FirstOrDefault(d => d.Serial == dstPhone.Serial);
         if (dstData is null) { Status = "Destination disconnected."; return; }
 
@@ -105,9 +106,31 @@ public partial class RolesViewModel : ObservableObject
                 var match = result.Failures.FirstOrDefault(f => f.Role == row.Role);
                 row.Status = match.Error is null ? (DryRun ? "would assign" : "assigned") : $"failed: {match.Error}";
             }
+            var receiptPath = await new MigrationReceiptService(_log).WriteAsync(
+                MigrationReceiptService.Create(
+                    operation: "wpf-roles-apply",
+                    dryRun: DryRun,
+                    devices: srcPhone is null
+                        ? new[] { MigrationReceiptService.Device("destination", dstData) }
+                        : new[]
+                        {
+                            MigrationReceiptService.Device("source", srcPhone),
+                            MigrationReceiptService.Device("destination", dstData),
+                        },
+                    categories: new[]
+                    {
+                        MigrationReceiptService.Category(
+                            "roles",
+                            planned: queue.Count,
+                            succeeded: result.Applied,
+                            skipped: 0,
+                            failed: result.Failed,
+                            failureDetails: result.Failures.Select(f => $"{f.Role}->{f.Pkg}: {f.Error}")),
+                    }),
+                ct);
             Status = DryRun
-                ? $"Dry-run: would assign {result.Applied}, would fail {result.Failed}."
-                : $"Assigned {result.Applied}, failed {result.Failed}.";
+                ? $"Dry-run: would assign {result.Applied}, would fail {result.Failed}. Receipt: {receiptPath}"
+                : $"Assigned {result.Applied}, failed {result.Failed}. Receipt: {receiptPath}";
         }
         catch (Exception ex)
         {

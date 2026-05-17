@@ -45,6 +45,7 @@
 | L39 | `src/PhoneFork.Core/Services/AppTransferReportService.cs`, `src/PhoneFork.Cli/Commands/AppsReportCommand.cs`, `src/PhoneFork.Core/Services/AppInstallerService.cs`, and `tests/PhoneFork.Core.Tests/AppTransferReportTests.cs` | R013 per-app transfer posture reports, OBB/external-data probes, and local APK SHA-256 provenance logging. |
 | L40 | `src/PhoneFork.Core/Services/AndroidUserProfileService.cs`, package/settings/role write services, CLI apply/install/grant commands, and `tests/PhoneFork.Core.Tests/AndroidUserProfileTests.cs` | R014 multi-user/work-profile topology guard before destructive package, settings, role, permission, appop, and backup-install actions. |
 | L41 | `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`, `SettingsApplyService.cs`, `SettingsDiffCommand.cs`, WPF settings view-model/view files, and `tests/PhoneFork.Core.Tests/DifferTests.cs` | R015 Samsung/One UI safe settings corpus, read-only safety comparison, and default-safe settings apply behavior. |
+| L42 | `src/PhoneFork.Core/Services/MigrationReceiptService.cs`, CLI/WPF migration and apply command/view-model integrations, and `tests/PhoneFork.Core.Tests/MigrationReceiptTests.cs` | R016 local migration receipts with hashed devices, categories, counts, failures, warnings, and rollback/evidence artifacts. |
 
 ## Instruction And Memory Sources
 

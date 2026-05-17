@@ -58,6 +58,7 @@ builds.
 3. For wireless debugging, open **Wireless ADB** in the device bar, pair with the phone's pairing endpoint/code, then connect to the wireless ADB endpoint.
 4. Open the tab for whatever you want to migrate. Each tab has a **dry-run** preview before **Apply**.
 5. Audit log writes one NDJSON line per operation to `%LOCALAPPDATA%\PhoneFork\logs\audit-YYYY-MM-DD.log`.
+6. Completed migration/apply flows write JSON receipts to `%LOCALAPPDATA%\PhoneFork\receipts`.
 
 ## CLI
 
@@ -92,6 +93,10 @@ Settings apply is corpus-gated. By default, PhoneFork applies only reviewed safe
 Samsung/Android settings and reports review-only, blocked, and unknown keys in
 the read-only diff. CLI callers can opt into non-blocked uncatalogued keys with
 `--include-uncatalogued-settings`.
+
+Receipts use hashed device IDs and include operation type, PhoneFork version,
+category counts, failures, warnings, and rollback/evidence paths such as debloat
+snapshots, media checkpoints, and media evidence reports.
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 
