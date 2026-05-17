@@ -69,9 +69,13 @@ public sealed class DebloatService
         IEnumerable<string> packageIds,
         bool dryRun,
         IProgress<string>? progress = null,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool allowMultiUser = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
+        if (!dryRun)
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(device, "debloat package disable", allowMultiUser, ct);
         var snapshot = await SnapshotAsync(device, ct);
         var snapshotPath = "";
         if (!dryRun)
@@ -148,9 +152,13 @@ public sealed class DebloatService
         DebloatSnapshot snapshot,
         bool dryRun,
         IProgress<string>? progress = null,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool allowMultiUser = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
+        if (!dryRun)
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(device, "debloat rollback package enable", allowMultiUser, ct);
         // Pull current enabled set; anything in snapshot.EnabledSystemPackages not currently enabled needs re-enabling.
         var current = await SnapshotAsync(device, ct);
         var currentSet = current.EnabledSystemPackages.ToHashSet(StringComparer.Ordinal);

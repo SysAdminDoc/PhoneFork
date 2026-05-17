@@ -40,11 +40,14 @@ public sealed class AppInstallerService
         AppInfo app,
         bool reinstall,
         IProgress<string>? progress,
-        CancellationToken ct)
+        CancellationToken ct,
+        bool allowMultiUser = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         try
         {
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(destination, "app install migration", allowMultiUser, ct);
             // 1) Pull every split APK to the local cache.
             var localFiles = await PullApksToCacheAsync(source, app, progress, ct);
 
@@ -69,11 +72,14 @@ public sealed class AppInstallerService
         IReadOnlyList<string> localApkPaths,
         bool reinstall,
         IProgress<string>? progress,
-        CancellationToken ct)
+        CancellationToken ct,
+        bool allowMultiUser = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         try
         {
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(destination, "backup APK install", allowMultiUser, ct);
             if (localApkPaths is null || localApkPaths.Count == 0)
                 throw new ArgumentException("At least one local APK path is required.", nameof(localApkPaths));
             foreach (var path in localApkPaths)

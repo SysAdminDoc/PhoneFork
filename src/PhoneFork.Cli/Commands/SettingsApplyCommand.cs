@@ -28,6 +28,10 @@ public sealed class SettingsApplyCommand : AsyncCommand<SettingsApplyCommand.Set
 
         [CommandOption("--dry-run")] [Description("Print what would change; don't write to destination.")]
         public bool DryRun { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -60,7 +64,8 @@ public sealed class SettingsApplyCommand : AsyncCommand<SettingsApplyCommand.Set
 
         var apply = new SettingsApplyService(host.Client, log);
         var result = await apply.ApplyAsync(dst, entries, s.DryRun,
-            new Progress<string>(msg => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(msg)}[/]")), ct);
+            new Progress<string>(msg => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(msg)}[/]")), ct,
+            allowMultiUser: s.AllowMultiUser);
 
         AnsiConsole.MarkupLine($"[green]applied[/] {result.Applied}, [grey]skipped[/] {result.Skipped}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
         if (result.Failed > 0)

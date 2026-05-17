@@ -17,6 +17,10 @@ public sealed class DebloatRollbackCommand : AsyncCommand<DebloatRollbackCommand
 
         [CommandOption("--dry-run")] [Description("Print what would be re-enabled; don't write to device.")]
         public bool DryRun { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -33,7 +37,8 @@ public sealed class DebloatRollbackCommand : AsyncCommand<DebloatRollbackCommand
         AnsiConsole.MarkupLine($"[grey]Snapshot was captured {snap.CapturedAt:u} from {snap.DeviceSerial}; {snap.EnabledSystemPackages.Count} packages were enabled then.[/]");
 
         var result = await svc.RollbackAsync(picked, snap, s.DryRun,
-            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct);
+            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct,
+            allowMultiUser: s.AllowMultiUser);
         AnsiConsole.MarkupLine($"[green]re-enabled[/] {result.ReEnabled}, [grey]already enabled[/] {result.AlreadyEnabled}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
         return result.Failed == 0 ? 0 : 2;
     }

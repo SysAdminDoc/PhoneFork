@@ -250,3 +250,19 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R014 Multi-User / Work-Profile Guard
+
+- `src/PhoneFork.Core/Services/AndroidUserProfileService.cs`: added `pm list users` / `am get-current-user` probing, topology parsing, primary-user-only blocker detection, and a guarded exception for unsafe write contexts.
+- `src/PhoneFork.Core/Services/AppInstallerService.cs`, `DebloatService.cs`, `SettingsApplyService.cs`, and `RoleService.cs`: guard app installs, AppManager backup installs, debloat disable/rollback, settings writes, role assignments, runtime permission grants, and appop writes before mutating Android user 0.
+- CLI apply/install/grant commands: added `--allow-multi-user` to explicitly bypass the guard while keeping all writes targeted to Android user 0.
+- `tests/PhoneFork.Core.Tests/AndroidUserProfileTests.cs`: covers owner-only, managed work profile, guest/current-user, and unverifiable topology blocker cases.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R014 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 154 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

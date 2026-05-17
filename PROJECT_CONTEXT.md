@@ -49,6 +49,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Wireless ADB: supports Android 11+ pairing/connect/disconnect, mDNS discovery, per-install ADB home, patch-level gate for CVE-2026-0073, trusted-pair registry with hashed serials, session timeout, and kill switch.
 - Honesty/pre-flight: probes Samsung Pass/Wallet/Secure Folder/Routines/Notes/Gallery/OneDrive/Samsung Account, Samsung Messages/Google Messages/default SMS posture, OneDrive camera-backup account/permission/storage posture, CSC, security patch level, OEM unlock, Knox, and destination posture.
 - Backup interop: AppManager-compatible v5 writer/reader with SHA-256 checksums, CLI inspect/export/install commands, retention sweeper, Android `.ab` sniffer, Open Android Backup sniffer, and open archive metadata including Android 16 QPR2 cross-platform-transfer posture.
+- User/profile safety: destructive package, settings, role, permission, appop, and backup-install writes probe `pm list users` / `am get-current-user` first and refuse work-profile, secondary-user, non-zero-current-user, or unverifiable topology cases unless the CLI caller explicitly passes `--allow-multi-user`. WPF intentionally has no bypass yet.
 
 ## Known Gaps
 
@@ -68,6 +69,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Keep Windows-safe local staging in `LocalPathNames.SafeFileName` and `LocalPathNames.CombineSafeRelativePath`.
 - Store raw device serials only where absolutely necessary; logs and trust registries should use `SerialHash`.
 - Keep debloat default action reversible (`pm disable-user --user 0`), not uninstall.
+- Keep primary-user-only writes behind `AndroidUserProfileService`; commands that touch package state, settings, roles, permissions, or appops must not silently run on devices with work profiles or secondary users.
 - Treat wireless ADB as USB-first, opt-in, and patch-gated.
 - Do not claim private app data migration without root. Use honesty reports and official app handoff workflows instead.
 - Preserve the WPF host for v1; Avalonia is a v2 portability track.
