@@ -11,6 +11,8 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 
 ## What it does
 
+![PhoneFork WPF cockpit](docs/screenshots/phonefork-main-2026-05-17.png)
+
 | Domain | What gets copied | Mechanism |
 |---|---|---|
 | **Apps** | All `-3` user apps + their split APKs | `pm path` → `adb pull` → `pm install-create/-write/-commit -i com.android.vending --install-reason 4` |
@@ -71,6 +73,7 @@ git clone https://github.com/SysAdminDoc/PhoneFork.git
 cd PhoneFork
 dotnet build -c Release
 dotnet test -c Release
+pwsh scripts/Test-VersionConsistency.ps1
 dotnet run --project src/PhoneFork.App
 ```
 

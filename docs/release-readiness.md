@@ -23,11 +23,20 @@ Run these from the repository root before tagging:
 
 ```powershell
 dotnet restore PhoneFork.slnx
+pwsh scripts\Test-VersionConsistency.ps1
 dotnet build PhoneFork.slnx -c Release --no-restore
 dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build
 dotnet publish src\PhoneFork.App\PhoneFork.App.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\wpf
 dotnet publish src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\cli
 ```
+
+Current screenshot:
+
+- `docs/screenshots/phonefork-main-2026-05-17.png`
+
+Release notes draft:
+
+- `docs/releases/v0.9.0-pre.md`
 
 Expected outputs:
 
