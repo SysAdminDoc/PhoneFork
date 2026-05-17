@@ -14,7 +14,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Local branch: `main`; check `git status --short --branch` live before acting.
 - Current product state: `v0.9.0-pre` per `CHANGELOG.md`.
 - Visible version strings synced on 2026-05-17: README badge `0.9.0-pre`, WPF title `v0.9.0-pre`, app manifest `0.9.0.0`.
-- Unsigned GitHub prerelease `v0.9.0-pre` is published with WPF/CLI ZIPs and an `ARTIFACT-TRUST.txt` note. Signed release artifacts still require repository signing secrets.
+- Unsigned GitHub prerelease `v0.9.0-pre` is published with WPF/CLI ZIPs and an `ARTIFACT-TRUST.txt` note. The future tag workflow now emits an SPDX SBOM, SHA-256 checksums, provenance/SBOM attestations, and signs Windows EXE/DLL payloads when Azure Artifact Signing secrets are present.
 - Local `rtk` command required by global instructions is not installed in this shell; use plain `git`, `gh`, and `dotnet` unless `rtk` becomes available.
 
 ## Stack
@@ -36,7 +36,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - `src/PhoneFork.Cli`: scriptable command surface for devices, apps, media, settings, debloat, backup inspect/AppManager export/install, Wi-Fi, CSC, roles, permissions, wireless ADB pairing/connect/disconnect, mDNS, honesty, helper lifecycle, Shizuku, Smart Switch, trusted pairs, and burst mode.
 - `helper-apk`: companion Android APK with provider authorities and v1 JSON export envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary.
 - `assets/debloat`: embedded AppManagerNG/UAD-NG package datasets plus PhoneFork overrides.
-- `.github/workflows`: Windows .NET CI, Linux helper APK assemble/metadata/staging CI, and release packaging with Artifact Signing and provenance slots.
+- `.github/workflows`: Windows .NET CI, Linux helper APK assemble/metadata/staging CI, and release packaging with Artifact Signing, SBOM, checksum, release-note, and provenance/SBOM attestation steps.
 
 ## Shipped Capability Summary
 
@@ -55,7 +55,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Helper APK restore writes are still guarded and intentionally disabled until the host workflow can sequence default-app and destructive-action confirmation safely.
 - Helper APK release signing is not wired; CI builds debug and unsigned release APKs, signs the release APK with the CI debug keystore for verification-only staging, and exercises the verified staging path.
 - WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain CLI-first.
-- No signed release exists yet; README now distinguishes the unsigned prerelease from source builds.
+- No signed release exists yet; README now distinguishes the unsigned prerelease from source builds and explains that even signed new-publisher builds may still trigger SmartScreen until reputation builds.
 - Signing secrets are intentionally not provisioned.
 - Release readiness notes live in `docs/release-readiness.md`; the first prerelease path is clearly unsigned unless Azure Artifact Signing secrets are provisioned.
 - Version consistency is guarded by `scripts/Test-VersionConsistency.ps1` and CI.
@@ -83,6 +83,14 @@ dotnet build PhoneFork.slnx -c Release --no-restore
 dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release --no-build
 dotnet list PhoneFork.slnx package --vulnerable --include-transitive
 dotnet list PhoneFork.slnx package --outdated
+```
+
+Release SBOM smoke:
+
+```powershell
+Compress-Archive -Path artifacts\publish\wpf\* -DestinationPath artifacts\PhoneFork-local-wpf-win-x64.zip
+Compress-Archive -Path artifacts\publish\cli\* -DestinationPath artifacts\PhoneFork-local-cli-win-x64.zip
+& .\scripts\New-ReleaseSbom.ps1 -Version local -OutputPath artifacts\release-sbom.spdx.json -ArtifactPath @("artifacts\PhoneFork-local-wpf-win-x64.zip", "artifacts\PhoneFork-local-cli-win-x64.zip")
 ```
 
 After signing a helper release APK, stage it for host packaging with:

@@ -24,6 +24,10 @@ All notable changes to PhoneFork.
   so OEM/package safety changes can be patched with source URLs, risk notes,
   review/expiry dates, and action overrides while retaining the embedded
   offline dataset.
+- Release packaging now emits WPF and CLI ZIPs, an SPDX SBOM, SHA-256 checksums,
+  GitHub provenance/SBOM attestations, and release-note trust text. When Azure
+  Artifact Signing secrets are present, the workflow signs Windows EXE/DLL
+  payloads before ZIP packaging and verifies their Authenticode status.
 
 ## v0.9.0-pre — 2026-05-17
 
