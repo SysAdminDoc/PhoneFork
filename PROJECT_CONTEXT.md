@@ -42,7 +42,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 
 - Apps: enumerates third-party packages, pulls all split APK paths, stages safely on Windows, logs pulled APK byte counts and SHA-256 hashes, installs via session-based multi-APK install with Play attribution, and can report per-app APK/private-data/OBB transfer posture through the CLI.
 - Media: manifests `/sdcard` categories, diffs source/destination, syncs pull-then-push, preserves mtime, supports delete/update/conflict policy, writes resumable checkpoints and evidence reports, emits huge-file/Quick Share advisories, and has size+mtime/CRC32/SHA-256 integrity verification primitives.
-- Settings: snapshots AOSP namespaces, diffs them, applies selected values behind a safety blocklist.
+- Settings: snapshots AOSP namespaces, diffs them, classifies applicable keys through a Samsung/One UI safety corpus, and applies reviewed safe keys by default behind the existing dangerous-key blocklist.
 - Debloat: embeds a 5,481-entry dataset, disables packages only, writes rollback snapshots, applies source-backed OEM/One UI override metadata, and lets CLI scans/applies load checksummed out-of-band overlay feeds.
 - Wi-Fi: enumerates SSIDs where shell permits, renders QR PNG/SVG, and surfaces CSC mismatch.
 - Roles and permissions: snapshots and applies AOSP default roles, runtime permissions, and appops.
@@ -70,6 +70,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Store raw device serials only where absolutely necessary; logs and trust registries should use `SerialHash`.
 - Keep debloat default action reversible (`pm disable-user --user 0`), not uninstall.
 - Keep primary-user-only writes behind `AndroidUserProfileService`; commands that touch package state, settings, roles, permissions, or appops must not silently run on devices with work profiles or secondary users.
+- Keep settings writes corpus-gated through `SamsungSettingsCorpus`; WPF applies safe keys only, while CLI callers must explicitly opt into non-blocked uncatalogued keys.
 - Treat wireless ADB as USB-first, opt-in, and patch-gated.
 - Do not claim private app data migration without root. Use honesty reports and official app handoff workflows instead.
 - Preserve the WPF host for v1; Avalonia is a v2 portability track.
