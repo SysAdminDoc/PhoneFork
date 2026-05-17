@@ -30,6 +30,8 @@ Knox-bound data (Secure Folder, Samsung Wallet payment tokens, enterprise contai
 
 For SMS, PhoneFork's pre-flight checks verify the default SMS role and the Samsung Messages -> Google Messages transition state before any helper-assisted SMS workflow.
 
+For Samsung Gallery, pre-flight checks use Microsoft's September 30, 2026 direct OneDrive sync cutoff and verify OneDrive camera-backup prerequisites where Android exposes them.
+
 ## Android developer verification (Sept 2026)
 
 Google's [developer verification](https://developer.android.com/developer-verification/guides/faq) requirement applies to **Play / sideload installs of unverified developers**. It does **not** apply to packages installed via ADB. PhoneFork's planned helper APK path uses `adb install`, so the verification gate is not on the critical path. If you sideload the helper outside ADB you may be prompted by your launcher to verify the developer; that is normal.
