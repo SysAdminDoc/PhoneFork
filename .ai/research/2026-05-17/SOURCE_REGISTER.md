@@ -43,6 +43,7 @@
 | L37 | `.github/workflows/release.yml`, `scripts/New-ReleaseSbom.ps1`, and `docs/release-readiness.md` | Release signing, SBOM, checksum, release-note, and GitHub attestation implementation. |
 | L38 | `src/*/*.csproj`, `tests/PhoneFork.Core.Tests/SchemaCompatibilityTests.cs`, `tests/PhoneFork.Core.Tests/AuditLoggerTests.cs`, and `dotnet list PhoneFork.slnx package --outdated` | R012 dependency upgrades, schema compatibility coverage, audit-log sink coverage, and post-update package scan. |
 | L39 | `src/PhoneFork.Core/Services/AppTransferReportService.cs`, `src/PhoneFork.Cli/Commands/AppsReportCommand.cs`, `src/PhoneFork.Core/Services/AppInstallerService.cs`, and `tests/PhoneFork.Core.Tests/AppTransferReportTests.cs` | R013 per-app transfer posture reports, OBB/external-data probes, and local APK SHA-256 provenance logging. |
+| L40 | `src/PhoneFork.Core/Services/AndroidUserProfileService.cs`, package/settings/role write services, CLI apply/install/grant commands, and `tests/PhoneFork.Core.Tests/AndroidUserProfileTests.cs` | R014 multi-user/work-profile topology guard before destructive package, settings, role, permission, appop, and backup-install actions. |
 
 ## Instruction And Memory Sources
 

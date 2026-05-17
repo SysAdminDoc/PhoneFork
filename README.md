@@ -65,14 +65,14 @@ builds.
 phonefork devices                          # list connected
 phonefork apps list --device R5CY34G070L   # enumerate user apps
 phonefork apps report --device <serial> [--json]
-phonefork apps migrate --from <src> --to <dst> [--dry-run]
+phonefork apps migrate --from <src> --to <dst> [--dry-run] [--allow-multi-user]
 phonefork media sync   --from <src> --to <dst> [--checkpoint path] [--report path]
 phonefork settings dump --device <serial> --out settings.json
-phonefork settings apply --device <serial> --plan plan.json
-phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed feed.json --overlay-sha256 <sha256>]
+phonefork settings apply --from <src> --to <dst> [--allow-multi-user]
+phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed feed.json --overlay-sha256 <sha256>] [--allow-multi-user]
 phonefork backup inspect <path> [--json]
 phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
-phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run]
+phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run] [--allow-multi-user]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
 ```
@@ -80,6 +80,12 @@ phonefork connect <ip:connect-port>
 `apps report` explains per-app APK installability, private-data limits,
 OBB/external-data payloads, and source/provenance posture so a user can see
 what PhoneFork can and cannot transfer before wiping the source.
+
+Package, settings, role, permission, appop, and backup-install writes are
+primary-user-only by default. PhoneFork probes Android user/profile topology
+first and refuses work-profile or secondary-user devices unless the CLI caller
+explicitly passes `--allow-multi-user`; the WPF cockpit blocks those writes for
+now.
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 
