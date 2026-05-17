@@ -17,6 +17,10 @@ public sealed class RolesApplyCommand : AsyncCommand<RolesApplyCommand.Settings>
 
         [CommandOption("--dry-run")] [Description("Print what would be assigned; don't write.")]
         public bool DryRun { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -54,7 +58,8 @@ public sealed class RolesApplyCommand : AsyncCommand<RolesApplyCommand.Settings>
         if (s.DryRun) AnsiConsole.MarkupLine("[yellow]Dry-run — no writes.[/]");
 
         var result = await svc.ApplyAsync(dst, queued, s.DryRun,
-            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct);
+            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct,
+            allowMultiUser: s.AllowMultiUser);
 
         AnsiConsole.MarkupLine($"[green]applied[/] {result.Applied}, [red]failed[/] {result.Failed}.");
         if (result.Failed > 0)

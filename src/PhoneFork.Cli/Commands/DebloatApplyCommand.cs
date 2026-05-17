@@ -32,6 +32,10 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
         [CommandOption("--overlay-sha256 <SHA256>")]
         [Description("Expected SHA-256 for --overlay-feed. If omitted, <feed>.sha256 is required.")]
         public string? OverlaySha256 { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -65,7 +69,8 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
 
         var svc = new DebloatService(host.Client, log);
         var result = await svc.ApplyAsync(picked, queue, s.DryRun,
-            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct);
+            new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct,
+            allowMultiUser: s.AllowMultiUser);
 
         AnsiConsole.MarkupLine($"[green]disabled[/] {result.Disabled}, [grey]already disabled[/] {result.AlreadyDisabled}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
         if (s.DryRun)

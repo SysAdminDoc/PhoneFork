@@ -66,8 +66,12 @@ public sealed class RoleService
         IEnumerable<(string Role, string Pkg)> assignments,
         bool dryRun,
         IProgress<string>? progress = null,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool allowMultiUser = false)
     {
+        if (!dryRun)
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(destination, "role assignment", allowMultiUser, ct);
         int applied = 0, failed = 0;
         var failures = new List<(string, string, string)>();
         foreach (var (role, pkg) in assignments)
@@ -101,9 +105,17 @@ public sealed class RoleService
     /// Grants a runtime permission and/or sets an <c>appops</c> mode. Either may fail silently; we
     /// return the raw shell output for diagnostics.
     /// </summary>
-    public async Task<string> GrantAsync(DeviceData device, string pkg, string permission, CancellationToken ct = default)
-        => await _client.ShellAsync(device, $"pm grant {AdbShell.PackageArg(pkg)} {AdbShell.Arg(permission)}", ct);
+    public async Task<string> GrantAsync(DeviceData device, string pkg, string permission, CancellationToken ct = default, bool allowMultiUser = false)
+    {
+        await new AndroidUserProfileService(_client, _log)
+            .EnsurePrimaryUserWriteSafeAsync(device, "runtime permission grant", allowMultiUser, ct);
+        return await _client.ShellAsync(device, $"pm grant {AdbShell.PackageArg(pkg)} {AdbShell.Arg(permission)}", ct);
+    }
 
-    public async Task<string> SetAppOpAsync(DeviceData device, string pkg, string op, string mode, CancellationToken ct = default)
-        => await _client.ShellAsync(device, $"appops set {AdbShell.PackageArg(pkg)} {AdbShell.Arg(op)} {AdbShell.Arg(mode)}", ct);
+    public async Task<string> SetAppOpAsync(DeviceData device, string pkg, string op, string mode, CancellationToken ct = default, bool allowMultiUser = false)
+    {
+        await new AndroidUserProfileService(_client, _log)
+            .EnsurePrimaryUserWriteSafeAsync(device, "appop apply", allowMultiUser, ct);
+        return await _client.ShellAsync(device, $"appops set {AdbShell.PackageArg(pkg)} {AdbShell.Arg(op)} {AdbShell.Arg(mode)}", ct);
+    }
 }

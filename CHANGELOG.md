@@ -36,6 +36,10 @@ All notable changes to PhoneFork.
   whether APK install, private app data, and OBB/external-data payloads are
   supported, external, partial, unsupported, or unknown. APK pulls now log local
   byte counts and SHA-256 hashes for package provenance.
+- Multi-user/work-profile safety guard: destructive package, settings, role,
+  runtime-permission, appop, and backup-install writes now probe Android user
+  topology first and refuse non-primary-user-only devices unless the CLI caller
+  explicitly passes `--allow-multi-user`.
 
 ## v0.9.0-pre — 2026-05-17
 

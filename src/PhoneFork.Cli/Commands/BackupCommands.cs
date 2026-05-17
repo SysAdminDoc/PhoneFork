@@ -213,6 +213,10 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
         [CommandOption("--dry-run")]
         [Description("Verify checksums and print the install plan without installing.")]
         public bool DryRun { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken ct)
@@ -254,7 +258,8 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
         };
 
         var installer = new AppInstallerService(host.Client, log);
-        var result = await installer.InstallLocalBackupAsync(destination, app, localApks, settings.Reinstall, progress: null, ct);
+        var result = await installer.InstallLocalBackupAsync(destination, app, localApks, settings.Reinstall, progress: null, ct,
+            allowMultiUser: settings.AllowMultiUser);
         if (result.Success)
         {
             AnsiConsole.MarkupLine($"[green]installed[/] {Markup.Escape(result.PackageName)} ({result.Duration.TotalSeconds:F1}s)");
