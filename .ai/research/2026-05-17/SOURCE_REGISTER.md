@@ -46,6 +46,7 @@
 | L40 | `src/PhoneFork.Core/Services/AndroidUserProfileService.cs`, package/settings/role write services, CLI apply/install/grant commands, and `tests/PhoneFork.Core.Tests/AndroidUserProfileTests.cs` | R014 multi-user/work-profile topology guard before destructive package, settings, role, permission, appop, and backup-install actions. |
 | L41 | `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`, `SettingsApplyService.cs`, `SettingsDiffCommand.cs`, WPF settings view-model/view files, and `tests/PhoneFork.Core.Tests/DifferTests.cs` | R015 Samsung/One UI safe settings corpus, read-only safety comparison, and default-safe settings apply behavior. |
 | L42 | `src/PhoneFork.Core/Services/MigrationReceiptService.cs`, CLI/WPF migration and apply command/view-model integrations, and `tests/PhoneFork.Core.Tests/MigrationReceiptTests.cs` | R016 local migration receipts with hashed devices, categories, counts, failures, warnings, and rollback/evidence artifacts. |
+| L43 | `src/PhoneFork.Core/Services/PlatformMigrationWatcherService.cs`, `src/PhoneFork.Cli/Commands/PlatformWatchCommand.cs`, `src/PhoneFork.Cli/Program.cs`, and `tests/PhoneFork.Core.Tests/PlatformMigrationWatcherTests.cs` | R017 platform migration watcher for Seedvault, Android cross-platform-transfer, Apple Android-transfer, and PhoneFork open-archive metadata implications. |
 
 ## Instruction And Memory Sources
 
@@ -134,3 +135,4 @@
 - Release metadata was collected with `gh api repos/<owner>/<repo>/releases/latest`.
 - Issue signals were collected with `gh issue list --search`.
 - Web searches prioritized official Android, Samsung, Microsoft, Apple, CA/B Forum, GitHub, NuGet, and project-owned pages.
+- R017 implementation refreshed S04, S14, and G14 live on 2026-05-17 before encoding watcher status.
