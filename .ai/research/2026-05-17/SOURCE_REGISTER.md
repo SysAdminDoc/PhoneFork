@@ -38,6 +38,7 @@
 | L32 | `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json` | Offline AppManager backup inspection smoke test. |
 | L33 | `src/PhoneFork.Core/Services/MessageTransitionService.cs` and `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs` | Samsung Messages / Google Messages pre-flight implementation and tests. |
 | L34 | `src/PhoneFork.Core/Services/GalleryOneDriveService.cs` and `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs` | Gallery / OneDrive cutoff assistant implementation and tests. |
+| L35 | `src/PhoneFork.Core/Services/MediaSyncEvidence.cs`, `MediaSyncService.cs`, and `tests/PhoneFork.Core.Tests/MediaSyncEvidenceTests.cs` | Media sync checkpoint, evidence report, retry, throughput, and Quick Share advisory implementation and tests. |
 
 ## Instruction And Memory Sources
 

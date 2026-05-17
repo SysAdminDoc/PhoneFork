@@ -16,6 +16,10 @@ All notable changes to PhoneFork.
   direct-sync cutoff, detect OneDrive and Samsung account/cloud indicators, and
   surface account, media-permission, and manual storage-quota checks for
   OneDrive camera backup.
+- Media sync now writes resumable checkpoints and JSON evidence reports,
+  records skipped/retried/failed/deferred entries, samples throughput/ETA in
+  progress, warns on huge files, and can defer single-large-file runs to Quick
+  Share when requested.
 
 ## v0.9.0-pre — 2026-05-17
 

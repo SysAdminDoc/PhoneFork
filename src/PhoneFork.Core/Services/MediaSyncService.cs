@@ -17,6 +17,18 @@ public sealed record MediaSyncOptions
     public bool DryRun { get; init; }
     /// <summary>Local stage directory for the pull leg. Defaults to <c>%LOCALAPPDATA%\PhoneFork\stage\&lt;sourceSerial&gt;\</c>.</summary>
     public string? StageDir { get; init; }
+    /// <summary>JSON checkpoint used to skip completed entries after interruption.</summary>
+    public string? CheckpointPath { get; init; }
+    /// <summary>JSON evidence report path. Defaults under the stage directory.</summary>
+    public string? ReportPath { get; init; }
+    /// <summary>Maximum attempts for each pull/push entry. Conflict-preserving writes stay single-attempt to avoid double-renaming.</summary>
+    public int MaxAttempts { get; init; } = 3;
+    /// <summary>Emit a huge-file advisory at or above this byte size.</summary>
+    public long HugeFileWarningBytes { get; init; } = MediaSyncEvidence.DefaultHugeFileWarningBytes;
+    /// <summary>Emit a Quick Share advisory for a single transfer at or above this byte size.</summary>
+    public long QuickShareSingleFileBytes { get; init; } = MediaSyncEvidence.DefaultQuickShareSingleFileBytes;
+    /// <summary>If true, single-file Quick Share candidates are recorded as user-deferred instead of transferred.</summary>
+    public bool DeferQuickShareCandidates { get; init; }
 }
 
 public sealed record MediaSyncProgress(
@@ -24,7 +36,12 @@ public sealed record MediaSyncProgress(
     long FilesDone,
     long FilesTotal,
     long BytesDone,
-    long BytesTotal);
+    long BytesTotal)
+{
+    public double BytesPerSecond { get; init; }
+    public TimeSpan? Eta { get; init; }
+    public int Attempts { get; init; }
+}
 
 public sealed record MediaSyncResult(
     int FilesPulled,
@@ -33,7 +50,15 @@ public sealed record MediaSyncResult(
     int FilesDeleted,
     int FilesRenamedAsConflict,
     int Errors,
-    TimeSpan Elapsed);
+    TimeSpan Elapsed)
+{
+    public int FilesRetried { get; init; }
+    public int FilesDeferred { get; init; }
+    public string? CheckpointPath { get; init; }
+    public string? ReportPath { get; init; }
+    public IReadOnlyList<MediaSyncEvidenceEntry> Evidence { get; init; } = Array.Empty<MediaSyncEvidenceEntry>();
+    public IReadOnlyList<MediaTransferAdvisory> Advisories { get; init; } = Array.Empty<MediaTransferAdvisory>();
+}
 
 /// <summary>
 /// Two-leg sync: pull source files to a local stage dir, then push the stage to the destination.
@@ -60,18 +85,30 @@ public sealed class MediaSyncService
         CancellationToken ct = default)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        int pulled = 0, pushed = 0, skipped = 0, deleted = 0, renamed = 0, errors = 0;
+        int pulled = 0, pushed = 0, skipped = 0, deleted = 0, renamed = 0, errors = 0, retried = 0, deferred = 0;
 
         var stageRoot = options.StageDir ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "PhoneFork", "stage", LocalPathNames.SafeFileName(source.Serial, "device"));
         Directory.CreateDirectory(stageRoot);
+        var checkpointPath = options.CheckpointPath ?? Path.Combine(stageRoot, "media-sync-checkpoint.json");
+        var reportPath = options.ReportPath ?? Path.Combine(stageRoot, $"media-sync-report-{DateTime.UtcNow:yyyyMMddTHHmmss}.json");
+        var checkpoint = options.DryRun
+            ? new MediaSyncCheckpoint(MediaSyncEvidence.CheckpointSchema, plan.SourceSerial, plan.DestSerial, DateTimeOffset.UtcNow, Array.Empty<string>())
+            : await MediaSyncCheckpointStore.LoadOrCreateAsync(checkpointPath, plan.SourceSerial, plan.DestSerial, ct);
+        var completedKeys = checkpoint.CompletedKeys.ToHashSet(StringComparer.Ordinal);
+        var evidence = new List<MediaSyncEvidenceEntry>();
+        var advisories = MediaSyncEvidence.BuildAdvisories(plan, options.HugeFileWarningBytes, options.QuickShareSingleFileBytes);
+        var quickShareDeferredKeys = options.DeferQuickShareCandidates
+            ? advisories.Where(a => a.Kind == MediaTransferAdvisoryKind.QuickShareBetterSingleFile)
+                .Select(a => $"{a.Category}|{a.RelPath}")
+                .ToHashSet(StringComparer.Ordinal)
+            : new HashSet<string>(StringComparer.Ordinal);
+        var startedAt = DateTimeOffset.UtcNow;
 
         // Pre-compute totals for progress reporting.
-        var transferEntries = plan.CategoryDiffs
-            .SelectMany(cd => cd.Entries
-                .Where(e => e.Outcome is MediaDiffOutcome.NewOnSource or MediaDiffOutcome.Conflict)
-                .Select(e => (cd.Category, Entry: e)))
+        var transferEntries = MediaSyncEvidence.TransferEntries(plan)
+            .Select(t => (t.Category, Entry: t.Entry))
             .ToList();
         long totalFiles = transferEntries.Count;
         long totalBytes = transferEntries.Sum(t => t.Entry.Source?.SizeBytes ?? 0);
@@ -93,6 +130,7 @@ public sealed class MediaSyncService
                 {
                     case MediaDiffOutcome.Identical:
                         skipped++;
+                        evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.SkippedIdentical));
                         continue;
 
                     case MediaDiffOutcome.NewOnDest:
@@ -103,12 +141,18 @@ public sealed class MediaSyncService
                                 var p = $"{remoteRoot}/{entry.RelPath}";
                                 await _client.ShellAsync(dest, $"rm -f {AdbShell.Arg(p)}", ct);
                                 deleted++;
+                                evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.Deleted));
                             }
                             catch (Exception ex)
                             {
                                 errors++;
                                 _log.Warning(ex, "Delete failed {Path}", entry.RelPath);
+                                evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.Failed, error: ex.Message));
                             }
+                        }
+                        else if (options.DryRun)
+                        {
+                            evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.DryRun));
                         }
                         continue;
 
@@ -119,52 +163,120 @@ public sealed class MediaSyncService
                             && (entry.Source?.Mtime ?? 0) <= (entry.Dest?.Mtime ?? 0))
                         {
                             skipped++;
+                            evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.SkippedIdentical));
                             continue;
                         }
 
                         var srcRemote = $"{remoteRoot}/{entry.RelPath}";
                         var local = LocalPathNames.CombineSafeRelativePath(stageCatDir, entry.RelPath);
                         Directory.CreateDirectory(Path.GetDirectoryName(local)!);
+                        var checkpointKey = MediaSyncEvidence.CheckpointKey(catDiff.Category, entry);
+                        var quickShareKey = $"{catDiff.Category}|{entry.RelPath}";
+
+                        if (quickShareDeferredKeys.Contains(quickShareKey))
+                        {
+                            deferred++;
+                            filesDone++;
+                            bytesDone += entry.Source?.SizeBytes ?? 0;
+                            evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.DeferredQuickShare));
+                            ReportProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes, sw, progress);
+                            continue;
+                        }
+
+                        if (completedKeys.Contains(checkpointKey))
+                        {
+                            skipped++;
+                            filesDone++;
+                            bytesDone += entry.Source?.SizeBytes ?? 0;
+                            evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.SkippedCheckpoint));
+                            ReportProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes, sw, progress);
+                            continue;
+                        }
 
                         if (options.DryRun)
                         {
                             filesDone++;
                             bytesDone += entry.Source?.SizeBytes ?? 0;
-                            progress?.Report(new MediaSyncProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes));
+                            evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.DryRun));
+                            ReportProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes, sw, progress);
                             continue;
                         }
 
-                        try
+                        var entrySw = System.Diagnostics.Stopwatch.StartNew();
+                        var attempts = 0;
+                        var actualAttempts = 0;
+                        var attemptLimit = entry.Outcome == MediaDiffOutcome.Conflict && options.PreserveConflicts
+                            ? 1
+                            : Math.Max(1, options.MaxAttempts);
+                        Exception? lastError = null;
+                        var transferred = false;
+                        for (attempts = 1; attempts <= attemptLimit; attempts++)
                         {
-                            await PullAsync(source, srcRemote, local, ct);
-                            pulled++;
-
-                            if (entry.Outcome == MediaDiffOutcome.Conflict && options.PreserveConflicts)
+                            actualAttempts = attempts;
+                            try
                             {
-                                // Sync-conflict filename per Syncthing pattern:  foo.sync-conflict-<ts>-<sha8>.jpg
-                                var sha8 = ShortSha(entry.Source?.SizeBytes ?? 0, entry.Source?.Mtime ?? 0);
-                                var ts = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
-                                var conflictRelPath = AppendBeforeExt(entry.RelPath, $".sync-conflict-{ts}-{sha8}");
-                                var conflictRemote = $"{remoteRoot}/{conflictRelPath}";
-                                await _client.ShellAsync(dest, $"mv {AdbShell.Arg($"{remoteRoot}/{entry.RelPath}")} {AdbShell.Arg(conflictRemote)}", ct);
-                                renamed++;
-                            }
+                                await PullAsync(source, srcRemote, local, ct);
 
-                            // Preserve source mtime so re-running the sync marks the file as Identical, not Conflict.
-                            var srcMtimeUtc = entry.Source is { Mtime: var m } && m > 0
-                                ? DateTimeOffset.FromUnixTimeSeconds(m)
-                                : DateTimeOffset.UtcNow;
-                            await PushAsync(dest, local, srcRemote, srcMtimeUtc, ct);
+                                if (entry.Outcome == MediaDiffOutcome.Conflict && options.PreserveConflicts)
+                                {
+                                    // Sync-conflict filename per Syncthing pattern:  foo.sync-conflict-<ts>-<sha8>.jpg
+                                    var sha8 = ShortSha(entry.Source?.SizeBytes ?? 0, entry.Source?.Mtime ?? 0);
+                                    var ts = DateTime.UtcNow.ToString("yyyyMMddTHHmmss");
+                                    var conflictRelPath = AppendBeforeExt(entry.RelPath, $".sync-conflict-{ts}-{sha8}");
+                                    var conflictRemote = $"{remoteRoot}/{conflictRelPath}";
+                                    await _client.ShellAsync(dest, $"mv {AdbShell.Arg($"{remoteRoot}/{entry.RelPath}")} {AdbShell.Arg(conflictRemote)}", ct);
+                                    renamed++;
+                                    evidence.Add(MakeEvidence(catDiff.Category, entry, MediaSyncEvidenceStatus.ConflictRenamed, attempts: actualAttempts));
+                                }
+
+                                // Preserve source mtime so re-running the sync marks the file as Identical, not Conflict.
+                                var srcMtimeUtc = entry.Source is { Mtime: var m } && m > 0
+                                    ? DateTimeOffset.FromUnixTimeSeconds(m)
+                                    : DateTimeOffset.UtcNow;
+                                await PushAsync(dest, local, srcRemote, srcMtimeUtc, ct);
+                                transferred = true;
+                                break;
+                            }
+                            catch (Exception ex)
+                            {
+                                lastError = ex;
+                                if (attempts < attemptLimit)
+                                    _log.Warning(ex, "Sync entry failed {Path}; retrying attempt {Attempt}/{Attempts}", entry.RelPath, attempts + 1, attemptLimit);
+                            }
+                        }
+
+                        entrySw.Stop();
+                        retried += Math.Max(0, actualAttempts - 1);
+                        if (transferred)
+                        {
+                            pulled++;
                             pushed++;
+                            completedKeys.Add(checkpointKey);
+                            checkpoint = checkpoint with { CompletedKeys = completedKeys.OrderBy(k => k, StringComparer.Ordinal).ToArray() };
+                            await MediaSyncCheckpointStore.SaveAsync(checkpointPath, checkpoint, ct);
 
                             filesDone++;
                             bytesDone += entry.Source?.SizeBytes ?? 0;
-                            progress?.Report(new MediaSyncProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes));
+                            evidence.Add(MakeEvidence(
+                                catDiff.Category,
+                                entry,
+                                MediaSyncEvidenceStatus.Transferred,
+                                attempts: actualAttempts,
+                                durationMs: entrySw.ElapsedMilliseconds,
+                                throughput: Throughput(entry.Source?.SizeBytes ?? 0, entrySw.Elapsed)));
+                            ReportProgress(entry.RelPath, filesDone, totalFiles, bytesDone, totalBytes, sw, progress, actualAttempts);
                         }
-                        catch (Exception ex)
+                        else
                         {
                             errors++;
-                            _log.Warning(ex, "Sync entry failed {Path}", entry.RelPath);
+                            _log.Warning(lastError, "Sync entry failed {Path} after {Attempts} attempt(s)", entry.RelPath, actualAttempts);
+                            evidence.Add(MakeEvidence(
+                                catDiff.Category,
+                                entry,
+                                MediaSyncEvidenceStatus.Failed,
+                                attempts: actualAttempts,
+                                durationMs: entrySw.ElapsedMilliseconds,
+                                error: lastError?.Message));
                         }
                         continue;
                 }
@@ -172,9 +284,78 @@ public sealed class MediaSyncService
         }
 
         sw.Stop();
+        await WriteReportAsync(reportPath, new MediaSyncEvidenceReport(
+            MediaSyncEvidence.ReportSchema,
+            plan.SourceSerial,
+            plan.DestSerial,
+            startedAt,
+            DateTimeOffset.UtcNow,
+            evidence,
+            advisories), ct);
         _log.Information("Media sync done: pulled={Pulled} pushed={Pushed} skipped={Skipped} deleted={Deleted} renamed={Renamed} errors={Errors} in {Ms} ms",
             pulled, pushed, skipped, deleted, renamed, errors, sw.ElapsedMilliseconds);
-        return new MediaSyncResult(pulled, pushed, skipped, deleted, renamed, errors, sw.Elapsed);
+        return new MediaSyncResult(pulled, pushed, skipped, deleted, renamed, errors, sw.Elapsed)
+        {
+            FilesRetried = retried,
+            FilesDeferred = deferred,
+            CheckpointPath = options.DryRun ? null : checkpointPath,
+            ReportPath = reportPath,
+            Evidence = evidence,
+            Advisories = advisories,
+        };
+    }
+
+    private static void ReportProgress(
+        string relPath,
+        long filesDone,
+        long totalFiles,
+        long bytesDone,
+        long totalBytes,
+        System.Diagnostics.Stopwatch sw,
+        IProgress<MediaSyncProgress>? progress,
+        int attempts = 1)
+    {
+        var bytesPerSecond = sw.Elapsed.TotalSeconds <= 0 ? 0 : bytesDone / sw.Elapsed.TotalSeconds;
+        var eta = bytesPerSecond <= 0 || totalBytes <= bytesDone
+            ? (TimeSpan?)null
+            : TimeSpan.FromSeconds((totalBytes - bytesDone) / bytesPerSecond);
+        progress?.Report(new MediaSyncProgress(relPath, filesDone, totalFiles, bytesDone, totalBytes)
+        {
+            BytesPerSecond = bytesPerSecond,
+            Eta = eta,
+            Attempts = attempts,
+        });
+    }
+
+    private static MediaSyncEvidenceEntry MakeEvidence(
+        MediaCategory category,
+        MediaDiffEntry entry,
+        MediaSyncEvidenceStatus status,
+        int attempts = 0,
+        long durationMs = 0,
+        double throughput = 0,
+        string? error = null) =>
+        new(
+            category,
+            entry.RelPath,
+            entry.Outcome,
+            status,
+            entry.Source?.SizeBytes ?? entry.Dest?.SizeBytes ?? 0,
+            attempts,
+            durationMs,
+            throughput,
+            error);
+
+    private static double Throughput(long bytes, TimeSpan elapsed) =>
+        elapsed.TotalSeconds <= 0 ? 0 : bytes / elapsed.TotalSeconds;
+
+    private static async Task WriteReportAsync(string path, MediaSyncEvidenceReport report, CancellationToken ct)
+    {
+        var dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(dir))
+            Directory.CreateDirectory(dir);
+        await using var write = File.Create(path);
+        await System.Text.Json.JsonSerializer.SerializeAsync(write, report, MediaJson.Options, ct);
     }
 
     private async Task PullAsync(DeviceData device, string remote, string local, CancellationToken ct)
