@@ -33,10 +33,10 @@ Guardrails:
 | Area | Verified state |
 |---|---|
 | Version | `CHANGELOG.md` is at `v0.9.0-pre`; README badge, WPF title, and manifest were synced during this research pass. Sources: L04, L05. |
-| Repo | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`, no tags/releases/issues/PRs at reconnaissance time. Source: L03. |
+| Repo | `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`; first unsigned prerelease `v0.9.0-pre` is published with WPF/CLI ZIPs and `ARTIFACT-TRUST.txt`. Sources: L03, L31. |
 | Host stack | .NET 10, WPF, MVVM, Spectre CLI, AdvancedSharpAdbClient, bundled platform-tools. Sources: L08-L13, L26. |
 | Helper APK | Gradle/Kotlin helper targets SDK 36 and now emits `phonefork.helper.v1` JSON envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary. Restore writes remain guarded/disabled. Sources: L14-L17. |
-| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI now assembles debug/release APKs, verifies metadata/signature, and uploads staged helper artifacts; release workflow still has signing and attestation slots but no published release. Sources: L18, L19. |
+| CI/release | Windows build/test/vulnerable scan workflow exists; helper APK CI now assembles debug/release APKs, verifies metadata/signature, and uploads staged helper artifacts; release workflow has published the unsigned `v0.9.0-pre` prerelease and still has signing/attestation slots for signed releases. Sources: L18, L19, L31. |
 | Dependency state | No vulnerable NuGet packages found; `xunit` 2.9.3 is flagged legacy; several package updates are available. Sources: L27-L29. |
 | Research artifacts | Canonical project context and dated research set live in `PROJECT_CONTEXT.md` and `.ai/research/2026-05-17/`. |
 
@@ -140,18 +140,18 @@ Sources: L12, L13, L04, M01, M02.
 ### R004 - Release-readiness correction pass
 
 Priority: P0. Impact: 4. Effort: 2. Risk: 2.
-Status: In progress. Local publish docs/workflow trust notes are wired,
-screenshots are captured, and publish outputs verify locally. Proceeding with a
-clearly unsigned prerelease because signing secrets are not provisioned.
+Status: Completed 2026-05-17 for the unsigned prerelease path. Local publish
+docs/workflow trust notes are wired, screenshots are captured, publish outputs
+verify locally, and `v0.9.0-pre` is published as an unsigned GitHub prerelease
+because signing secrets are not provisioned.
 
-The repo has release workflow scaffolding but no tags or releases. Before the
-first public release, produce screenshots, verify publish outputs locally, and
-tag a signed or clearly unsigned pre-release with matching changelog.
+Before the first public release, produce screenshots, verify publish outputs
+locally, and tag a signed or clearly unsigned pre-release with matching
+changelog.
 
 Acceptance:
 
-- README distinguishes "build from source" from "download a release" until the
-  first release exists.
+- README distinguishes the unsigned prerelease from source builds.
 - `dotnet publish` produces WPF and CLI artifacts.
 - Release notes include no unsupported migration claims.
 - GitHub attestation and signing behavior is documented for unsigned builds and
@@ -183,6 +183,10 @@ Sources: L04, L05, L09.
 ### R006 - Finish backup archive interop beyond sniffing
 
 Priority: P1. Impact: 5. Effort: 5. Risk: 4.
+Status: Completed 2026-05-17 for a CLI-first AppManager APK/split
+export/import workflow, offline metadata inspection, checksum verification, and
+inspect-only `.ab`/Open Android Backup handling. Real-device export/install
+validation remains under the hardware validation release gate.
 
 Convert the current AppManager-compatible writer/reader and archive sniffers
 into a user-visible import/export/inspect workflow. Treat Android `.ab`, Open

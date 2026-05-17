@@ -34,7 +34,7 @@ Google's [developer verification](https://developer.android.com/developer-verifi
 
 ## Install
 
-No tagged release has been published yet. Until the first release appears under [Releases](https://github.com/SysAdminDoc/PhoneFork/releases), build from source with the commands below.
+An unsigned prerelease is available under [Releases](https://github.com/SysAdminDoc/PhoneFork/releases). Build from source remains supported with the commands below.
 
 Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)) — the zip is framework-dependent (~10 MB).
 
@@ -62,6 +62,9 @@ phonefork media sync   --from <src> --to <dst>
 phonefork settings dump --device <serial> --out settings.json
 phonefork settings apply --device <serial> --plan plan.json
 phonefork debloat apply --device <serial> --profile aggressive
+phonefork backup inspect <path> [--json]
+phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
+phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
 ```

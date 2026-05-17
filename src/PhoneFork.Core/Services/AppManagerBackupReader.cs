@@ -11,6 +11,9 @@ public sealed record AppManagerBackupHandle(
     IReadOnlyDictionary<string, string> ChecksumsByFileName)
 {
     public DateTimeOffset BackupTime => DateTimeOffset.FromUnixTimeMilliseconds(Meta.BackupTimeMs);
+
+    public IReadOnlyList<string> ResolveApkPaths() =>
+        Meta.Apks.Select(a => Path.Combine(Directory, a.FileName)).ToArray();
 }
 
 /// <summary>

@@ -11,10 +11,10 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 ## Current Repository State
 
 - Repo: `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`.
-- Local branch: `main`, five commits ahead of `origin/main` before this implementation batch.
+- Local branch: `main`; check `git status --short --branch` live before acting.
 - Current product state: `v0.9.0-pre` per `CHANGELOG.md`.
 - Visible version strings synced on 2026-05-17: README badge `0.9.0-pre`, WPF title `v0.9.0-pre`, app manifest `0.9.0.0`.
-- No GitHub releases or tags exist yet. GitHub reports 0 stars, 0 issues, and 0 pull requests.
+- Unsigned GitHub prerelease `v0.9.0-pre` is published with WPF/CLI ZIPs and an `ARTIFACT-TRUST.txt` note. Signed release artifacts still require repository signing secrets.
 - Local `rtk` command required by global instructions is not installed in this shell; use plain `git`, `gh`, and `dotnet` unless `rtk` becomes available.
 
 ## Stack
@@ -33,7 +33,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 
 - `src/PhoneFork.Core`: ADB host, shell quoting, device inventory, app migration, media diff/sync, settings diff/apply, debloat dataset, wireless ADB policy, trusted-pair registry, Smart Switch detection, backup interop, pre-flight, integrity verification, and helper lifecycle services.
 - `src/PhoneFork.App`: WPF shell, Catppuccin Mocha theme, device bar, migration tabs, and an Operations tab for helper/Shizuku/Smart Switch/pre-flight/backup/media-integrity/trust/burst-mode workflows.
-- `src/PhoneFork.Cli`: scriptable command surface for devices, apps, media, settings, debloat, Wi-Fi, CSC, roles, permissions, wireless ADB pairing/connect/disconnect, mDNS, honesty, helper lifecycle, Shizuku, Smart Switch, trusted pairs, and burst mode.
+- `src/PhoneFork.Cli`: scriptable command surface for devices, apps, media, settings, debloat, backup inspect/AppManager export/install, Wi-Fi, CSC, roles, permissions, wireless ADB pairing/connect/disconnect, mDNS, honesty, helper lifecycle, Shizuku, Smart Switch, trusted pairs, and burst mode.
 - `helper-apk`: companion Android APK with provider authorities and v1 JSON export envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary.
 - `assets/debloat`: embedded AppManagerNG/UAD-NG package datasets plus PhoneFork overrides.
 - `.github/workflows`: Windows .NET CI, Linux helper APK assemble/metadata/staging CI, and release packaging with Artifact Signing and provenance slots.
@@ -48,14 +48,14 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Roles and permissions: snapshots and applies AOSP default roles, runtime permissions, and appops.
 - Wireless ADB: supports Android 11+ pairing/connect/disconnect, mDNS discovery, per-install ADB home, patch-level gate for CVE-2026-0073, trusted-pair registry with hashed serials, session timeout, and kill switch.
 - Honesty/pre-flight: probes Samsung Pass/Wallet/Secure Folder/Routines/Notes/Gallery/OneDrive/Samsung Account, CSC, security patch level, OEM unlock, Knox, and destination posture.
-- Backup interop: AppManager-compatible v5 writer/reader with SHA-256 checksums, retention sweeper, Android `.ab` sniffer, Open Android Backup sniffer, and open archive metadata including Android 16 QPR2 cross-platform-transfer posture.
+- Backup interop: AppManager-compatible v5 writer/reader with SHA-256 checksums, CLI inspect/export/install commands, retention sweeper, Android `.ab` sniffer, Open Android Backup sniffer, and open archive metadata including Android 16 QPR2 cross-platform-transfer posture.
 
 ## Known Gaps
 
 - Helper APK restore writes are still guarded and intentionally disabled until the host workflow can sequence default-app and destructive-action confirmation safely.
 - Helper APK release signing is not wired; CI builds debug and unsigned release APKs, signs the release APK with the CI debug keystore for verification-only staging, and exercises the verified staging path.
-- WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain incomplete.
-- No tagged signed release exists yet; README now directs users to build from source until a release is published.
+- WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain CLI-first.
+- No signed release exists yet; README now distinguishes the unsigned prerelease from source builds.
 - Signing secrets are intentionally not provisioned.
 - Release readiness notes live in `docs/release-readiness.md`; the first prerelease path is clearly unsigned unless Azure Artifact Signing secrets are provisioned.
 - Version consistency is guarded by `scripts/Test-VersionConsistency.ps1` and CI.
@@ -95,6 +95,7 @@ Useful smoke commands when a device or host UI is available:
 
 ```powershell
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- devices
+dotnet run --project src\PhoneFork.Cli -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- wifi qr --ssid AuditTest --psk abc123 -o scratch\audit-test.png
 dotnet run --project src\PhoneFork.App -c Release --no-build
 ```
