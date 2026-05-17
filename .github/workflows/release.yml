@@ -1,10 +1,10 @@
 name: release
 
 # Triggered on a `v*` tag. Publishes framework-dependent ZIPs for the WPF host
-# and CLI. Signing + provenance attestation slots are wired (F064 / F065 / F066),
-# but signing is skipped until the maintainer provisions Azure Artifact Signing
-# secrets. The workflow always publishes ARTIFACT-TRUST.txt so unsigned releases
-# are explicit.
+# and CLI, emits an SPDX SBOM + SHA-256 manifest, and creates GitHub artifact
+# attestations. Authenticode signing is skipped until the maintainer provisions
+# Azure Artifact Signing secrets. The workflow always publishes ARTIFACT-TRUST.txt
+# and release notes so signed/unsigned status is explicit.
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
   build-and-sign:
     runs-on: windows-latest
     env:
-      HAVE_SIGNING_SECRETS: ${{ secrets.AZURE_TENANT_ID != '' && secrets.AZURE_CLIENT_ID != '' && secrets.AZURE_CLIENT_SECRET != '' && secrets.AZURE_SIGNING_ACCOUNT != '' && secrets.AZURE_SIGNING_PROFILE != '' && 'true' || 'false' }}
+      HAVE_SIGNING_SECRETS: ${{ secrets.AZURE_TENANT_ID != '' && secrets.AZURE_CLIENT_ID != '' && secrets.AZURE_CLIENT_SECRET != '' && secrets.AZURE_SIGNING_ENDPOINT != '' && secrets.AZURE_SIGNING_ACCOUNT != '' && secrets.AZURE_SIGNING_PROFILE != '' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -50,6 +50,51 @@ jobs:
             -c Release -r win-x64 --self-contained false `
             -o publish/cli
 
+      # Azure Artifact Signing signs the Authenticode-capable EXE/DLL payloads
+      # before they are zipped. The ZIPs themselves are attested by GitHub.
+      - name: Sign Windows binaries (Azure Artifact Signing)
+        if: ${{ env.HAVE_SIGNING_SECRETS == 'true' }}
+        uses: azure/artifact-signing-action@v1
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          files: |
+            ${{ github.workspace }}\publish\wpf\PhoneFork.exe
+            ${{ github.workspace }}\publish\wpf\PhoneFork.dll
+            ${{ github.workspace }}\publish\wpf\PhoneFork.Core.dll
+            ${{ github.workspace }}\publish\cli\phonefork.exe
+            ${{ github.workspace }}\publish\cli\phonefork.dll
+            ${{ github.workspace }}\publish\cli\PhoneFork.Core.dll
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          description: PhoneFork release
+          description-url: https://github.com/SysAdminDoc/PhoneFork
+
+      - name: Verify signed Windows binaries
+        if: ${{ env.HAVE_SIGNING_SECRETS == 'true' }}
+        shell: pwsh
+        run: |
+          $paths = @(
+            "publish/wpf/PhoneFork.exe",
+            "publish/wpf/PhoneFork.dll",
+            "publish/wpf/PhoneFork.Core.dll",
+            "publish/cli/phonefork.exe",
+            "publish/cli/phonefork.dll",
+            "publish/cli/PhoneFork.Core.dll"
+          )
+          foreach ($path in $paths) {
+            $sig = Get-AuthenticodeSignature -LiteralPath $path
+            if ($sig.Status -ne "Valid") {
+              throw "Invalid Authenticode signature on $path: $($sig.Status) $($sig.StatusMessage)"
+            }
+            Write-Host "Valid signature: $path ($($sig.SignerCertificate.Subject))"
+          }
+
       - name: Zip release artifacts
         shell: pwsh
         run: |
@@ -58,60 +103,107 @@ jobs:
           Compress-Archive -Path publish/wpf/* -DestinationPath "PhoneFork-$tag-wpf-win-x64.zip"
           Compress-Archive -Path publish/cli/* -DestinationPath "PhoneFork-$tag-cli-win-x64.zip"
 
-      # F064 — Azure Artifact Signing. Sign the produced ZIPs with the configured
-      # certificate. Disabled until AZURE_TENANT_ID / AZURE_CLIENT_ID / AZURE_CLIENT_SECRET
-      # secrets are set on the repo.
-      - name: Sign artifacts (Azure Artifact Signing)
-        if: ${{ env.HAVE_SIGNING_SECRETS == 'true' }}
+      - name: Generate SPDX SBOM and checksums
+        shell: pwsh
         run: |
-          dotnet tool install --global sign --version 0.9.1-beta.25101.4
-          sign code azure-trusted-signing PhoneFork-*-win-x64.zip `
-            --azure-tenant-id "${env:AZURE_TENANT_ID}" `
-            --azure-client-id "${env:AZURE_CLIENT_ID}" `
-            --azure-client-secret "${env:AZURE_CLIENT_SECRET}" `
-            --trusted-signing-account "${env:AZURE_SIGNING_ACCOUNT}" `
-            --certificate-profile "${env:AZURE_SIGNING_PROFILE}" `
-            --description "PhoneFork release" `
-            --description-url "https://github.com/SysAdminDoc/PhoneFork"
-        env:
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
-          AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          $tag = "${env:GITHUB_REF_NAME}"
+          if (-not $tag) { $tag = "dev" }
+          $wpf = "PhoneFork-$tag-wpf-win-x64.zip"
+          $cli = "PhoneFork-$tag-cli-win-x64.zip"
+          $sbom = "PhoneFork-$tag-sbom.spdx.json"
+          & ./scripts/New-ReleaseSbom.ps1 `
+            -Version $tag `
+            -OutputPath $sbom `
+            -ArtifactPath @($wpf, $cli)
+          Get-FileHash -Algorithm SHA256 $wpf, $cli, $sbom |
+            ForEach-Object { "$($_.Hash.ToLowerInvariant())  $(Split-Path -Leaf $_.Path)" } |
+            Set-Content -Path "PhoneFork-$tag-SHA256SUMS.txt" -Encoding UTF8
 
       - name: Write artifact trust note
         shell: pwsh
         run: |
+          $tag = "${env:GITHUB_REF_NAME}"
+          if (-not $tag) { $tag = "dev" }
           if ($env:HAVE_SIGNING_SECRETS -eq "true") {
             $lines = @(
               "PhoneFork release artifact trust",
               "",
-              "Status: ZIP artifacts were submitted to Azure Artifact Signing in this workflow.",
-              "Verify: use signtool verify /v /debug /pa against downloaded artifacts where applicable.",
-              "Provenance: GitHub artifact attestation is generated for PhoneFork-*-win-x64.zip."
+              "Status: Windows EXE/DLL payloads were signed with Azure Artifact Signing before ZIP packaging.",
+              "Important: ZIP files are containers. Verify the GitHub attestation for the downloaded ZIP, then extract and verify Authenticode signatures on PhoneFork.exe / phonefork.exe and PhoneFork*.dll.",
+              "SmartScreen: a valid signature identifies the publisher, but new publisher identities can still show warnings until Microsoft reputation builds.",
+              "Verify signatures: signtool verify /pa /v <extracted-exe-or-dll>.",
+              "Verify provenance: gh attestation verify PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork.",
+              "Verify SBOM attestation: gh attestation verify PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork --predicate-type https://spdx.dev/Document/v2.3."
             )
           } else {
             $lines = @(
               "PhoneFork release artifact trust",
               "",
-              "Status: ZIP artifacts are UNSIGNED. Azure Artifact Signing secrets were not configured for this run.",
-              "Expected Windows behavior: SmartScreen or Defender may warn until signed releases are available.",
-              "Provenance: GitHub artifact attestation is generated for PhoneFork-*-win-x64.zip."
+              "Status: Windows EXE/DLL payloads are UNSIGNED. Azure Artifact Signing secrets were not configured for this run.",
+              "Expected Windows behavior: SmartScreen or Defender may warn. This release should be treated as an unsigned development artifact.",
+              "Verify provenance: gh attestation verify PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork.",
+              "Verify SBOM attestation: gh attestation verify PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork --predicate-type https://spdx.dev/Document/v2.3."
             )
           }
           $lines | Set-Content -Path ARTIFACT-TRUST.txt -Encoding UTF8
 
-      # F066 — SLSA Level 3 build provenance via GitHub artifact attestations.
-      - name: Generate SLSA attestation
-        uses: actions/attest-build-provenance@v2
+      - name: Write release notes
+        shell: pwsh
+        run: |
+          $tag = "${env:GITHUB_REF_NAME}"
+          if (-not $tag) { $tag = "dev" }
+          if ($env:HAVE_SIGNING_SECRETS -eq "true") {
+            $status = "Signed Windows payload release"
+            $trust = "Windows EXE/DLL payloads were signed with Azure Artifact Signing before ZIP packaging. SmartScreen may still warn for a new publisher identity until reputation builds."
+          } else {
+            $status = "Unsigned development release"
+            $trust = "Windows EXE/DLL payloads are unsigned because Azure Artifact Signing secrets were not configured for this run. SmartScreen or Defender warnings are expected."
+          }
+          $notes = @(
+            "# PhoneFork $tag",
+            "",
+            "Status: $status.",
+            "",
+            $trust,
+            "",
+            "Release assets include WPF and CLI ZIPs, an SPDX 2.3 SBOM, SHA-256 checksums, and ARTIFACT-TRUST.txt.",
+            "",
+            "Verify provenance:",
+            "",
+            "~~~powershell",
+            "gh attestation verify .\PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork",
+            "gh attestation verify .\PhoneFork-$tag-cli-win-x64.zip -R SysAdminDoc/PhoneFork",
+            "gh attestation verify .\PhoneFork-$tag-wpf-win-x64.zip -R SysAdminDoc/PhoneFork --predicate-type https://spdx.dev/Document/v2.3",
+            "~~~",
+            "",
+            "Verify signatures after extraction when this is a signed release:",
+            "",
+            "~~~powershell",
+            "signtool verify /pa /v .\PhoneFork.exe",
+            "signtool verify /pa /v .\PhoneFork.Core.dll",
+            "~~~"
+          )
+          $notes | Set-Content -Path RELEASE-NOTES.md -Encoding UTF8
+
+      # F066 - GitHub artifact attestations for release ZIP provenance.
+      - name: Generate release ZIP provenance attestation
+        uses: actions/attest@v4
         with:
           subject-path: 'PhoneFork-*-win-x64.zip'
+
+      - name: Generate release SBOM attestation
+        uses: actions/attest@v4
+        with:
+          subject-path: 'PhoneFork-*-win-x64.zip'
+          sbom-path: 'PhoneFork-${{ github.ref_name }}-sbom.spdx.json'
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          body_path: RELEASE-NOTES.md
+          fail_on_unmatched_files: true
           files: |
             PhoneFork-*-win-x64.zip
+            PhoneFork-*-sbom.spdx.json
+            PhoneFork-*-SHA256SUMS.txt
             ARTIFACT-TRUST.txt
-          generate_release_notes: true

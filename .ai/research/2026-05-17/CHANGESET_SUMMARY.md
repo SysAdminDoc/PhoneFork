@@ -198,3 +198,19 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R011 Release Signing / Provenance
+
+- `.github/workflows/release.yml`: signs Authenticode-capable WPF/CLI EXE and PhoneFork DLL payloads with `azure/artifact-signing-action@v1` when all Azure Artifact Signing secrets are present, verifies signed payload status, packages WPF/CLI ZIPs, emits SBOM/checksum/trust-note assets, creates GitHub provenance and SBOM attestations with `actions/attest@v4`, and publishes release notes that distinguish signed and unsigned SmartScreen behavior.
+- `scripts/New-ReleaseSbom.ps1`: added a local SPDX 2.3 SBOM generator for release ZIPs and non-test NuGet dependencies.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, `docs/release-readiness.md`, and `SOURCE_REGISTER.md`: documented the completed R011 release trust path and verification commands.
+
+Verification:
+
+- Local publish smoke to `artifacts\r011-smoke\wpf` and `artifacts\r011-smoke\cli`: passed.
+- `scripts/New-ReleaseSbom.ps1` against smoke ZIPs: passed; SPDX 2.3 output contained 21 packages, 2 files, and 22 relationships.
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 144 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

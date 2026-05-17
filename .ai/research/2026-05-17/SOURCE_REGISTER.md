@@ -40,6 +40,7 @@
 | L34 | `src/PhoneFork.Core/Services/GalleryOneDriveService.cs` and `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs` | Gallery / OneDrive cutoff assistant implementation and tests. |
 | L35 | `src/PhoneFork.Core/Services/MediaSyncEvidence.cs`, `MediaSyncService.cs`, and `tests/PhoneFork.Core.Tests/MediaSyncEvidenceTests.cs` | Media sync checkpoint, evidence report, retry, throughput, and Quick Share advisory implementation and tests. |
 | L36 | `src/PhoneFork.Core/Services/DebloatDataset.cs`, `assets/debloat/overrides.json`, `src/PhoneFork.Cli/Commands/Debloat*Command.cs`, and `tests/PhoneFork.Core.Tests/DebloatOverrideTests.cs` | Checksummed debloat overlay feed, OEM/action/risk/source/review/expiry metadata, CLI feed options, and override tests. |
+| L37 | `.github/workflows/release.yml`, `scripts/New-ReleaseSbom.ps1`, and `docs/release-readiness.md` | Release signing, SBOM, checksum, release-note, and GitHub attestation implementation. |
 
 ## Instruction And Memory Sources
 
@@ -76,6 +77,9 @@
 | S17 | CA/Browser Forum Code Signing Baseline Requirements | https://cabforum.org/working-groups/code-signing/requirements/ | Code signing certificate and timestamp guidance. |
 | S18 | GitHub Artifact Attestations docs | https://docs.github.com/en/actions/concepts/security/artifact-attestations | Provenance, SBOM, and Sigstore behavior for public repos. |
 | S19 | GitHub Actions setup-dotnet | https://github.com/actions/setup-dotnet | CI SDK setup action used by repo. |
+| S20 | GitHub actions/attest | https://github.com/actions/attest | Current provenance/SBOM attestation action and inputs. |
+| S21 | Azure Artifact Signing Action | https://github.com/Azure/artifact-signing-action | Current Windows runner, auth, file list, timestamp, and signing action inputs. |
+| S22 | Microsoft MSIX signing guide | https://learn.microsoft.com/en-us/windows/msix/package/sign-msix-package-guide | Artifact Signing rename, action reference, and SmartScreen reputation warning for new publishers. |
 
 ## External OSS And Competitor Sources
 
