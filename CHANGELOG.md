@@ -12,6 +12,10 @@ All notable changes to PhoneFork.
 - Samsung Messages / Google Messages transition pre-flight checks detect the
   SMS default role, installed messaging apps, the US July 2026 retirement path,
   and whether helper-assisted SMS work is safe to proceed.
+- Gallery / OneDrive pre-flight checks now use Microsoft's September 30, 2026
+  direct-sync cutoff, detect OneDrive and Samsung account/cloud indicators, and
+  surface account, media-permission, and manual storage-quota checks for
+  OneDrive camera backup.
 
 ## v0.9.0-pre — 2026-05-17
 

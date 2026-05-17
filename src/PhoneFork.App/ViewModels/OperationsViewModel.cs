@@ -87,6 +87,7 @@ public partial class OperationsViewModel : ObservableObject
     [ObservableProperty] private string _burstLine = "ADB Burst Mode not checked.";
     [ObservableProperty] private string _preflightLine = "Pre-flight not run.";
     [ObservableProperty] private string _messagesLine = "Messages transition not checked.";
+    [ObservableProperty] private string _galleryOneDriveLine = "Gallery / OneDrive posture not checked.";
     [ObservableProperty] private string _mediaIntegrityLine = "Media integrity not run.";
 
     public OperationsViewModel(DeviceService devices, AdbHostService host, SecurityPostureService posture, TrustedPairRegistry trusted, ILogger log)
@@ -184,6 +185,7 @@ public partial class OperationsViewModel : ObservableObject
             foreach (var finding in report.AllFindings)
                 PreflightFindings.Add(new PreflightFindingRowViewModel(finding));
             MessagesLine = report.Messages.Summary;
+            GalleryOneDriveLine = report.GalleryOneDrive.Summary;
 
             var csc = report.Csc is null
                 ? "CSC unavailable"
@@ -192,6 +194,7 @@ public partial class OperationsViewModel : ObservableObject
             Status = PreflightLine;
             AddRow("Pre-flight", report.HasBlockers ? "Blockers" : "Complete", PreflightLine, report.HasBlockers ? "Blocker" : "Info");
             AddRow("Messages", report.Messages.CanUseHelperSms ? "Clear" : "Review", MessagesLine, report.Messages.CanUseHelperSms ? "Info" : "Warning");
+            AddRow("Gallery/OneDrive", report.GalleryOneDrive.CameraBackupReady ? "Ready" : "Review", GalleryOneDriveLine, report.GalleryOneDrive.CameraBackupReady ? "Info" : "Warning");
         }, ct);
     }
 

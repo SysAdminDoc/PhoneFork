@@ -15,7 +15,7 @@ public sealed class SamsungHonestyService
 {
     /// <summary>
     /// Known package IDs that map to "this category won't transfer" findings on Samsung One UI.
-    /// Updated for the 2026 Pass → Wallet / OneDrive → Samsung Cloud transitions.
+    /// Updated for the 2026 Pass -> Wallet transition.
     /// </summary>
     public static readonly IReadOnlyList<HonestyProbe> Probes = new[]
     {
@@ -65,13 +65,6 @@ public sealed class SamsungHonestyService
             Title: "Samsung Notes present",
             Detail: "Local-only notes do not transfer through ADB. Sync to Samsung Cloud or export to PDF/Markdown before wiping.",
             Level: HonestyLevel.Warning),
-        new HonestyProbe(
-            Id: "samsung-gallery-onedrive",
-            PackageId: "com.sec.android.gallery3d",
-            Title: "Samsung Gallery present",
-            Detail: "Samsung Gallery's OneDrive backup integration was retired on 2026-04-11; Samsung Cloud is now the default cloud target. PhoneFork's Media tab transfers the local /sdcard tree; if you relied on OneDrive cloud-only photos, log in to OneDrive separately on the destination.",
-            Level: HonestyLevel.Info,
-            ActionUrl: "https://www.sammobile.com/news/2026-bring-change-galaxy-phone-photo-backup-system/"),
     };
 
     private readonly IAdbClient _client;
