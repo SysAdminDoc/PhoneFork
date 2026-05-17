@@ -59,9 +59,13 @@ public sealed class SettingsApplyService
         IEnumerable<SettingsDiffEntry> entriesToApply,
         bool dryRun,
         IProgress<string>? progress = null,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool allowMultiUser = false)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
+        if (!dryRun)
+            await new AndroidUserProfileService(_client, _log)
+                .EnsurePrimaryUserWriteSafeAsync(destination, "settings apply", allowMultiUser, ct);
         int applied = 0, skipped = 0, failed = 0;
         var failures = new List<(SettingsNamespace, string, string)>();
 
@@ -128,8 +132,11 @@ public sealed class SettingsApplyService
         string? ringtoneRemotePath,
         string? notificationRemotePath,
         string? alarmRemotePath,
-        CancellationToken ct = default)
+        CancellationToken ct = default,
+        bool allowMultiUser = false)
     {
+        await new AndroidUserProfileService(_client, _log)
+            .EnsurePrimaryUserWriteSafeAsync(destination, "default sound URI apply", allowMultiUser, ct);
         int applied = 0;
         async Task ApplyOne(string key, string? remote)
         {

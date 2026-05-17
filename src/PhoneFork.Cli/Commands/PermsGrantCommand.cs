@@ -20,6 +20,10 @@ public sealed class PermsGrantCommand : AsyncCommand<PermsGrantCommand.Settings>
 
         [CommandOption("--appop <OP>")] [Description("Format: OP_NAME=mode (e.g. SYSTEM_ALERT_WINDOW=allow). Repeatable.")]
         public string[] AppOps { get; init; } = Array.Empty<string>();
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -43,7 +47,7 @@ public sealed class PermsGrantCommand : AsyncCommand<PermsGrantCommand.Settings>
         int ok = 0, fail = 0;
         foreach (var perm in s.Permissions)
         {
-            var output = await svc.GrantAsync(picked, s.Package, perm, ct);
+            var output = await svc.GrantAsync(picked, s.Package, perm, ct, allowMultiUser: s.AllowMultiUser);
             if (output.Contains("Exception", StringComparison.Ordinal)) { fail++; AnsiConsole.MarkupLine($"[red]grant fail[/] {Markup.Escape(perm)}: {Markup.Escape(output.Trim())}"); }
             else { ok++; AnsiConsole.MarkupLine($"[green]grant ok[/] {Markup.Escape(perm)}"); }
         }
@@ -53,7 +57,7 @@ public sealed class PermsGrantCommand : AsyncCommand<PermsGrantCommand.Settings>
             if (eq <= 0) { AnsiConsole.MarkupLine($"[yellow]Invalid --appop {Markup.Escape(spec)}, expected OP=mode.[/]"); continue; }
             var op = spec[..eq];
             var mode = spec[(eq + 1)..];
-            var output = await svc.SetAppOpAsync(picked, s.Package, op, mode, ct);
+            var output = await svc.SetAppOpAsync(picked, s.Package, op, mode, ct, allowMultiUser: s.AllowMultiUser);
             if (output.Contains("Exception", StringComparison.Ordinal)) { fail++; AnsiConsole.MarkupLine($"[red]appop fail[/] {Markup.Escape(spec)}: {Markup.Escape(output.Trim())}"); }
             else { ok++; AnsiConsole.MarkupLine($"[green]appop ok[/] {Markup.Escape(spec)}"); }
         }

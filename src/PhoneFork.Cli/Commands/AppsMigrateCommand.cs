@@ -28,6 +28,10 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
         [CommandOption("--reinstall")]
         [Description("Reinstall (pass -r) if the package is already present on destination.")]
         public bool Reinstall { get; init; }
+
+        [CommandOption("--allow-multi-user")]
+        [Description("Proceed even when the destination has work profiles or secondary users. PhoneFork still targets Android user 0 only.")]
+        public bool AllowMultiUser { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
@@ -79,7 +83,8 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
                     }
                     else
                     {
-                        var r = await installer.MigrateAsync(src, dst, app, settings.Reinstall, progress, cancellationToken);
+                        var r = await installer.MigrateAsync(src, dst, app, settings.Reinstall, progress, cancellationToken,
+                            allowMultiUser: settings.AllowMultiUser);
                         if (r.Success)
                         {
                             ok++;
