@@ -117,11 +117,11 @@ Sources: L14, L18, L17.
 ### R003 - Surface v0.7-v0.9 Core services in WPF
 
 Priority: P0. Impact: 4. Effort: 4. Risk: 3.
-Status: In progress. 2026-05-17 slice added an Operations tab for helper
-lifecycle, Shizuku checks, Smart Switch detection, backup interop inspection,
-pre-flight bundles, media size/mtime verification, trusted-pair visibility, and
-ADB Burst Mode status/toggle. Remaining work: deeper per-flow rollback/audit
-drilldowns and richer archive import/export actions.
+Status: Completed 2026-05-17. The Operations tab surfaces helper lifecycle,
+Shizuku checks, Smart Switch detection, backup interop inspection, pre-flight
+bundles, media size/mtime verification, trusted-pair visibility, and ADB Burst
+Mode status/toggle. Deeper archive import/export actions remain tracked under
+R006.
 
 The CLI exposes more of the shipped Core surface than the WPF cockpit. Add
 workflow panels for helper lifecycle, Shizuku status, Smart Switch detection,
@@ -140,6 +140,10 @@ Sources: L12, L13, L04, M01, M02.
 ### R004 - Release-readiness correction pass
 
 Priority: P0. Impact: 4. Effort: 2. Risk: 2.
+Status: Blocked after local readiness work on 2026-05-17. Local publish
+docs/workflow trust notes are wired and publish outputs verify locally. Public
+tag/release remains blocked pending current screenshots and an explicit signed
+vs unsigned prerelease decision.
 
 The repo has release workflow scaffolding but no tags or releases. Before the
 first public release, produce screenshots, verify publish outputs locally, and

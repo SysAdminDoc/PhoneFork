@@ -82,3 +82,17 @@ Verification:
 - `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R004 Release Readiness
+
+- `docs/release-readiness.md`: added the first-release checklist, local publish gate, artifact trust policy, release-notes guardrails, and remaining public-release inputs.
+- `.github/workflows/release.yml`: corrected the stale SBOM comment, made signing-secret detection explicit at job scope, and added `ARTIFACT-TRUST.txt` to every GitHub release.
+- `README.md`: documented unsigned ZIP behavior and added local publish smoke commands.
+- `ROADMAP.md` and `PROJECT_CONTEXT.md`: marked R003 complete and R004 blocked after local readiness work with the public release blocker captured.
+
+Verification:
+
+- `dotnet publish src\PhoneFork.App\PhoneFork.App.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\wpf`: passed.
+- `dotnet publish src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\cli`: passed.
+- Confirmed `artifacts\publish\wpf\PhoneFork.exe`, `artifacts\publish\wpf\tools\adb.exe`, `artifacts\publish\cli\phonefork.exe`, and `artifacts\publish\cli\tools\adb.exe` exist.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.
