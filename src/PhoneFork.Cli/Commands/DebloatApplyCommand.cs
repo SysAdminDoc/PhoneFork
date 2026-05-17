@@ -77,6 +77,29 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
             AnsiConsole.MarkupLine("[grey]No snapshot written during dry-run.[/]");
         else
             AnsiConsole.MarkupLine($"[grey]Snapshot:[/] {Markup.Escape(result.SnapshotPath)}");
+        var artifacts = string.IsNullOrWhiteSpace(result.SnapshotPath)
+            ? Array.Empty<MigrationReceiptArtifact>()
+            : new[] { new MigrationReceiptArtifact("rollback-snapshot", result.SnapshotPath) };
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "debloat-apply",
+                dryRun: s.DryRun,
+                devices: new[] { MigrationReceiptService.Device("destination", picked) },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "debloat",
+                        planned: queue.Count,
+                        succeeded: result.Disabled,
+                        skipped: result.AlreadyDisabled,
+                        failed: result.Failed,
+                        failureDetails: result.Results.Where(r => !r.Success).Select(r => $"{r.PackageId}: {r.Output}"),
+                        artifacts: artifacts),
+                },
+                warnings: s.IncludeUnsafe ? new[] { "Unsafe debloat tier was included by explicit CLI option." } : null,
+                artifacts: artifacts),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         return result.Failed == 0 ? 0 : 2;
     }
 

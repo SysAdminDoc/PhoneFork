@@ -284,3 +284,19 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R016 Local Migration Receipts
+
+- `src/PhoneFork.Core/Services/MigrationReceiptService.cs`: added export-safe JSON receipt models and writer under `%LOCALAPPDATA%\PhoneFork\receipts`, using `SerialHash` for device identity and artifact paths for rollback/evidence.
+- CLI flows now emit receipt paths for app migration, media sync, settings apply, debloat apply/rollback, roles apply, and AppManager backup install.
+- WPF Apps, Media, Settings, Debloat, and Roles view-models now write receipts and include the receipt path in completion status.
+- `tests/PhoneFork.Core.Tests/MigrationReceiptTests.cs`: covers receipt persistence, raw-serial exclusion, hashed serial inclusion, category failure counts, and PhoneInfo label handling.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R016 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 160 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only after trimming one CLI trailing-space line.

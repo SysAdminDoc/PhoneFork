@@ -44,6 +44,10 @@ All notable changes to PhoneFork.
   review-only, blocked, and unknown keys; settings apply defaults to reviewed
   safe keys only, with a CLI-only `--include-uncatalogued-settings` escape hatch
   for non-blocked keys.
+- Local migration receipts: CLI and WPF app, media, settings, debloat, roles,
+  and AppManager backup-install flows now write JSON receipts under
+  `%LOCALAPPDATA%\PhoneFork\receipts` with hashed device IDs, category counts,
+  failures, warnings, and rollback/evidence artifact paths.
 
 ## v0.9.0-pre — 2026-05-17
 
