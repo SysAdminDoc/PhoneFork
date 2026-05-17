@@ -80,6 +80,30 @@ public sealed class SettingsApplyCommand : AsyncCommand<SettingsApplyCommand.Set
                 t.AddRow(f.Ns.ToString(), Markup.Escape(f.Key), Markup.Escape(f.Error));
             AnsiConsole.Write(t);
         }
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "settings-apply",
+                dryRun: s.DryRun,
+                devices: new[]
+                {
+                    MigrationReceiptService.Device("source", src),
+                    MigrationReceiptService.Device("destination", dst),
+                },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "settings",
+                        planned: entries.Count,
+                        succeeded: result.Applied,
+                        skipped: result.Skipped,
+                        failed: result.Failed,
+                        failureDetails: result.Failures.Select(f => $"{f.Ns}/{f.Key}: {f.Error}")),
+                },
+                warnings: s.IncludeUncataloguedSettings
+                    ? new[] { "Non-blocked uncatalogued settings were allowed by explicit CLI option." }
+                    : new[] { "Default settings apply used the Samsung/One UI safe corpus only." }),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         return result.Failed == 0 ? 0 : 2;
     }
 }

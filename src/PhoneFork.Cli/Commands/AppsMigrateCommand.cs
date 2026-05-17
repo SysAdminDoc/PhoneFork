@@ -58,6 +58,7 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
         AnsiConsole.MarkupLine($"[grey]Selected {apps.Count} app(s) to migrate.[/]");
 
         int ok = 0, fail = 0;
+        var failureDetails = new List<string>();
         await AnsiConsole.Progress()
             .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new RemainingTimeColumn())
             .StartAsync(async ctx =>
@@ -78,6 +79,7 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
                         catch (Exception ex)
                         {
                             fail++;
+                            failureDetails.Add($"{app.PackageName}: {ex.Message}");
                             AnsiConsole.MarkupLine($"[red]pull failed[/] {Markup.Escape(app.PackageName)}: {Markup.Escape(ex.Message)}");
                         }
                     }
@@ -93,6 +95,7 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
                         else
                         {
                             fail++;
+                            failureDetails.Add($"{r.PackageName}: {r.Error ?? "(unknown)"}");
                             AnsiConsole.MarkupLine($"[red]fail[/] {Markup.Escape(r.PackageName)}: {Markup.Escape(r.Error ?? "(unknown)")}");
                         }
                     }
@@ -101,6 +104,28 @@ public sealed class AppsMigrateCommand : AsyncCommand<AppsMigrateCommand.Setting
             });
 
         AnsiConsole.MarkupLine($"\n[bold]{ok} migrated[/], [red]{fail} failed[/].");
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "apps-migrate",
+                dryRun: settings.DryRun,
+                devices: new[]
+                {
+                    MigrationReceiptService.Device("source", src),
+                    MigrationReceiptService.Device("destination", dst),
+                },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "apps",
+                        planned: apps.Count,
+                        succeeded: ok,
+                        skipped: 0,
+                        failed: fail,
+                        failureDetails: failureDetails),
+                },
+                warnings: settings.DryRun ? new[] { "Dry-run pulled APKs but did not install them on the destination." } : null),
+            cancellationToken);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         AnsiConsole.MarkupLine($"[grey]Audit log: {Markup.Escape(PhoneFork.Core.Logging.AuditLogger.LogDirectory)}[/]");
         return fail == 0 ? 0 : 2;
     }

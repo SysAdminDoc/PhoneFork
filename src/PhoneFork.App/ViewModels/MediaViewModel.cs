@@ -139,9 +139,37 @@ public partial class MediaViewModel : ObservableObject
                 ProgressPercent = p.FilesTotal == 0 ? 0 : 100.0 * p.FilesDone / p.FilesTotal;
             });
             var result = await svc.ApplyAsync(srcData, dstData, _lastPlan, options, prog, ct);
+            var artifacts = new List<MigrationReceiptArtifact>();
+            if (!string.IsNullOrWhiteSpace(result.CheckpointPath))
+                artifacts.Add(new MigrationReceiptArtifact("checkpoint", result.CheckpointPath));
+            if (!string.IsNullOrWhiteSpace(result.ReportPath))
+                artifacts.Add(new MigrationReceiptArtifact("evidence-report", result.ReportPath));
+            var receiptPath = await new MigrationReceiptService(_log).WriteAsync(
+                MigrationReceiptService.Create(
+                    operation: "wpf-media-sync",
+                    dryRun: DryRun,
+                    devices: new[]
+                    {
+                        MigrationReceiptService.Device("source", srcData),
+                        MigrationReceiptService.Device("destination", dstData),
+                    },
+                    categories: new[]
+                    {
+                        MigrationReceiptService.Category(
+                            "media",
+                            planned: _lastPlan.TotalFilesToTransfer + (Delete ? _lastPlan.CategoryDiffs.Sum(c => c.Count(MediaDiffOutcome.NewOnDest)) : 0),
+                            succeeded: result.FilesPushed + result.FilesDeleted,
+                            skipped: result.FilesSkipped + result.FilesDeferred,
+                            failed: result.Errors,
+                            warnings: result.Advisories.Select(a => $"{a.Kind}: {a.RelPath} - {a.Detail}"),
+                            artifacts: artifacts),
+                    },
+                    warnings: result.Advisories.Select(a => a.Detail),
+                    artifacts: artifacts),
+                ct);
             Status = DryRun
-                ? $"Dry-run done — plan was {TotalFiles} files / {TotalMib:F1} MiB."
-                : $"Pulled {result.FilesPulled}, pushed {result.FilesPushed}, skipped {result.FilesSkipped}, retried {result.FilesRetried}, deferred {result.FilesDeferred}, renamed {result.FilesRenamedAsConflict}, deleted {result.FilesDeleted}, errors {result.Errors} in {result.Elapsed.TotalSeconds:F1}s. Report: {result.ReportPath}";
+                ? $"Dry-run done — plan was {TotalFiles} files / {TotalMib:F1} MiB. Receipt: {receiptPath}"
+                : $"Pulled {result.FilesPulled}, pushed {result.FilesPushed}, skipped {result.FilesSkipped}, retried {result.FilesRetried}, deferred {result.FilesDeferred}, renamed {result.FilesRenamedAsConflict}, deleted {result.FilesDeleted}, errors {result.Errors} in {result.Elapsed.TotalSeconds:F1}s. Report: {result.ReportPath}. Receipt: {receiptPath}";
         }
         catch (Exception ex)
         {
