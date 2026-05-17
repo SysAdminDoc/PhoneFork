@@ -8,7 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="PhoneFork  &#x00B7;  v0.6.8"
+        Title="PhoneFork  &#x00B7;  v0.9.0-pre"
         MinWidth="1100" MinHeight="700"
         Width="1280" Height="820"
         WindowStartupLocation="CenterScreen"
