@@ -47,7 +47,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Wi-Fi: enumerates SSIDs where shell permits, renders QR PNG/SVG, and surfaces CSC mismatch.
 - Roles and permissions: snapshots and applies AOSP default roles, runtime permissions, and appops.
 - Wireless ADB: supports Android 11+ pairing/connect/disconnect, mDNS discovery, per-install ADB home, patch-level gate for CVE-2026-0073, trusted-pair registry with hashed serials, session timeout, and kill switch.
-- Honesty/pre-flight: probes Samsung Pass/Wallet/Secure Folder/Routines/Notes/Gallery/OneDrive/Samsung Account, Samsung Messages/Google Messages/default SMS posture, CSC, security patch level, OEM unlock, Knox, and destination posture.
+- Honesty/pre-flight: probes Samsung Pass/Wallet/Secure Folder/Routines/Notes/Gallery/OneDrive/Samsung Account, Samsung Messages/Google Messages/default SMS posture, OneDrive camera-backup account/permission/storage posture, CSC, security patch level, OEM unlock, Knox, and destination posture.
 - Backup interop: AppManager-compatible v5 writer/reader with SHA-256 checksums, CLI inspect/export/install commands, retention sweeper, Android `.ab` sniffer, Open Android Backup sniffer, and open archive metadata including Android 16 QPR2 cross-platform-transfer posture.
 
 ## Known Gaps

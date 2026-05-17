@@ -70,6 +70,61 @@ public class MessageTransitionTests
     }
 }
 
+public class GalleryOneDriveTests
+{
+    [Fact]
+    public void GalleryFindingUsesMicrosoftCutoffAndOneDriveAccessLanguage()
+    {
+        var report = GalleryOneDriveService.Assess(
+            samsungGalleryInstalled: true,
+            oneDriveInstalled: true,
+            samsungAccountInstalled: true,
+            samsungCloudPackagesInstalled: new[] { "com.samsung.android.scloud" },
+            oneDriveAccountVisible: true,
+            oneDriveMediaPermissionGranted: true);
+
+        Assert.True(report.CameraBackupReady);
+        Assert.Contains(report.Findings, f => f.Id == "samsung-gallery-onedrive-cutoff"
+                                             && f.Detail.Contains("September 30, 2026")
+                                             && f.Detail.Contains("Files already in OneDrive remain accessible"));
+    }
+
+    [Fact]
+    public void GalleryWithoutOneDriveWarnsAboutCameraBackupHandoff()
+    {
+        var report = GalleryOneDriveService.Assess(
+            samsungGalleryInstalled: true,
+            oneDriveInstalled: false,
+            samsungAccountInstalled: false,
+            samsungCloudPackagesInstalled: Array.Empty<string>(),
+            oneDriveAccountVisible: null,
+            oneDriveMediaPermissionGranted: null);
+
+        Assert.False(report.CameraBackupReady);
+        Assert.Contains(report.Findings, f => f.Id == "onedrive-missing-for-camera-backup"
+                                             && f.Level == HonestyLevel.Warning);
+    }
+
+    [Fact]
+    public void OneDriveCameraBackupChecksWarnWhenAccountOrPermissionMissing()
+    {
+        var report = GalleryOneDriveService.Assess(
+            samsungGalleryInstalled: false,
+            oneDriveInstalled: true,
+            samsungAccountInstalled: false,
+            samsungCloudPackagesInstalled: Array.Empty<string>(),
+            oneDriveAccountVisible: false,
+            oneDriveMediaPermissionGranted: false);
+
+        Assert.False(report.CameraBackupReady);
+        Assert.Contains(report.Findings, f => f.Id == "onedrive-account-visible"
+                                             && f.Level == HonestyLevel.Warning);
+        Assert.Contains(report.Findings, f => f.Id == "onedrive-media-permission"
+                                             && f.Level == HonestyLevel.Warning);
+        Assert.Contains(report.Findings, f => f.Id == "onedrive-storage-manual-check");
+    }
+}
+
 public class IntegrityModeTests
 {
     [Theory]

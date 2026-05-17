@@ -148,3 +148,19 @@ Verification:
 - `dotnet build PhoneFork.slnx -c Release`: passed.
 - `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 132 tests.
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+
+## Continuation Implementation - R008 Gallery / OneDrive
+
+- `src/PhoneFork.Core/Services/GalleryOneDriveService.cs`: added Samsung Gallery, OneDrive, Samsung account, Samsung Cloud package, OneDrive account, OneDrive media-permission, and manual storage-quota posture checks.
+- `src/PhoneFork.Core/Services/SamsungHonestyService.cs`: removed the stale April 2026 Gallery/OneDrive warning so the dedicated Microsoft-sourced pre-flight report owns that guidance.
+- `src/PhoneFork.Core/Services/PreflightService.cs`: includes Gallery/OneDrive findings in aggregate pre-flight output.
+- `src/PhoneFork.App/ViewModels/OperationsViewModel.cs` and `src/PhoneFork.App/Views/OperationsView.xaml`: surface the Gallery/OneDrive summary and status row in WPF Operations.
+- `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs`: added pure assessment coverage for the Microsoft September 30, 2026 cutoff language, missing OneDrive handoff, and missing account/permission checks.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R008 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 135 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `rg -n "2026-04-11|SamMobile|retired on|April 2026" src README.md ROADMAP.md PROJECT_CONTEXT.md CHANGELOG.md`: passed with no stale cutoff text.
