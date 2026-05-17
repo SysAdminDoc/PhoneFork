@@ -44,11 +44,9 @@ public static class AuditLogger
 {
     public const string LogDirEnv = "LOCALAPPDATA";
 
-    public static ILogger Create()
+    public static ILogger Create(string? logDirectory = null)
     {
-        var logDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "PhoneFork", "logs");
+        var logDir = logDirectory ?? LogDirectory;
         Directory.CreateDirectory(logDir);
 
         return new LoggerConfiguration()
