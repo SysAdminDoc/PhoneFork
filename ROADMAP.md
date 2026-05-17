@@ -298,6 +298,11 @@ Sources: L13, G06, G07, G08, G22.
 ### R011 - Windows release signing and provenance
 
 Priority: P1. Impact: 4. Effort: 3. Risk: 3.
+Status: Completed 2026-05-17. The release workflow now signs Authenticode-capable
+Windows payloads with Azure Artifact Signing when all signing secrets are
+present, zips the signed/unsigned publish outputs, emits an SPDX 2.3 SBOM and
+SHA-256 manifest, creates GitHub provenance and SBOM attestations, and writes
+release notes / `ARTIFACT-TRUST.txt` with honest SmartScreen guidance.
 
 Wire the existing release workflow to a real signing profile and document the
 unsigned-development path. Use GitHub artifact attestations for release ZIPs and
@@ -310,7 +315,7 @@ Acceptance:
 - Release notes explain SmartScreen reputation honestly.
 - Verification instructions cover `signtool verify` and attestation checks.
 
-Sources: L19, S15, S16, S17, S18.
+Sources: L19, L37, S15, S16, S17, S18, S20, S21, S22.
 
 ### R012 - Dependency maintenance window
 

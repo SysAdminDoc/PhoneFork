@@ -44,9 +44,12 @@ Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.co
 
 The bundled `tools/adb.exe` ships with the app — no Android SDK needed on your PC.
 
-Release ZIPs are unsigned until Azure Artifact Signing secrets are provisioned.
-Unsigned prereleases, when published, will include an `ARTIFACT-TRUST.txt` note
-and may trigger Windows SmartScreen warnings.
+The current `v0.9.0-pre` ZIPs are unsigned. Future release ZIPs include
+`ARTIFACT-TRUST.txt`, an SPDX SBOM, SHA-256 checksums, and GitHub artifact
+attestations. When Azure Artifact Signing secrets are provisioned, PhoneFork
+signs the Windows EXE/DLL payloads before ZIP packaging. Even signed releases
+from a new publisher can still show SmartScreen warnings until reputation
+builds.
 
 ## Usage
 
