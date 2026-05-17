@@ -89,6 +89,23 @@ Verification:
 - `.github/workflows/release.yml`: corrected the stale SBOM comment, made signing-secret detection explicit at job scope, and added `ARTIFACT-TRUST.txt` to every GitHub release.
 - `README.md`: documented unsigned ZIP behavior and added local publish smoke commands.
 - `ROADMAP.md` and `PROJECT_CONTEXT.md`: marked R003 complete and R004 blocked after local readiness work with the public release blocker captured.
+- `docs/screenshots/phonefork-main-2026-05-17.png`: captured the current WPF cockpit for release/README use.
+- `docs/releases/v0.9.0-pre.md`: added release notes with unsigned prerelease status, boundaries, and verification commands.
+- `CHANGELOG.md`: reconciled the `v0.9.0-pre` entry with the helper provider, WPF Operations, release-readiness, and version-gate continuation work.
+
+## Continuation Implementation - R005 Version Gate
+
+- `scripts/Test-VersionConsistency.ps1`: added the release consistency gate for changelog, README badge, WPF window title/header, numeric app manifest, helper APK versionName, and release workflow tag trigger.
+- `.github/workflows/ci.yml`: runs the version consistency gate before Release build/test.
+- `README.md`, `docs/release-readiness.md`, `PROJECT_CONTEXT.md`, and `ROADMAP.md`: documented the gate and marked R005 complete.
+
+Verification:
+
+- `pwsh scripts/Test-VersionConsistency.ps1`: passed.
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.
 
 Verification:
 

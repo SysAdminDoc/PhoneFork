@@ -57,7 +57,8 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain incomplete.
 - No tagged signed release exists yet; README now directs users to build from source until a release is published.
 - Signing secrets are intentionally not provisioned.
-- Release readiness notes live in `docs/release-readiness.md`; public tag/release is still pending screenshots and signed-vs-unsigned prerelease decision.
+- Release readiness notes live in `docs/release-readiness.md`; the first prerelease path is clearly unsigned unless Azure Artifact Signing secrets are provisioned.
+- Version consistency is guarded by `scripts/Test-VersionConsistency.ps1` and CI.
 - Current dependency scan is clean for vulnerabilities, but several packages have current upgrades and test `xunit` is flagged as legacy.
 - Hardware validation was not available in this research session.
 
@@ -77,6 +78,7 @@ Use these as the standard local gate after source changes:
 
 ```powershell
 dotnet restore PhoneFork.slnx
+pwsh scripts/Test-VersionConsistency.ps1
 dotnet build PhoneFork.slnx -c Release --no-restore
 dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release --no-build
 dotnet list PhoneFork.slnx package --vulnerable --include-transitive
