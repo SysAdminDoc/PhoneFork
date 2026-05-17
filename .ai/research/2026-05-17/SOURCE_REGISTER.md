@@ -36,6 +36,7 @@
 | L30 | `scripts/Stage-HelperApk.ps1` | Verified helper APK staging gate for host packaging. |
 | L31 | `gh release view v0.9.0-pre --repo SysAdminDoc/PhoneFork` | Published unsigned prerelease URL, prerelease flag, and asset list. |
 | L32 | `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json` | Offline AppManager backup inspection smoke test. |
+| L33 | `src/PhoneFork.Core/Services/MessageTransitionService.cs` and `tests/PhoneFork.Core.Tests/PreflightAndIntegrityTests.cs` | Samsung Messages / Google Messages pre-flight implementation and tests. |
 
 ## Instruction And Memory Sources
 
