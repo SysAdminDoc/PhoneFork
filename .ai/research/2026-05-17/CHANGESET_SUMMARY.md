@@ -164,3 +164,20 @@ Verification:
 - `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 135 tests.
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `rg -n "2026-04-11|SamMobile|retired on|April 2026" src README.md ROADMAP.md PROJECT_CONTEXT.md CHANGELOG.md`: passed with no stale cutoff text.
+
+## Continuation Implementation - R009 Media Sync Resilience
+
+- `src/PhoneFork.Core/Services/MediaSyncEvidence.cs`: added checkpoint, evidence report, evidence-entry, transfer-advisory, and checkpoint-store models.
+- `src/PhoneFork.Core/Services/MediaSyncService.cs`: added resumable checkpoint skips, per-entry retry tracking, JSON evidence report output, throughput/ETA progress fields, huge-file advisories, and opt-in Quick Share deferral for single large ad hoc transfers.
+- `src/PhoneFork.Cli/Commands/MediaSyncCommand.cs`: added `--checkpoint`, `--report`, `--max-attempts`, and `--defer-quick-share`; prints advisories plus checkpoint/report paths.
+- `src/PhoneFork.App/ViewModels/MediaViewModel.cs`: includes retry/deferred counts and report path in WPF media-sync completion status.
+- `tests/PhoneFork.Core.Tests/MediaSyncEvidenceTests.cs`: covers Quick Share advisory gating, huge-file advisory thresholding, and checkpoint round-trip persistence.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R009 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 139 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

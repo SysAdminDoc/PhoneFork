@@ -62,7 +62,7 @@ and may trigger Windows SmartScreen warnings.
 phonefork devices                          # list connected
 phonefork apps list --device R5CY34G070L   # enumerate user apps
 phonefork apps migrate --from <src> --to <dst> [--dry-run]
-phonefork media sync   --from <src> --to <dst>
+phonefork media sync   --from <src> --to <dst> [--checkpoint path] [--report path]
 phonefork settings dump --device <serial> --out settings.json
 phonefork settings apply --device <serial> --plan plan.json
 phonefork debloat apply --device <serial> --profile aggressive
@@ -72,6 +72,8 @@ phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
 ```
+
+Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 
 ## Build from source
 

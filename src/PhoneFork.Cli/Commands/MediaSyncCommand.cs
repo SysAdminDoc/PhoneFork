@@ -36,6 +36,22 @@ public sealed class MediaSyncCommand : AsyncCommand<MediaSyncCommand.Settings>
         [CommandOption("--preserve-conflicts")]
         [Description("Rename destination conflicts to <name>.sync-conflict-<ts>-<hash>.<ext> before overwriting (Syncthing pattern).")]
         public bool PreserveConflicts { get; init; }
+
+        [CommandOption("--checkpoint <PATH>")]
+        [Description("Resume checkpoint JSON path. Default: stage/media-sync-checkpoint.json.")]
+        public string? CheckpointPath { get; init; }
+
+        [CommandOption("--report <PATH>")]
+        [Description("Evidence report JSON path. Default: stage/media-sync-report-<timestamp>.json.")]
+        public string? ReportPath { get; init; }
+
+        [CommandOption("--max-attempts <N>")]
+        [Description("Pull/push attempts per file before marking failed. Default: 3.")]
+        public int MaxAttempts { get; init; } = 3;
+
+        [CommandOption("--defer-quick-share")]
+        [Description("Record single-large-file Quick Share candidates as user-deferred instead of transferring them.")]
+        public bool DeferQuickShare { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -58,6 +74,8 @@ public sealed class MediaSyncCommand : AsyncCommand<MediaSyncCommand.Settings>
 
         var plan = MediaDiffer.Build(srcManifest, dstManifest);
         AnsiConsole.MarkupLine($"[bold]Plan:[/] {plan.TotalFilesToTransfer} files, {plan.TotalBytesToTransfer / 1024.0 / 1024.0:F1} MiB, {plan.TotalConflicts} conflicts.");
+        foreach (var advisory in MediaSyncEvidence.BuildAdvisories(plan))
+            AnsiConsole.MarkupLine($"[yellow]{advisory.Kind}[/] {Markup.Escape(advisory.RelPath)} ({advisory.SizeBytes / 1024.0 / 1024.0:F1} MiB): {Markup.Escape(advisory.Detail)}");
         if (s.DryRun) AnsiConsole.MarkupLine("[yellow]Dry-run mode — no writes.[/]");
 
         var syncSvc = new MediaSyncService(host.Client, log);
@@ -70,7 +88,8 @@ public sealed class MediaSyncCommand : AsyncCommand<MediaSyncCommand.Settings>
                 var progress = new Progress<MediaSyncProgress>(p =>
                 {
                     task.Value = p.FilesDone;
-                    task.Description = $"[grey]{Markup.Escape(Truncate(p.CurrentRelPath, 60))}[/]";
+                    var speed = p.BytesPerSecond <= 0 ? "" : $" {p.BytesPerSecond / 1024.0 / 1024.0:F1} MiB/s";
+                    task.Description = $"[grey]{Markup.Escape(Truncate(p.CurrentRelPath, 54))}{speed}[/]";
                 });
                 result = await syncSvc.ApplyAsync(src, dst, plan, new MediaSyncOptions
                 {
@@ -78,10 +97,18 @@ public sealed class MediaSyncCommand : AsyncCommand<MediaSyncCommand.Settings>
                     UpdateOnly = s.UpdateOnly,
                     PreserveConflicts = s.PreserveConflicts,
                     DryRun = s.DryRun,
+                    CheckpointPath = s.CheckpointPath,
+                    ReportPath = s.ReportPath,
+                    MaxAttempts = s.MaxAttempts,
+                    DeferQuickShareCandidates = s.DeferQuickShare,
                 }, progress, ct);
             });
 
-        AnsiConsole.MarkupLine($"[green]pulled[/] {result!.FilesPulled}, [green]pushed[/] {result.FilesPushed}, [grey]skipped[/] {result.FilesSkipped}, [yellow]renamed[/] {result.FilesRenamedAsConflict}, [yellow]deleted[/] {result.FilesDeleted}, [red]errors[/] {result.Errors}.");
+        AnsiConsole.MarkupLine($"[green]pulled[/] {result!.FilesPulled}, [green]pushed[/] {result.FilesPushed}, [grey]skipped[/] {result.FilesSkipped}, [yellow]retried[/] {result.FilesRetried}, [yellow]deferred[/] {result.FilesDeferred}, [yellow]renamed[/] {result.FilesRenamedAsConflict}, [yellow]deleted[/] {result.FilesDeleted}, [red]errors[/] {result.Errors}.");
+        if (!string.IsNullOrWhiteSpace(result.CheckpointPath))
+            AnsiConsole.MarkupLine($"[grey]Checkpoint:[/] {Markup.Escape(result.CheckpointPath)}");
+        if (!string.IsNullOrWhiteSpace(result.ReportPath))
+            AnsiConsole.MarkupLine($"[grey]Report:[/] {Markup.Escape(result.ReportPath)}");
         AnsiConsole.MarkupLine($"[grey]Elapsed: {result.Elapsed.TotalSeconds:F1}s[/]");
         return result.Errors == 0 ? 0 : 2;
     }
