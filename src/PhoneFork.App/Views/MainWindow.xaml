@@ -33,7 +33,7 @@
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
                 <TextBlock Text="PhoneFork" FontSize="26" FontWeight="SemiBold"
                            Foreground="{StaticResource AccentBrush}"/>
-                <TextBlock Text=" v0.6.8" FontSize="20" Margin="6,4,0,0"
+                <TextBlock Text=" v0.9.0-pre" FontSize="20" Margin="6,4,0,0"
                            Foreground="{StaticResource ForegroundMutedBrush}"/>
             </StackPanel>
             <TextBlock Text="Dual-Samsung migration &#x00B7; local-only &#x00B7; no root &#x00B7; no cloud"
@@ -64,6 +64,9 @@
             </TabItem>
             <TabItem Header="Roles">
                 <views:RolesView DataContext="{Binding Roles}" Margin="0,12,0,0"/>
+            </TabItem>
+            <TabItem Header="Operations">
+                <views:OperationsView DataContext="{Binding Operations}" Margin="0,12,0,0"/>
             </TabItem>
         </TabControl>
 
