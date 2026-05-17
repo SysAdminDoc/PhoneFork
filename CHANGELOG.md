@@ -2,6 +2,14 @@
 
 All notable changes to PhoneFork.
 
+## Unreleased
+
+### Added
+- CLI AppManager backup workflow: `phonefork backup inspect`, `backup
+  export-appmanager`, and `backup install-appmanager` now expose checksum
+  verification, package listing, APK/split export, and local APK-set install
+  from AppManager-compatible backup directories.
+
 ## v0.9.0-pre — 2026-05-17
 
 Backup format detection layer (F031, F032) + Android `<cross-platform-transfer>`
