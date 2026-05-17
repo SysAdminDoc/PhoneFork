@@ -112,6 +112,9 @@ app.Configure(config =>
     config.AddCommand<HonestyCommand>("honesty")
         .WithDescription("Pre-flight scan of a source device for Samsung categories that won't transfer (Pass, Wallet, Secure Folder, Routines, etc.).");
 
+    config.AddCommand<PlatformWatchCommand>("platform-watch")
+        .WithDescription("Show Seedvault, Android cross-platform-transfer, and Android 17+ official migration watch items.");
+
     config.AddBranch("helper", helper =>
     {
         helper.SetDescription("Lifecycle for the PhoneForkHelper companion APK (SMS, call log, contacts, Wi-Fi, wallpaper, ringtone, dictionary).");

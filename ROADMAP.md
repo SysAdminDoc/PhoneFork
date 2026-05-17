@@ -347,7 +347,7 @@ Sources: L27-L29.
 | R014 | Completed 2026-05-17: multi-user and work-profile awareness before destructive package, settings, role, permission, appop, and backup-install actions. | L13, L40, G06, G08 |
 | R015 | Completed 2026-05-17: Samsung/One UI safe settings corpus with read-only safety comparison before apply and default-safe WPF/CLI apply behavior. | L13, L21, L41, G07 |
 | R016 | Completed 2026-05-17: local JSON migration receipts with hashed devices, tool version, categories, counts, failures, warnings, and rollback/evidence artifact locations. | L13, L19, L42, S18 |
-| R017 | Seedvault, Android cross-platform transfer metadata, and official Android 17+ migration watcher. | S04, S13, S14, G14 |
+| R017 | Completed 2026-05-17: Seedvault, Android cross-platform-transfer metadata, and official Android 17+ migration watcher exposed through `phonefork platform-watch`. | S04, S13, S14, G14, L43 |
 
 ## v2 Watchlist
 

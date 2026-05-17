@@ -48,6 +48,10 @@ All notable changes to PhoneFork.
   and AppManager backup-install flows now write JSON receipts under
   `%LOCALAPPDATA%\PhoneFork\receipts` with hashed device IDs, category counts,
   failures, warnings, and rollback/evidence artifact paths.
+- Platform migration watcher: `phonefork platform-watch` reports the current
+  Android cross-platform-transfer, Apple iOS-to-Android, Seedvault, and
+  PhoneFork open-archive watch items with source IDs and implementation
+  implications.
 
 ## v0.9.0-pre — 2026-05-17
 

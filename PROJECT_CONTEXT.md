@@ -51,6 +51,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - Backup interop: AppManager-compatible v5 writer/reader with SHA-256 checksums, CLI inspect/export/install commands, retention sweeper, Android `.ab` sniffer, Open Android Backup sniffer, and open archive metadata including Android 16 QPR2 cross-platform-transfer posture.
 - User/profile safety: destructive package, settings, role, permission, appop, and backup-install writes probe `pm list users` / `am get-current-user` first and refuse work-profile, secondary-user, non-zero-current-user, or unverifiable topology cases unless the CLI caller explicitly passes `--allow-multi-user`. WPF intentionally has no bypass yet.
 - Receipts: CLI and WPF app, media, settings, debloat, roles, and AppManager backup-install flows write local JSON receipts under `%LOCALAPPDATA%\PhoneFork\receipts` with hashed device IDs, tool version, category counts, failures, warnings, and rollback/evidence artifacts.
+- Platform watcher: `phonefork platform-watch` tracks source-backed Android cross-platform-transfer, Apple iOS-to-Android, Seedvault, and PhoneFork open-archive implications so future releases refresh moving official migration behavior before making claims.
 
 ## Known Gaps
 
@@ -110,6 +111,7 @@ Useful smoke commands when a device or host UI is available:
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- devices
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- apps report --device <serial> --json
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- backup inspect scratch\cli-backup-smoke --json
+dotnet run --project src\PhoneFork.Cli -c Release --no-build -- platform-watch --json
 dotnet run --project src\PhoneFork.Cli -c Release --no-build -- wifi qr --ssid AuditTest --psk abc123 -o scratch\audit-test.png
 dotnet run --project src\PhoneFork.App -c Release --no-build
 ```

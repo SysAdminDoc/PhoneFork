@@ -75,6 +75,7 @@ phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed f
 phonefork backup inspect <path> [--json]
 phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
 phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run] [--allow-multi-user]
+phonefork platform-watch [--json]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
 ```
@@ -97,6 +98,10 @@ the read-only diff. CLI callers can opt into non-blocked uncatalogued keys with
 Receipts use hashed device IDs and include operation type, PhoneFork version,
 category counts, failures, warnings, and rollback/evidence paths such as debloat
 snapshots, media checkpoints, and media evidence reports.
+
+`platform-watch` is a release-planning check for moving official flows:
+Android cross-platform transfer metadata, Apple iOS-to-Android transfer,
+Seedvault ROM integration limits, and PhoneFork open-archive implications.
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 

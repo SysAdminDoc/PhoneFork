@@ -300,3 +300,20 @@ Verification:
 - `pwsh scripts\Test-VersionConsistency.ps1`: passed.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only after trimming one CLI trailing-space line.
+
+## Continuation Implementation - R017 Platform Migration Watcher
+
+- Refreshed official/external sources on 2026-05-17 before implementation: Android Auto Backup cross-platform-transfer docs (S04), Apple iOS/iPadOS 26.3 to Android transfer support (S14), and Seedvault repo README (G14).
+- `src/PhoneFork.Core/Services/PlatformMigrationWatcherService.cs`: added a source-backed watch report for Android cross-platform-transfer, Apple iOS-to-Android/Android 17 transfer, Seedvault ROM integration limits, and PhoneFork open-archive implications.
+- `src/PhoneFork.Cli/Commands/PlatformWatchCommand.cs` and `src/PhoneFork.Cli/Program.cs`: added `phonefork platform-watch [--json]`.
+- `tests/PhoneFork.Core.Tests/PlatformMigrationWatcherTests.cs`: covers source IDs, watch counts, refresh action text, and Seedvault's "not a stock Samsung install plan" implication.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R017 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 162 tests.
+- `dotnet run --project src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release --no-build -- platform-watch --json`: passed.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.
