@@ -234,3 +234,19 @@ Verification:
 - `dotnet list PhoneFork.slnx package --deprecated`: passed with only the known `xunit` legacy notice.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R013 App Transfer Posture Reports
+
+- `src/PhoneFork.Core/Services/AppTransferReportService.cs`: added per-app APK/private-data/OBB transfer posture assessment, ADB-visible `/sdcard/Android/obb/<pkg>` and `/sdcard/Android/data/<pkg>` probes, and local APK SHA-256 artifact metadata.
+- `src/PhoneFork.Core/Services/AppInstallerService.cs`: logs local byte counts and SHA-256 hashes after each APK/split pull so install provenance is visible in audit output.
+- `src/PhoneFork.Cli/Commands/AppsReportCommand.cs` and `src/PhoneFork.Cli/Program.cs`: added `phonefork apps report` with package filters, optional JSON output, backup probe skipping, and external-data probe skipping.
+- `tests/PhoneFork.Core.Tests/AppTransferReportTests.cs`: covers transfer-posture warnings, external-data probe parsing, and package-file hash calculation.
+- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `PROJECT_CONTEXT.md`, and `SOURCE_REGISTER.md`: documented the completed R013 slice.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 149 tests.
+- `pwsh scripts\Test-VersionConsistency.ps1`: passed.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

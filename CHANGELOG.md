@@ -32,6 +32,10 @@ All notable changes to PhoneFork.
   Serilog.Sinks.File, coverlet.collector, and Microsoft.NET.Test.Sdk. New
   schema and audit-log tests cover the higher-risk JsonSchema.Net and file sink
   major upgrades; xUnit v3 remains tracked but deferred.
+- App transfer posture reports: `phonefork apps report` now explains, per app,
+  whether APK install, private app data, and OBB/external-data payloads are
+  supported, external, partial, unsupported, or unknown. APK pulls now log local
+  byte counts and SHA-256 hashes for package provenance.
 
 ## v0.9.0-pre — 2026-05-17
 
