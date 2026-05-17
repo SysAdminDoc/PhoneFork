@@ -19,9 +19,9 @@
 | L13 | `src/PhoneFork.Core/Services/*` | Current service architecture. |
 | L14 | `helper-apk/app/build.gradle.kts` | Helper targetSdk/minSdk and build state. |
 | L15 | `helper-apk/app/src/main/AndroidManifest.xml` | Helper permissions and provider authorities. |
-| L16 | `helper-apk/app/src/main/java/.../BaseHelperProvider.kt` | Shell/system UID gate and `not-implemented` provider default. |
-| L17 | `helper-apk/README.md` | Helper APK status and wire-protocol plan. |
-| L18 | `.github/workflows/ci.yml` | CI scope and helper APK tree-only check. |
+| L16 | `helper-apk/app/src/main/java/.../BaseHelperProvider.kt` and `Providers.kt` | Shell/system UID gate, v1 JSON envelopes, category export bodies, and guarded restore endpoints. |
+| L17 | `helper-apk/README.md` | Helper APK status, wire protocol, build, signing, and verified staging plan. |
+| L18 | `.github/workflows/ci.yml` | CI scope, helper APK assemble, metadata verification, signing check, and artifact upload. |
 | L19 | `.github/workflows/release.yml` | Release artifacts, signing slots, attestation slot. |
 | L20 | `docs/competitor-research.md` | Commercial competitor baseline. |
 | L21 | `docs/community-signal.md` | Prior community pain-point harvest. |
@@ -33,6 +33,7 @@
 | L27 | `dotnet list PhoneFork.slnx package --outdated` | Current package upgrade candidates. |
 | L28 | `dotnet list PhoneFork.slnx package --vulnerable --include-transitive` | Vulnerability scan. |
 | L29 | `dotnet list PhoneFork.slnx package --deprecated` | Deprecated package scan. |
+| L30 | `scripts/Stage-HelperApk.ps1` | Verified helper APK staging gate for host packaging. |
 
 ## Instruction And Memory Sources
 

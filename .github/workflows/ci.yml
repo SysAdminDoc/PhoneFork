@@ -42,25 +42,67 @@ jobs:
         shell: pwsh
 
   helper-apk-lint:
-    name: helper-apk gradle (lint-only)
+    name: helper-apk assemble
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
-      - name: Gradle help (settings + manifest probe)
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platforms;android-36" "build-tools;35.0.0" "platform-tools"
+
+      - name: Build helper APK
+        working-directory: helper-apk
+        run: gradle --no-daemon :app:assembleDebug :app:assembleRelease
+
+      - name: Verify helper APK metadata and staging gate
         working-directory: helper-apk
         run: |
-          # The helper APK build is wired to assembleRelease in the v0.7.x stream.
-          # We don't ship Gradle Wrapper jars in the repo, so for now this job only
-          # verifies that the project tree parses. The "Build helper APK" job below
-          # (gated behind the helper-apk-build label) does the real assembleRelease.
-          test -f settings.gradle.kts
-          test -f app/build.gradle.kts
-          test -f app/src/main/AndroidManifest.xml
-          echo "helper-apk tree OK"
+          set -euo pipefail
+          release_apk="app/build/outputs/apk/release/app-release-unsigned.apk"
+          debug_apk="app/build/outputs/apk/debug/app-debug.apk"
+          ci_signed_apk="../artifacts/helper/PhoneForkHelper-ci-signed.apk"
+          test -f "$release_apk"
+          test -f "$debug_apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$release_apk" | tee helper-apk-metadata.txt
+          mkdir -p ../artifacts/helper
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+            --ks "$HOME/.android/debug.keystore" \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            --out "$ci_signed_apk" \
+            "$release_apk"
+          pwsh ../scripts/Stage-HelperApk.ps1 \
+            -ApkPath "$ci_signed_apk" \
+            -OutputDirectory artifacts/helper \
+            -AaptPath "$ANDROID_HOME/build-tools/35.0.0/aapt" \
+            -ApkSignerPath "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          cat ../artifacts/helper/PhoneForkHelper.apk.metadata.txt | tee -a helper-apk-metadata.txt
+          grep -q "package: name='com.sysadmindoc.phonefork.helper'" helper-apk-metadata.txt
+          grep -q "sdkVersion:'30'" helper-apk-metadata.txt
+          grep -q "targetSdkVersion:'36'" helper-apk-metadata.txt
+
+      - name: Upload helper APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phonefork-helper-apks
+          path: |
+            helper-apk/app/build/outputs/apk/debug/app-debug.apk
+            helper-apk/app/build/outputs/apk/release/app-release-unsigned.apk
+            helper-apk/helper-apk-metadata.txt
+            artifacts/helper/PhoneForkHelper-ci-signed.apk
+            artifacts/helper/PhoneForkHelper.apk
+            artifacts/helper/PhoneForkHelper.apk.metadata.txt
+            artifacts/helper/PhoneForkHelper.apk.sha256

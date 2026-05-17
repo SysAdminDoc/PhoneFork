@@ -79,14 +79,36 @@ public sealed class HelperAppService
         if (!Authorities.Contains(authority))
             throw new ArgumentException($"Unknown helper authority: {authority}", nameof(authority));
 
-        var uri = $"content://{AuthorityPrefix}.{authority}/health";
+        var uri = HelperProviderContract.BuildQueryUri(authority, path: "health");
         var output = await _client.ShellAsync(device,
             $"content query --uri {AdbShell.Arg(uri)} --projection json", ct);
 
-        if (string.IsNullOrWhiteSpace(output)) return null;
-        // `content query` emits "Row: 0 json=<payload>" — extract the json= field.
-        var idx = output.IndexOf("json=", StringComparison.Ordinal);
-        return idx < 0 ? output.Trim() : output[(idx + "json=".Length)..].Trim();
+        return HelperProviderContract.ExtractJsonFromContentQuery(output);
+    }
+
+    /// <summary>
+    /// Query a helper authority and parse the v1 JSON envelope into a typed host DTO.
+    /// </summary>
+    public async Task<HelperProviderEnvelope?> QueryAsync(
+        DeviceData device,
+        string authority,
+        int? limit = null,
+        int? offset = null,
+        CancellationToken ct = default)
+    {
+        var uri = HelperProviderContract.BuildQueryUri(authority, limit: limit, offset: offset);
+        using var audit = ProviderCallAudit.Begin($"{authority}.query", device.Serial, null, null, _log);
+        var output = await _client.ShellAsync(device,
+            $"content query --uri {AdbShell.Arg(uri)} --projection json", ct);
+        var json = HelperProviderContract.ExtractJsonFromContentQuery(output);
+        if (!HelperProviderContract.TryParseEnvelope(json, out var envelope))
+        {
+            audit.End(ok: false, note: "invalid-or-empty-provider-envelope");
+            return null;
+        }
+
+        audit.End(ok: envelope!.IsOk, rowsTouched: envelope.Count, note: envelope.Status);
+        return envelope;
     }
 
     /// <summary>
@@ -102,7 +124,7 @@ public sealed class HelperAppService
             try
             {
                 var resp = await HealthCheckAsync(device, auth, ct);
-                results[auth] = !string.IsNullOrWhiteSpace(resp) && resp.Contains("\"ok\":true", StringComparison.Ordinal);
+                results[auth] = HelperProviderContract.TryParseEnvelope(resp, out var envelope) && envelope!.IsOk;
             }
             catch (Exception ex)
             {

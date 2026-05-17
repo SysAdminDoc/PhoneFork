@@ -11,7 +11,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 ## Current Repository State
 
 - Repo: `SysAdminDoc/PhoneFork`, public, MIT, default branch `main`.
-- Local branch: `main`, four commits ahead of `origin/main` before this research commit.
+- Local branch: `main`, five commits ahead of `origin/main` before this implementation batch.
 - Current product state: `v0.9.0-pre` per `CHANGELOG.md`.
 - Visible version strings synced on 2026-05-17: README badge `0.9.0-pre`, WPF title `v0.9.0-pre`, app manifest `0.9.0.0`.
 - No GitHub releases or tags exist yet. GitHub reports 0 stars, 0 issues, and 0 pull requests.
@@ -26,7 +26,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - APK parsing: AlphaOmega.ApkReader 2.0.10.
 - Logging: Serilog + CompactJsonFormatter NDJSON audit logs.
 - QR: QRCoder.
-- Helper APK: Kotlin / Android Gradle Plugin 8.7.0 / targetSdk 36 / minSdk 30.
+- Helper APK: Kotlin 2.3.21 / Android Gradle Plugin 8.13.2 / targetSdk 36 / minSdk 30.
 - Tests: xUnit Core tests under `tests/PhoneFork.Core.Tests`.
 
 ## Current Architecture
@@ -34,9 +34,9 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - `src/PhoneFork.Core`: ADB host, shell quoting, device inventory, app migration, media diff/sync, settings diff/apply, debloat dataset, wireless ADB policy, trusted-pair registry, Smart Switch detection, backup interop, pre-flight, integrity verification, and helper lifecycle services.
 - `src/PhoneFork.App`: WPF shell, Catppuccin Mocha theme, device bar, and migration tabs.
 - `src/PhoneFork.Cli`: scriptable command surface for devices, apps, media, settings, debloat, Wi-Fi, CSC, roles, permissions, wireless ADB pairing/connect/disconnect, mDNS, honesty, helper lifecycle, Shizuku, Smart Switch, trusted pairs, and burst mode.
-- `helper-apk`: companion Android APK scaffold with provider authorities for SMS, call log, contacts, Wi-Fi, wallpaper, ringtone, and dictionary.
+- `helper-apk`: companion Android APK with provider authorities and v1 JSON export envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary.
 - `assets/debloat`: embedded AppManagerNG/UAD-NG package datasets plus PhoneFork overrides.
-- `.github/workflows`: Windows .NET CI and release packaging with Artifact Signing and provenance slots.
+- `.github/workflows`: Windows .NET CI, Linux helper APK assemble/metadata/staging CI, and release packaging with Artifact Signing and provenance slots.
 
 ## Shipped Capability Summary
 
@@ -52,8 +52,8 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 
 ## Known Gaps
 
-- Helper APK provider bodies are still stubs. `BaseHelperProvider` returns `{"status":"not-implemented"}` for category bodies; v0.7.1 should implement the provider contract.
-- Helper APK build is scaffolded but not validated in CI as a real release APK. CI currently checks tree shape only.
+- Helper APK restore writes are still guarded and intentionally disabled until the host workflow can sequence default-app and destructive-action confirmation safely.
+- Helper APK release signing is not wired; CI builds debug and unsigned release APKs, signs the release APK with the CI debug keystore for verification-only staging, and exercises the verified staging path.
 - WPF UI does not yet expose every Core service added in v0.7.0-v0.9.0-pre.
 - No tagged signed release exists yet; README now directs users to build from source until a release is published.
 - Signing secrets are intentionally not provisioned.
@@ -80,6 +80,12 @@ dotnet build PhoneFork.slnx -c Release --no-restore
 dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release --no-build
 dotnet list PhoneFork.slnx package --vulnerable --include-transitive
 dotnet list PhoneFork.slnx package --outdated
+```
+
+After signing a helper release APK, stage it for host packaging with:
+
+```powershell
+pwsh scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk -OutputDirectory assets/helper
 ```
 
 Useful smoke commands when a device or host UI is available:
