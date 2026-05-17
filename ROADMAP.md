@@ -253,6 +253,12 @@ Sources: S10, L13, L21.
 ### R009 - Media sync resilience and evidence trail
 
 Priority: P1. Impact: 5. Effort: 4. Risk: 3.
+Status: Completed 2026-05-17. Media sync now writes resumable checkpoint JSON,
+emits a JSON evidence report, records skipped/retried/failed/user-deferred
+entries, samples throughput and ETA through progress, warns on huge files, and
+can defer a single-large-file transfer to Quick Share when explicitly requested.
+The existing integrity service continues to distinguish size+mtime, CRC32, and
+SHA-256 verification levels.
 
 Harden large media migration with checkpoints, retry/replay manifests, ETA,
 throughput sampling, huge-file warnings, partial failure recovery, and an
