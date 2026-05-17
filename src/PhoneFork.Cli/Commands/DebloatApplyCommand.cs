@@ -24,6 +24,14 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
 
         [CommandOption("--dry-run")] [Description("Print what would change; don't disable anything.")]
         public bool DryRun { get; init; }
+
+        [CommandOption("--overlay-feed <PATH>")]
+        [Description("Checksummed out-of-band debloat override feed JSON.")]
+        public string? OverlayFeed { get; init; }
+
+        [CommandOption("--overlay-sha256 <SHA256>")]
+        [Description("Expected SHA-256 for --overlay-feed. If omitted, <feed>.sha256 is required.")]
+        public string? OverlaySha256 { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -33,7 +41,8 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
         var picked = devices.FirstOrDefault(d => d.Serial == s.Serial);
         if (picked is null) { AnsiConsole.MarkupLine($"[red]Device {Markup.Escape(s.Serial)} not connected.[/]"); return 1; }
 
-        var dataset = DebloatDataset.Load(log);
+        var dataset = await DebloatDatasetResolver.LoadForDeviceAsync(
+            host.Client, picked, log, s.OverlayFeed, s.OverlaySha256, ct);
         var scanner = new DebloatScanner(host.Client, log, dataset);
         var candidates = await scanner.ScanAsync(picked, ct);
 

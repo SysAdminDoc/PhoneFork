@@ -276,6 +276,11 @@ Sources: L13, S11, S12, G10, G11, G18.
 ### R010 - Debloat safety feed and out-of-band overrides
 
 Priority: P1. Impact: 4. Effort: 3. Risk: 3.
+Status: Completed 2026-05-17. Override rows now carry OEM, One UI/Android
+predicates, action, risk, source, review date, and expiry metadata. The
+embedded dataset remains offline-first, and CLI debloat list/apply can load an
+external JSON feed only when verified by `--overlay-sha256` or a `.sha256`
+sidecar.
 
 The embedded dataset is valuable but OEM regressions change quickly. Add a
 signed or checksummed overlay feed so known-bad package actions can be patched
