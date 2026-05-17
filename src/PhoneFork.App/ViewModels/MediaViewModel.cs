@@ -141,7 +141,7 @@ public partial class MediaViewModel : ObservableObject
             var result = await svc.ApplyAsync(srcData, dstData, _lastPlan, options, prog, ct);
             Status = DryRun
                 ? $"Dry-run done — plan was {TotalFiles} files / {TotalMib:F1} MiB."
-                : $"Pulled {result.FilesPulled}, pushed {result.FilesPushed}, skipped {result.FilesSkipped}, renamed {result.FilesRenamedAsConflict}, deleted {result.FilesDeleted}, errors {result.Errors} in {result.Elapsed.TotalSeconds:F1}s.";
+                : $"Pulled {result.FilesPulled}, pushed {result.FilesPushed}, skipped {result.FilesSkipped}, retried {result.FilesRetried}, deferred {result.FilesDeferred}, renamed {result.FilesRenamedAsConflict}, deleted {result.FilesDeleted}, errors {result.Errors} in {result.Elapsed.TotalSeconds:F1}s. Report: {result.ReportPath}";
         }
         catch (Exception ex)
         {
