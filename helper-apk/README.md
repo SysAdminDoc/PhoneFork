@@ -1,6 +1,6 @@
 # PhoneForkHelper
 
-Companion Android APK for PhoneFork (v0.7.0). Surfaces categories that `adb shell` alone cannot reach without a manifest-permission-holding process: SMS, call log, contacts, Wi-Fi networks (with PSK), wallpaper, ringtones, and user dictionary.
+Companion Android APK for PhoneFork. Surfaces categories that `adb shell` alone cannot reach without a manifest-permission-holding process: SMS, call log, contacts, Wi-Fi metadata, wallpaper metadata, ringtones, and user dictionary.
 
 ## Architecture
 
@@ -24,17 +24,17 @@ adb shell content insert --uri content://com.sysadmindoc.phonefork.helper/sms/re
 ```bash
 cd helper-apk
 ./gradlew assembleRelease
-# Output: app/build/outputs/apk/release/PhoneForkHelper-release.apk
+# Output: app/build/outputs/apk/release/app-release-unsigned.apk
 ```
 
-Sign with `apksigner`:
+Sign with `apksigner`, then stage through the host packaging gate:
 
 ```bash
-apksigner sign --ks ~/.android/phonefork-helper/phonefork-helper.jks --out PhoneForkHelper.apk app/build/outputs/apk/release/PhoneForkHelper-release-unsigned.apk
-apksigner verify --print-certs PhoneForkHelper.apk
+apksigner sign --ks ~/.android/phonefork-helper/phonefork-helper.jks --out PhoneForkHelper.apk app/build/outputs/apk/release/app-release-unsigned.apk
+pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 ```
 
-CI smoke (F020) calls `apksigner verify --print-certs` before embedding the artifact in the .NET publish.
+`Stage-HelperApk.ps1` verifies package name, minSdk, targetSdk, and APK signature before copying the artifact to `assets/helper/PhoneForkHelper.apk`, which is the only default path consumed by the host app and CLI. CI now assembles debug and release helper APKs, dumps package metadata from the release artifact, signs the release APK with the CI debug keystore for verification-only staging, and uploads metadata plus APK artifacts. Release signing remains a packaging step.
 
 ## Target SDK policy
 
@@ -44,4 +44,4 @@ CI smoke (F020) calls `apksigner verify --print-certs` before embedding the arti
 
 ## Status
 
-**v0.7.0 — work in progress.** Gradle scaffold + manifest + ContentProvider stubs exist; provider bodies and JAR push-and-run path follow.
+**v0.9.0-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.

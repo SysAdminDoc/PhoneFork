@@ -38,3 +38,31 @@
 - `dotnet list PhoneFork.slnx package --outdated`: completed; upgrade candidates recorded in `SECURITY_AND_DEPENDENCY_REVIEW.md`.
 - `dotnet build PhoneFork.slnx -c Release`: passed after the CLI command signature fix.
 - `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 122 tests.
+
+## Continuation Implementation - R001/R002
+
+Additional files created or modified after the research commit:
+
+- `helper-apk/app/src/main/java/com/sysadmindoc/phonefork/helper/providers/BaseHelperProvider.kt`: changed health/default responses to the `phonefork.helper.v1` envelope.
+- `helper-apk/app/src/main/java/com/sysadmindoc/phonefork/helper/providers/Providers.kt`: implemented SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary export bodies with pagination and guarded restore endpoints.
+- `src/PhoneFork.Core/Services/HelperProviderContract.cs`: added typed host parser, URI builder, and content-query JSON extraction for helper envelopes.
+- `src/PhoneFork.Core/Services/HelperAppService.cs`: added typed provider querying and audit-scoped helper calls.
+- `tests/PhoneFork.Core.Tests/HelperAppServiceTests.cs`: added malformed JSON, empty response, pagination, capability, and URI contract coverage.
+- `helper-apk/build.gradle.kts` and `helper-apk/app/build.gradle.kts`: updated the helper stack to AGP 8.13.2 and Kotlin 2.3.21 with Java 17 target settings.
+- `.github/workflows/ci.yml`: replaced tree-only helper validation with debug/release assembly, release metadata verification, CI debug-keystore signing for staging verification, signature verification, and artifact upload.
+- `scripts/Stage-HelperApk.ps1`: added the verified staging gate used before the host consumes `assets/helper/PhoneForkHelper.apk`.
+- `src/PhoneFork.Cli/PhoneFork.Cli.csproj` and `src/PhoneFork.App/PhoneFork.App.csproj`: copy a staged helper artifact into host outputs when present.
+- `helper-apk/README.md`, `PROJECT_CONTEXT.md`, `ROADMAP.md`, `SOURCE_REGISTER.md`, and this file: reconciled roadmap and memory state with the implemented helper provider/CI path.
+
+R001 is complete for export/provider contract behavior. R002 is complete for CI build, metadata verification, and verified host staging; release signing remains explicitly tracked under R004/R011.
+
+Continuation verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
+- `gradle --no-daemon :app:assembleDebug :app:assembleRelease` in `helper-apk`: passed with Gradle 8.13 and Android SDK 36.
+- `scripts/Stage-HelperApk.ps1` against a CI debug-keystore-signed release APK: passed and produced `artifacts/helper/PhoneForkHelper.apk` plus metadata and SHA-256 files.
+- `aapt dump badging helper-apk/app/build/outputs/apk/release/app-release-unsigned.apk`: confirmed package `com.sysadmindoc.phonefork.helper`, versionCode `2`, versionName `0.9.0-pre`, minSdk `30`, and targetSdk `36`.
+- `apksigner verify --print-certs artifacts/helper/PhoneForkHelper.apk`: passed with the local Android debug certificate for verification-only staging.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

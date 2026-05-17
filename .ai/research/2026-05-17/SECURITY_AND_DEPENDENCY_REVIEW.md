@@ -55,8 +55,12 @@ Sources: S02, S05, S06.
 Current state:
 
 - Helper providers include a shell/system UID gate.
-- The default provider body returns `status:not-implemented`.
-- Sensitive permissions are present in the manifest scaffold.
+- Helper providers emit versioned JSON envelopes for SMS, call log, contacts,
+  Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user
+  dictionary rows.
+- Restore endpoints remain guarded and intentionally disabled pending host-side
+  destructive-action confirmation.
+- Sensitive permissions are present in the manifest.
 
 Risks:
 
@@ -74,8 +78,10 @@ Required hardening:
   empty data, large data, and permission-denied Android states.
 - Include helper version, package, signature, targetSdk, and minSdk in host
   probe output.
+- Keep the host packaging path behind `scripts/Stage-HelperApk.ps1` so copied
+  helper APKs have validated package metadata and signatures before use.
 
-Sources: L14-L17, G20.
+Sources: L14-L18, L30, G20.
 
 ## Windows Release And Supply Chain
 
