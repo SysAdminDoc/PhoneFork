@@ -109,6 +109,35 @@ public sealed class MediaSyncCommand : AsyncCommand<MediaSyncCommand.Settings>
             AnsiConsole.MarkupLine($"[grey]Checkpoint:[/] {Markup.Escape(result.CheckpointPath)}");
         if (!string.IsNullOrWhiteSpace(result.ReportPath))
             AnsiConsole.MarkupLine($"[grey]Report:[/] {Markup.Escape(result.ReportPath)}");
+        var receiptArtifacts = new List<MigrationReceiptArtifact>();
+        if (!string.IsNullOrWhiteSpace(result.CheckpointPath))
+            receiptArtifacts.Add(new MigrationReceiptArtifact("checkpoint", result.CheckpointPath));
+        if (!string.IsNullOrWhiteSpace(result.ReportPath))
+            receiptArtifacts.Add(new MigrationReceiptArtifact("evidence-report", result.ReportPath));
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "media-sync",
+                dryRun: s.DryRun,
+                devices: new[]
+                {
+                    MigrationReceiptService.Device("source", src),
+                    MigrationReceiptService.Device("destination", dst),
+                },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "media",
+                        planned: plan.TotalFilesToTransfer + (s.Delete ? plan.CategoryDiffs.Sum(c => c.Count(PhoneFork.Core.Services.MediaDiffOutcome.NewOnDest)) : 0),
+                        succeeded: result.FilesPushed + result.FilesDeleted,
+                        skipped: result.FilesSkipped + result.FilesDeferred,
+                        failed: result.Errors,
+                        warnings: result.Advisories.Select(a => $"{a.Kind}: {a.RelPath} - {a.Detail}"),
+                        artifacts: receiptArtifacts),
+                },
+                warnings: result.Advisories.Select(a => a.Detail),
+                artifacts: receiptArtifacts),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         AnsiConsole.MarkupLine($"[grey]Elapsed: {result.Elapsed.TotalSeconds:F1}s[/]");
         return result.Errors == 0 ? 0 : 2;
     }

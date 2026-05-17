@@ -116,6 +116,7 @@ public partial class SettingsViewModel : ObservableObject
     {
         var dstPhone = _devices.RoleHolder(DeviceRole.Destination);
         if (dstPhone is null) return;
+        var srcPhone = _devices.RoleHolder(DeviceRole.Source);
         var dstData = _host.GetDevices().FirstOrDefault(d => d.Serial == dstPhone.Serial);
         if (dstData is null) { Status = "Destination disconnected."; return; }
 
@@ -129,9 +130,32 @@ public partial class SettingsViewModel : ObservableObject
             var apply = new SettingsApplyService(_host.Client, _log);
             var result = await apply.ApplyAsync(dstData, picked, DryRun,
                 new Progress<string>(_ => { }), ct);
+            var receiptPath = await new MigrationReceiptService(_log).WriteAsync(
+                MigrationReceiptService.Create(
+                    operation: "wpf-settings-apply",
+                    dryRun: DryRun,
+                    devices: srcPhone is null
+                        ? new[] { MigrationReceiptService.Device("destination", dstData) }
+                        : new[]
+                        {
+                            MigrationReceiptService.Device("source", srcPhone),
+                            MigrationReceiptService.Device("destination", dstData),
+                        },
+                    categories: new[]
+                    {
+                        MigrationReceiptService.Category(
+                            "settings",
+                            planned: picked.Count,
+                            succeeded: result.Applied,
+                            skipped: result.Skipped,
+                            failed: result.Failed,
+                            failureDetails: result.Failures.Select(f => $"{f.Ns}/{f.Key}: {f.Error}")),
+                    },
+                    warnings: new[] { "WPF settings apply uses reviewed safe corpus keys only." }),
+                ct);
             Status = DryRun
-                ? $"Dry-run: would apply {result.Applied}, skipped {result.Skipped} locked/dangerous."
-                : $"Applied {result.Applied}, skipped {result.Skipped}, failed {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.";
+                ? $"Dry-run: would apply {result.Applied}, skipped {result.Skipped}. Receipt: {receiptPath}"
+                : $"Applied {result.Applied}, skipped {result.Skipped}, failed {result.Failed} in {result.Elapsed.TotalSeconds:F1}s. Receipt: {receiptPath}";
         }
         catch (Exception ex)
         {

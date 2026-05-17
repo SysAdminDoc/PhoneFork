@@ -65,6 +65,27 @@ public sealed class RolesApplyCommand : AsyncCommand<RolesApplyCommand.Settings>
         if (result.Failed > 0)
             foreach (var f in result.Failures)
                 AnsiConsole.MarkupLine($"  [red]{Markup.Escape(f.Role)}[/] -> {Markup.Escape(f.Pkg)}: {Markup.Escape(f.Error)}");
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "roles-apply",
+                dryRun: s.DryRun,
+                devices: new[]
+                {
+                    MigrationReceiptService.Device("source", src),
+                    MigrationReceiptService.Device("destination", dst),
+                },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "roles",
+                        planned: queued.Count,
+                        succeeded: result.Applied,
+                        skipped: 0,
+                        failed: result.Failed,
+                        failureDetails: result.Failures.Select(f => $"{f.Role}->{f.Pkg}: {f.Error}")),
+                }),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         return result.Failed == 0 ? 0 : 2;
     }
 }

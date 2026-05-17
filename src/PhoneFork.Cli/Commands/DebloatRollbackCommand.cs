@@ -40,6 +40,26 @@ public sealed class DebloatRollbackCommand : AsyncCommand<DebloatRollbackCommand
             new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")), ct,
             allowMultiUser: s.AllowMultiUser);
         AnsiConsole.MarkupLine($"[green]re-enabled[/] {result.ReEnabled}, [grey]already enabled[/] {result.AlreadyEnabled}, [red]failed[/] {result.Failed} in {result.Elapsed.TotalSeconds:F1}s.");
+        var snapshotArtifact = new MigrationReceiptArtifact("rollback-snapshot", s.SnapshotPath);
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "debloat-rollback",
+                dryRun: s.DryRun,
+                devices: new[] { MigrationReceiptService.Device("destination", picked) },
+                categories: new[]
+                {
+                    MigrationReceiptService.Category(
+                        "debloat",
+                        planned: snap.EnabledSystemPackages.Count,
+                        succeeded: result.ReEnabled,
+                        skipped: result.AlreadyEnabled,
+                        failed: result.Failed,
+                        failureDetails: result.Results.Where(r => !r.Success).Select(r => $"{r.PackageId}: {r.Output}"),
+                        artifacts: new[] { snapshotArtifact }),
+                },
+                artifacts: new[] { snapshotArtifact }),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         return result.Failed == 0 ? 0 : 2;
     }
 }

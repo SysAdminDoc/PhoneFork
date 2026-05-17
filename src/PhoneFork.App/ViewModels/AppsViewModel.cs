@@ -93,6 +93,7 @@ public partial class AppsViewModel : ObservableObject
             var installer = new AppInstallerService(_host.Client, _log);
             var picked = Rows.Where(r => r.IsSelected).ToList();
             int ok = 0, fail = 0;
+            var failureDetails = new List<string>();
 
             foreach (var row in picked)
             {
@@ -111,17 +112,44 @@ public partial class AppsViewModel : ObservableObject
                     {
                         var r = await installer.MigrateAsync(srcData, dstData, row.App, Reinstall, progress, ct);
                         row.Status = r.Success ? $"Migrated ({r.Duration.TotalSeconds:F1}s)" : $"Failed: {r.Error}";
-                        if (r.Success) ok++; else fail++;
+                        if (r.Success) ok++;
+                        else
+                        {
+                            fail++;
+                            failureDetails.Add($"{r.PackageName}: {r.Error ?? "(unknown)"}");
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     row.Status = $"Failed: {ex.Message}";
+                    failureDetails.Add($"{row.App.PackageName}: {ex.Message}");
                     fail++;
                 }
             }
 
-            Status = $"{ok} migrated, {fail} failed.";
+            var receiptPath = await new MigrationReceiptService(_log).WriteAsync(
+                MigrationReceiptService.Create(
+                    operation: "wpf-apps-migrate",
+                    dryRun: DryRun,
+                    devices: new[]
+                    {
+                        MigrationReceiptService.Device("source", src),
+                        MigrationReceiptService.Device("destination", dst),
+                    },
+                    categories: new[]
+                    {
+                        MigrationReceiptService.Category(
+                            "apps",
+                            planned: picked.Count,
+                            succeeded: ok,
+                            skipped: 0,
+                            failed: fail,
+                            failureDetails: failureDetails),
+                    }),
+                ct);
+
+            Status = $"{ok} migrated, {fail} failed. Receipt: {receiptPath}";
         }
         finally
         {
