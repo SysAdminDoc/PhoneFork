@@ -9,6 +9,9 @@ All notable changes to PhoneFork.
   export-appmanager`, and `backup install-appmanager` now expose checksum
   verification, package listing, APK/split export, and local APK-set install
   from AppManager-compatible backup directories.
+- Samsung Messages / Google Messages transition pre-flight checks detect the
+  SMS default role, installed messaging apps, the US July 2026 retirement path,
+  and whether helper-assisted SMS work is safe to proceed.
 
 ## v0.9.0-pre — 2026-05-17
 

@@ -86,6 +86,7 @@ public partial class OperationsViewModel : ObservableObject
     [ObservableProperty] private string _trustedLine = "Trusted pairs not loaded.";
     [ObservableProperty] private string _burstLine = "ADB Burst Mode not checked.";
     [ObservableProperty] private string _preflightLine = "Pre-flight not run.";
+    [ObservableProperty] private string _messagesLine = "Messages transition not checked.";
     [ObservableProperty] private string _mediaIntegrityLine = "Media integrity not run.";
 
     public OperationsViewModel(DeviceService devices, AdbHostService host, SecurityPostureService posture, TrustedPairRegistry trusted, ILogger log)
@@ -180,15 +181,17 @@ public partial class OperationsViewModel : ObservableObject
             var report = await svc.RunAsync(source, destination, token);
 
             PreflightFindings.Clear();
-            foreach (var finding in report.SamsungHonesty.Findings)
+            foreach (var finding in report.AllFindings)
                 PreflightFindings.Add(new PreflightFindingRowViewModel(finding));
+            MessagesLine = report.Messages.Summary;
 
             var csc = report.Csc is null
                 ? "CSC unavailable"
                 : $"CSC {report.Csc.SourceCsc}/{report.Csc.SourceCountry}/{report.Csc.SourceLocale} -> {report.Csc.DestinationCsc}/{report.Csc.DestinationCountry}/{report.Csc.DestinationLocale}";
-            PreflightLine = $"{sourceLabel} -> {destinationLabel}: {report.SamsungHonesty.BlockerCount} blockers, {report.WarningCount} warnings. {csc}. Source {report.SourcePosture.SummaryLine()}; destination {report.DestinationPosture.SummaryLine()}.";
+            PreflightLine = $"{sourceLabel} -> {destinationLabel}: {report.BlockerCount} blockers, {report.WarningCount} warnings. {csc}. Source {report.SourcePosture.SummaryLine()}; destination {report.DestinationPosture.SummaryLine()}.";
             Status = PreflightLine;
             AddRow("Pre-flight", report.HasBlockers ? "Blockers" : "Complete", PreflightLine, report.HasBlockers ? "Blocker" : "Info");
+            AddRow("Messages", report.Messages.CanUseHelperSms ? "Clear" : "Review", MessagesLine, report.Messages.CanUseHelperSms ? "Info" : "Warning");
         }, ct);
     }
 
