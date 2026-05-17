@@ -17,7 +17,7 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 |---|---|---|
 | **Apps** | All `-3` user apps + their split APKs | `pm path` → `adb pull` → `pm install-create/-write/-commit -i com.android.vending --install-reason 4` |
 | **Media** | DCIM, Pictures, Movies, Download, Documents, Music, Ringtones, Notifications, Alarms | Incremental manifest diff + `adb pull/push` |
-| **Settings** | AOSP `secure`/`system`/`global` + Samsung One UI keys (AOD, edge panels, refresh rate, font scale, status-bar tweaks) | `settings list` snapshot diff + cherry-picked `settings put` |
+| **Settings** | AOSP `secure`/`system`/`global` + reviewed safe Samsung One UI keys (AOD, edge panels, display, sound, navigation) | `settings list` snapshot diff + safety-corpus-gated `settings put` |
 | **Debloat** | Apply [AppManagerNG](https://github.com/SysAdminDoc/AppManagerNG)'s 5,481-entry curated bloat list | `pm disable-user --user 0` (reversible) |
 | **Wi-Fi** | Saved-network visibility where Android permits + QR-bridge fallback; helper-assisted PSK export is planned | `cmd wifi` / shell probes where available, or `WIFI:T=WPA;S=…;P=…;;` QR |
 | **Roles** | Default dialer, SMS, browser, launcher, assistant | `cmd role add-role-holder` |
@@ -68,7 +68,8 @@ phonefork apps report --device <serial> [--json]
 phonefork apps migrate --from <src> --to <dst> [--dry-run] [--allow-multi-user]
 phonefork media sync   --from <src> --to <dst> [--checkpoint path] [--report path]
 phonefork settings dump --device <serial> --out settings.json
-phonefork settings apply --from <src> --to <dst> [--allow-multi-user]
+phonefork settings diff --src source.json --dst dest.json [--show-safety]
+phonefork settings apply --from <src> --to <dst> [--allow-multi-user] [--include-uncatalogued-settings]
 phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed feed.json --overlay-sha256 <sha256>] [--allow-multi-user]
 phonefork backup inspect <path> [--json]
 phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
@@ -86,6 +87,11 @@ primary-user-only by default. PhoneFork probes Android user/profile topology
 first and refuses work-profile or secondary-user devices unless the CLI caller
 explicitly passes `--allow-multi-user`; the WPF cockpit blocks those writes for
 now.
+
+Settings apply is corpus-gated. By default, PhoneFork applies only reviewed safe
+Samsung/Android settings and reports review-only, blocked, and unknown keys in
+the read-only diff. CLI callers can opt into non-blocked uncatalogued keys with
+`--include-uncatalogued-settings`.
 
 Media sync resumes from the checkpoint JSON, writes an evidence report JSON, and emits Quick Share guidance only for single large ad hoc files where a full ADB sync is not the best tool.
 
