@@ -57,6 +57,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 - WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain incomplete.
 - No tagged signed release exists yet; README now directs users to build from source until a release is published.
 - Signing secrets are intentionally not provisioned.
+- Release readiness notes live in `docs/release-readiness.md`; public tag/release is still pending screenshots and signed-vs-unsigned prerelease decision.
 - Current dependency scan is clean for vulnerabilities, but several packages have current upgrades and test `xunit` is flagged as legacy.
 - Hardware validation was not available in this research session.
 
