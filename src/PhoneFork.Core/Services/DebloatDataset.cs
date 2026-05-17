@@ -1,6 +1,9 @@
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.Models;
 using PhoneFork.Core.Models;
 using Serilog;
 
@@ -13,13 +16,18 @@ namespace PhoneFork.Core.Services;
 public sealed record DebloatOverride
 {
     [JsonPropertyName("packageId")] public required string PackageId { get; init; }
+    [JsonPropertyName("oem")] public string? Oem { get; init; }
     [JsonPropertyName("oneUi")] public string? OneUi { get; init; }
     [JsonPropertyName("android")] public string? Android { get; init; }
     [JsonPropertyName("tier")] public string? Tier { get; init; }
+    [JsonPropertyName("action")] public string? Action { get; init; }
+    [JsonPropertyName("risk")] public string? Risk { get; init; }
     [JsonPropertyName("warning")] public string? Warning { get; init; }
     [JsonPropertyName("source")] public string? Source { get; init; }
+    [JsonPropertyName("expiresAt")] public string? ExpiresAt { get; init; }
+    [JsonPropertyName("reviewAfter")] public string? ReviewAfter { get; init; }
 
-    public DebloatTier? ParsedTier => Tier?.ToLowerInvariant() switch
+    public DebloatTier? ParsedTier => (Tier ?? Action)?.ToLowerInvariant() switch
     {
         "delete" => DebloatTier.Delete,
         "replace" => DebloatTier.Replace,
@@ -27,6 +35,9 @@ public sealed record DebloatOverride
         "unsafe" => DebloatTier.Unsafe,
         _ => null,
     };
+
+    public bool IsExpired(DateOnly today) =>
+        DateOnly.TryParse(ExpiresAt, out var expires) && expires < today;
 }
 
 /// <summary>
@@ -34,7 +45,66 @@ public sealed record DebloatOverride
 /// </summary>
 public sealed record DebloatOverridesFile
 {
+    [JsonPropertyName("$schema")] public string? Schema { get; init; }
+    [JsonPropertyName("generatedAt")] public string? GeneratedAt { get; init; }
+    [JsonPropertyName("source")] public string? Source { get; init; }
     [JsonPropertyName("overrides")] public IReadOnlyList<DebloatOverride> Overrides { get; init; } = Array.Empty<DebloatOverride>();
+}
+
+public sealed record DebloatOverrideFeed(
+    string Path,
+    string Sha256,
+    IReadOnlyList<DebloatOverride> Overrides);
+
+public static class DebloatOverrideFeedLoader
+{
+    public static async Task<DebloatOverrideFeed> LoadAsync(
+        string path,
+        string? expectedSha256 = null,
+        bool requireChecksum = true,
+        CancellationToken ct = default)
+    {
+        if (!File.Exists(path))
+            throw new FileNotFoundException("Debloat override feed not found.", path);
+
+        var actual = await Sha256Async(path, ct);
+        var expected = NormalizeSha256(expectedSha256) ?? await TryReadSidecarSha256Async(path, ct);
+        if (requireChecksum && string.IsNullOrWhiteSpace(expected))
+            throw new InvalidOperationException("Debloat override feeds must be verified with --overlay-sha256 or a .sha256 sidecar file.");
+        if (!string.IsNullOrWhiteSpace(expected) && !string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException($"Debloat override feed checksum mismatch: expected {expected}, got {actual}.");
+
+        await using var stream = File.OpenRead(path);
+        var doc = await JsonSerializer.DeserializeAsync<DebloatOverridesFile>(stream, cancellationToken: ct)
+                  ?? throw new InvalidDataException("Debloat override feed did not deserialize.");
+        if (doc.Schema is not null && !doc.Schema.StartsWith("phonefork-debloat-overrides-", StringComparison.Ordinal))
+            throw new InvalidDataException($"Unsupported debloat override feed schema '{doc.Schema}'.");
+
+        return new DebloatOverrideFeed(path, actual, doc.Overrides);
+    }
+
+    private static async Task<string> Sha256Async(string path, CancellationToken ct)
+    {
+        await using var stream = File.OpenRead(path);
+        var hash = await SHA256.HashDataAsync(stream, ct);
+        return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static async Task<string?> TryReadSidecarSha256Async(string path, CancellationToken ct)
+    {
+        var sidecar = path + ".sha256";
+        if (!File.Exists(sidecar)) return null;
+        var text = await File.ReadAllTextAsync(sidecar, ct);
+        var token = text.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+        return NormalizeSha256(token);
+    }
+
+    private static string? NormalizeSha256(string? value)
+    {
+        var trimmed = value?.Trim();
+        if (trimmed is null || trimmed.Length != 64) return null;
+        return trimmed.All(Uri.IsHexDigit) ? trimmed.ToLowerInvariant() : null;
+    }
 }
 
 /// <summary>
@@ -113,16 +183,22 @@ public sealed class DebloatDataset
     /// from <c>ro.build.version.release</c>). Returns the same instance when nothing matches.
     /// </summary>
     public DebloatDataset WithOverridesFor(string oneUiVersionRaw, string androidVersionRaw)
+        => WithOverridesFor(oneUiVersionRaw, androidVersionRaw, oemRaw: null);
+
+    public DebloatDataset WithOverridesFor(string oneUiVersionRaw, string androidVersionRaw, string? oemRaw)
     {
         if (Overrides.Count == 0) return this;
 
         var oneUi = ParseOneUi(oneUiVersionRaw);
         var android = ParseAndroid(androidVersionRaw);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
         var modified = new Dictionary<string, DebloatEntry>(ByPackageId, StringComparer.Ordinal);
         var changed = 0;
         foreach (var ov in Overrides)
         {
+            if (ov.IsExpired(today)) continue;
+            if (!MatchesOem(ov.Oem, oemRaw)) continue;
             if (!MatchesOs(ov.OneUi, oneUi) || !MatchesOs(ov.Android, android)) continue;
             if (!modified.TryGetValue(ov.PackageId, out var entry))
             {
@@ -133,8 +209,8 @@ public sealed class DebloatDataset
                     PackageId = ov.PackageId,
                     Label = ov.PackageId,
                     Description = null,
-                    Warning = ov.Warning,
-                    Removal = (ov.Tier ?? "unsafe").ToLowerInvariant(),
+                    Warning = BuildOverrideWarning(null, ov),
+                    Removal = (ov.Tier ?? ov.Action ?? "unsafe").ToLowerInvariant(),
                     List = DebloatList.Misc,
                 };
                 modified[ov.PackageId] = entry;
@@ -146,12 +222,42 @@ public sealed class DebloatDataset
             modified[ov.PackageId] = entry with
             {
                 Removal = tier.ToString().ToLowerInvariant(),
-                Warning = string.IsNullOrWhiteSpace(ov.Warning) ? entry.Warning : ov.Warning,
+                Warning = BuildOverrideWarning(entry.Warning, ov),
             };
             changed++;
         }
         if (changed == 0) return this;
         return new DebloatDataset(modified.Values.ToArray(), Overrides);
+    }
+
+    public DebloatDataset WithOverrideFeed(DebloatOverrideFeed feed)
+    {
+        if (feed.Overrides.Count == 0) return this;
+        return new DebloatDataset(Entries, Overrides.Concat(feed.Overrides).ToArray());
+    }
+
+    internal static bool MatchesOem(string? predicate, string? oemRaw)
+    {
+        if (string.IsNullOrWhiteSpace(predicate) || predicate.Trim() == "*") return true;
+        if (string.IsNullOrWhiteSpace(oemRaw)) return false;
+
+        var oem = oemRaw.Trim();
+        return predicate.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Any(token => string.Equals(token, oem, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string? BuildOverrideWarning(string? existingWarning, DebloatOverride ov)
+    {
+        var warning = string.IsNullOrWhiteSpace(ov.Warning) ? existingWarning : ov.Warning;
+        var details = new List<string>();
+        if (!string.IsNullOrWhiteSpace(ov.Risk)) details.Add($"Risk: {ov.Risk}");
+        if (!string.IsNullOrWhiteSpace(ov.Source)) details.Add($"Source: {ov.Source}");
+        if (!string.IsNullOrWhiteSpace(ov.ReviewAfter)) details.Add($"Review after: {ov.ReviewAfter}");
+        if (!string.IsNullOrWhiteSpace(ov.ExpiresAt)) details.Add($"Expires: {ov.ExpiresAt}");
+        if (details.Count == 0) return warning;
+        return string.IsNullOrWhiteSpace(warning)
+            ? string.Join(" ", details)
+            : warning + " " + string.Join(" ", details);
     }
 
     internal static Version? ParseOneUi(string raw)
@@ -222,4 +328,42 @@ public sealed class DebloatDataset
 
     private static Version Normalize(Version v) =>
         new(v.Major, v.Minor >= 0 ? v.Minor : 0, v.Build >= 0 ? v.Build : 0);
+}
+
+public static class DebloatDatasetResolver
+{
+    public static async Task<DebloatDataset> LoadForDeviceAsync(
+        IAdbClient client,
+        DeviceData device,
+        ILogger log,
+        string? overlayFeedPath = null,
+        string? overlaySha256 = null,
+        CancellationToken ct = default)
+    {
+        var dataset = DebloatDataset.Load(log);
+        if (!string.IsNullOrWhiteSpace(overlayFeedPath))
+        {
+            var feed = await DebloatOverrideFeedLoader.LoadAsync(overlayFeedPath, overlaySha256, requireChecksum: true, ct);
+            dataset = dataset.WithOverrideFeed(feed);
+            log.Information("Loaded debloat overlay feed {Path} sha256={Sha256} overrides={Count}",
+                feed.Path, feed.Sha256, feed.Overrides.Count);
+        }
+
+        var oneUi = await SafeGetpropAsync(client, device, "ro.build.version.oneui", ct);
+        var android = await SafeGetpropAsync(client, device, "ro.build.version.release", ct);
+        var oem = await SafeGetpropAsync(client, device, "ro.product.manufacturer", ct);
+        return dataset.WithOverridesFor(oneUi, android, oem);
+    }
+
+    private static async Task<string> SafeGetpropAsync(IAdbClient client, DeviceData device, string prop, CancellationToken ct)
+    {
+        try
+        {
+            return (await client.ShellAsync(device, $"getprop {AdbShell.Arg(prop)}", ct)).Trim();
+        }
+        catch
+        {
+            return "";
+        }
+    }
 }

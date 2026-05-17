@@ -21,6 +21,14 @@ public sealed class DebloatListCommand : AsyncCommand<DebloatListCommand.Setting
 
         [CommandOption("--include-disabled")] [Description("Also show already-disabled rows (default: only currently enabled).")]
         public bool IncludeDisabled { get; init; }
+
+        [CommandOption("--overlay-feed <PATH>")]
+        [Description("Checksummed out-of-band debloat override feed JSON.")]
+        public string? OverlayFeed { get; init; }
+
+        [CommandOption("--overlay-sha256 <SHA256>")]
+        [Description("Expected SHA-256 for --overlay-feed. If omitted, <feed>.sha256 is required.")]
+        public string? OverlaySha256 { get; init; }
     }
 
     protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
@@ -32,7 +40,8 @@ public sealed class DebloatListCommand : AsyncCommand<DebloatListCommand.Setting
             : (devices.Count == 1 ? devices[0] : null);
         if (picked is null) { AnsiConsole.MarkupLine("[red]Specify --device <serial>.[/]"); return 1; }
 
-        var dataset = DebloatDataset.Load(log);
+        var dataset = await DebloatDatasetResolver.LoadForDeviceAsync(
+            host.Client, picked, log, s.OverlayFeed, s.OverlaySha256, ct);
         var scanner = new DebloatScanner(host.Client, log, dataset);
         var candidates = await scanner.ScanAsync(picked, ct);
 
