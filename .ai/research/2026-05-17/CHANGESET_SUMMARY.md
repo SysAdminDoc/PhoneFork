@@ -66,3 +66,19 @@ Continuation verification:
 - `apksigner verify --print-certs artifacts/helper/PhoneForkHelper.apk`: passed with the local Android debug certificate for verification-only staging.
 - `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
 - `git diff --check`: passed; Git reported CRLF normalization warnings only.
+
+## Continuation Implementation - R003 Slice
+
+Additional WPF parity work after R001/R002:
+
+- `src/PhoneFork.App/ViewModels/OperationsViewModel.cs`: added a WPF view-model for helper install/probe/uninstall, Shizuku checks, Smart Switch detection, trusted-pair visibility, ADB Burst Mode toggle/status, pre-flight bundles, backup interop inspection, and media size/mtime verification.
+- `src/PhoneFork.App/Views/OperationsView.xaml` and `.xaml.cs`: added the Operations tab UI with status rows, pre-flight findings, trusted-pair rows, helper controls, backup inspection path input, and action buttons.
+- `src/PhoneFork.App/ViewModels/MainViewModel.cs` and `src/PhoneFork.App/Views/MainWindow.xaml`: wired the Operations tab into the WPF shell and synchronized the visible header version string to `v0.9.0-pre`.
+- `ROADMAP.md` and `PROJECT_CONTEXT.md`: marked R003 as in progress with the completed WPF parity slice and remaining UI depth.
+
+Verification:
+
+- `dotnet build PhoneFork.slnx -c Release`: passed after adding the Operations tab.
+- `dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build`: passed, 129 tests.
+- `dotnet list PhoneFork.slnx package --vulnerable --include-transitive`: passed; no vulnerable packages reported.
+- `git diff --check`: passed; Git reported CRLF normalization warnings only.

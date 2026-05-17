@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject
     public DebloatViewModel Debloat { get; }
     public WifiViewModel Wifi { get; }
     public RolesViewModel Roles { get; }
+    public OperationsViewModel Operations { get; }
 
     public MainViewModel(DeviceService devices, AdbHostService host, SecurityPostureService posture, WirelessPolicy wireless, TrustedPairRegistry trusted, ILogger log)
     {
@@ -23,5 +24,6 @@ public partial class MainViewModel : ObservableObject
         Debloat = new DebloatViewModel(devices, host, log);
         Wifi = new WifiViewModel(devices, host, log);
         Roles = new RolesViewModel(devices, host, log);
+        Operations = new OperationsViewModel(devices, host, posture, trusted, log);
     }
 }

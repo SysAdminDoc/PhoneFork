@@ -117,6 +117,11 @@ Sources: L14, L18, L17.
 ### R003 - Surface v0.7-v0.9 Core services in WPF
 
 Priority: P0. Impact: 4. Effort: 4. Risk: 3.
+Status: In progress. 2026-05-17 slice added an Operations tab for helper
+lifecycle, Shizuku checks, Smart Switch detection, backup interop inspection,
+pre-flight bundles, media size/mtime verification, trusted-pair visibility, and
+ADB Burst Mode status/toggle. Remaining work: deeper per-flow rollback/audit
+drilldowns and richer archive import/export actions.
 
 The CLI exposes more of the shipped Core surface than the WPF cockpit. Add
 workflow panels for helper lifecycle, Shizuku status, Smart Switch detection,

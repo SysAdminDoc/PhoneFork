@@ -32,7 +32,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 ## Current Architecture
 
 - `src/PhoneFork.Core`: ADB host, shell quoting, device inventory, app migration, media diff/sync, settings diff/apply, debloat dataset, wireless ADB policy, trusted-pair registry, Smart Switch detection, backup interop, pre-flight, integrity verification, and helper lifecycle services.
-- `src/PhoneFork.App`: WPF shell, Catppuccin Mocha theme, device bar, and migration tabs.
+- `src/PhoneFork.App`: WPF shell, Catppuccin Mocha theme, device bar, migration tabs, and an Operations tab for helper/Shizuku/Smart Switch/pre-flight/backup/media-integrity/trust/burst-mode workflows.
 - `src/PhoneFork.Cli`: scriptable command surface for devices, apps, media, settings, debloat, Wi-Fi, CSC, roles, permissions, wireless ADB pairing/connect/disconnect, mDNS, honesty, helper lifecycle, Shizuku, Smart Switch, trusted pairs, and burst mode.
 - `helper-apk`: companion Android APK with provider authorities and v1 JSON export envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and dictionary.
 - `assets/debloat`: embedded AppManagerNG/UAD-NG package datasets plus PhoneFork overrides.
@@ -54,7 +54,7 @@ The product stance is deliberately narrow and honest: no root requirement, no cl
 
 - Helper APK restore writes are still guarded and intentionally disabled until the host workflow can sequence default-app and destructive-action confirmation safely.
 - Helper APK release signing is not wired; CI builds debug and unsigned release APKs, signs the release APK with the CI debug keystore for verification-only staging, and exercises the verified staging path.
-- WPF UI does not yet expose every Core service added in v0.7.0-v0.9.0-pre.
+- WPF UI now exposes a first Operations surface for several v0.7.0-v0.9.0-pre services, but deeper rollback/audit drilldowns and archive import/export actions remain incomplete.
 - No tagged signed release exists yet; README now directs users to build from source until a release is published.
 - Signing secrets are intentionally not provisioned.
 - Current dependency scan is clean for vulnerabilities, but several packages have current upgrades and test `xunit` is flagged as legacy.
