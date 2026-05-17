@@ -51,6 +51,7 @@ public class AppManagerBackupRoundTripTests : IDisposable
         Assert.Equal(5, handle.Meta.MetaVersion);
         Assert.Single(handle.Meta.Apks);
         Assert.Equal("fake-base.apk", handle.Meta.Apks[0].FileName);
+        Assert.Equal(Path.Combine(dir, "fake-base.apk"), Assert.Single(handle.ResolveApkPaths()));
 
         // Hashed serial only — no raw on disk.
         var diskContents = File.ReadAllText(Path.Combine(dir, "meta.am.v5"));

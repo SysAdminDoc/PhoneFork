@@ -7,8 +7,9 @@ It separates local publish readiness from the public tag/release decision.
 
 ## Current Release State
 
+- Unsigned prerelease `v0.9.0-pre` is published at `https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.0-pre`.
 - No signed public release is intentionally shipped yet.
-- `README.md` directs users to build from source until a GitHub release exists.
+- `README.md` distinguishes the unsigned prerelease from source builds.
 - The release workflow produces framework-dependent WPF and CLI ZIPs on `v*`
   tags.
 - GitHub build provenance attestation is wired for release ZIPs.
@@ -76,10 +77,10 @@ Use accurate capability language:
 - Helper APK provider exports are implemented, but restore writes remain
   intentionally disabled until host-side destructive-action confirmation ships.
 
-## Remaining Public-Release Inputs
+## Remaining Signed-Release Inputs
 
-- Capture current WPF screenshots for the README/release page.
-- Decide whether the first GitHub release should be an unsigned prerelease or
-  wait for Azure Artifact Signing secrets.
-- If publishing an unsigned prerelease, tag only after the README and release
-  notes clearly say the artifacts are unsigned.
+- Provision Azure Artifact Signing repository secrets.
+- Re-run the local publish gate before the next tag.
+- Verify signed artifacts with `signtool verify /v /debug /pa`.
+- Document at least one real two-phone Samsung migration smoke test before a
+  signed public v1 release.
