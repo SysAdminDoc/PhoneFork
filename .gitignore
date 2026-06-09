@@ -56,3 +56,7 @@ helper-apk/keystore.properties
 assets/helper/*.apk
 assets/helper/*.metadata.txt
 assets/helper/*.sha256
+
+# Markdown files local-only (except README)
+*.md
+!README.md
