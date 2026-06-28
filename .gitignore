@@ -62,3 +62,6 @@ assets/helper/*.sha256
 PROJECT_CONTEXT.md
 CONTINUATION_PROMPT.md
 RESEARCH_FEATURE_PLAN*.md
+
+# AI config
+AGENTS.md
