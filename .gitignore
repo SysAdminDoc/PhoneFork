@@ -56,3 +56,9 @@ helper-apk/keystore.properties
 assets/helper/*.apk
 assets/helper/*.metadata.txt
 assets/helper/*.sha256
+
+# AI artifacts
+.ai/
+PROJECT_CONTEXT.md
+CONTINUATION_PROMPT.md
+RESEARCH_FEATURE_PLAN*.md
