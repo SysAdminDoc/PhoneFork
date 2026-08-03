@@ -18,6 +18,11 @@
     <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY"
         tools:ignore="ProtectedPermissions"/>
 
+    <!-- SMS permissions imply telephony on ChromeOS unless the feature is explicitly optional. -->
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false"/>
+
     <!-- Android 13+ exposed app components must declare an exported attribute. The providers are exported false
          because they are reachable through `adb shell content query/insert` regardless: the shell UID has implicit
          provider access when the providing app is installed. No third-party app needs cross-process IPC against
