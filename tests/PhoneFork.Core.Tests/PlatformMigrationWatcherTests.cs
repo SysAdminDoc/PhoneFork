@@ -11,6 +11,8 @@ public sealed class PlatformMigrationWatcherTests
 
         Assert.Contains(report.Sources, s => s.Id == "android-cross-platform-transfer" && s.SourceId == "S04");
         Assert.Contains(report.Sources, s => s.Id == "apple-ios-to-android" && s.SourceId == "S14");
+        Assert.Contains(report.Sources, s => s.Id == "phonefork-open-archive"
+            && s.Url == "https://github.com/SysAdminDoc/PhoneFork/blob/main/src/PhoneFork.Core/Services/OpenArchiveSpec.cs");
         Assert.Contains(report.Sources, s => s.Id == "seedvault" && s.SourceId == "G14");
         Assert.True(report.WatchCount >= 2);
         Assert.Contains(report.RecommendedActions, a => a.Contains("Refresh S04, S14, and G14", StringComparison.Ordinal));

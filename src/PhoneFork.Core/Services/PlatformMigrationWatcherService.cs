@@ -58,7 +58,7 @@ public static class PlatformMigrationWatcherService
             new PlatformMigrationSource(
                 Id: "phonefork-open-archive",
                 Name: "PhoneFork open archive metadata",
-                Url: "PROJECT_CONTEXT.md",
+                Url: "https://github.com/SysAdminDoc/PhoneFork/blob/main/src/PhoneFork.Core/Services/OpenArchiveSpec.cs",
                 Status: "Open archives already carry crossPlatform.iosCompatibleApps metadata and hashed endpoint IDs.",
                 PhoneForkImplication: "Keep the archive schema stable; add new official platform fields only behind optional manifest properties.",
                 Severity: PlatformWatcherSeverity.Info,
