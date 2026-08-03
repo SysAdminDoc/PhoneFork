@@ -15,7 +15,7 @@ android {
         minSdk = 30
         targetSdk = 36
         versionCode = 2
-        versionName = "0.9.0-pre"
+        versionName = "0.9.1-pre"
 
         // The helper is intentionally invisible: no launcher icon, no exported main activity.
         // The host (Windows) drives every code path via `adb shell content query/insert/update`

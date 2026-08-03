@@ -68,9 +68,14 @@ if ($helperGradle -notmatch "versionName\s+=\s+""(?<helper>[^""]+)""") {
     Add-Failure "Helper APK versionName '$($Matches["helper"])' does not match changelog '$version'."
 }
 
-$releaseWorkflow = Read-RepoText ".github/workflows/release.yml"
-if ($releaseWorkflow -notmatch "tags:\s*\r?\n\s*-\s+'v\*'") {
-    Add-Failure "Release workflow does not advertise v* tag triggering."
+$releaseWorkflowPath = Join-Path $repoRoot ".github/workflows/release.yml"
+if (Test-Path -LiteralPath $releaseWorkflowPath) {
+    $releaseWorkflow = Read-RepoText ".github/workflows/release.yml"
+    if ($releaseWorkflow -notmatch "tags:\s*\r?\n\s*-\s+'v\*'") {
+        Add-Failure "Release workflow does not advertise v* tag triggering."
+    }
+} else {
+    Write-Host "No GitHub release workflow found; accepting the local-only release lane."
 }
 
 if ($failures.Count -gt 0) {

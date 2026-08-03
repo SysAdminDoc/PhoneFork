@@ -2,7 +2,7 @@
 
 All notable changes to PhoneFork.
 
-## Unreleased
+## v0.9.1-pre — 2026-08-03
 
 ### Added
 - CLI AppManager backup workflow: `phonefork backup inspect`, `backup
@@ -24,10 +24,9 @@ All notable changes to PhoneFork.
   so OEM/package safety changes can be patched with source URLs, risk notes,
   review/expiry dates, and action overrides while retaining the embedded
   offline dataset.
-- Release packaging now emits WPF and CLI ZIPs, an SPDX SBOM, SHA-256 checksums,
-  GitHub provenance/SBOM attestations, and release-note trust text. When Azure
-  Artifact Signing secrets are present, the workflow signs Windows EXE/DLL
-  payloads before ZIP packaging and verifies their Authenticode status.
+- The release lane is explicitly local-only. WPF and CLI publish commands remain
+  documented, while GitHub Actions packaging, provenance, and binary signing
+  are not part of this source tree; local outputs are unsigned.
 - Dependency maintenance updated QRCoder, Spectre.Console, JsonSchema.Net,
   Serilog.Sinks.File, coverlet.collector, and Microsoft.NET.Test.Sdk. New
   schema and audit-log tests cover the higher-risk JsonSchema.Net and file sink
@@ -52,6 +51,14 @@ All notable changes to PhoneFork.
   Android cross-platform-transfer, Apple iOS-to-Android, Seedvault, and
   PhoneFork open-archive watch items with source IDs and implementation
   implications.
+
+### Fixed
+- The helper APK manifest declares telephony hardware optional so its SMS
+  permissions pass Android lint on non-telephony devices.
+- The version consistency gate now accepts the local-only release lane when no
+  GitHub release workflow is present.
+- The platform migration watcher now links to the tracked open-archive schema
+  implementation instead of a removed planning artifact.
 
 ## v0.9.0-pre — 2026-05-17
 

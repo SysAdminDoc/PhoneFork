@@ -44,4 +44,4 @@ pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 
 ## Status
 
-**v0.9.0-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.
+**v0.9.1-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.
