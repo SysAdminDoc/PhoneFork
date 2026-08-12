@@ -34,7 +34,7 @@ apksigner sign --ks ~/.android/phonefork-helper/phonefork-helper.jks --out Phone
 pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 ```
 
-`Stage-HelperApk.ps1` verifies package name, minSdk, targetSdk, and APK signature before copying the artifact to `assets/helper/PhoneForkHelper.apk`, which is the only default path consumed by the host app and CLI. CI now assembles debug and release helper APKs, dumps package metadata from the release artifact, signs the release APK with the CI debug keystore for verification-only staging, and uploads metadata plus APK artifacts. Release signing remains a packaging step.
+`Stage-HelperApk.ps1` verifies package name, minSdk, targetSdk, and APK signature before copying the artifact to `assets/helper/PhoneForkHelper.apk`, which is the only default path consumed by the host app and CLI. The supported local release lane assembles and lints the helper APK before an operator signs and stages it. Release signing remains a packaging step.
 
 ## Target SDK policy
 
@@ -44,4 +44,4 @@ pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 
 ## Status
 
-**v0.9.1-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.
+**v0.9.2-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.
