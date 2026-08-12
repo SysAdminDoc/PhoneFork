@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.9.1--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.9.2--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -32,6 +32,10 @@ For SMS, PhoneFork's pre-flight checks verify the default SMS role and the Samsu
 
 For Samsung Gallery, pre-flight checks use Microsoft's September 30, 2026 direct OneDrive sync cutoff and verify OneDrive camera-backup prerequisites where Android exposes them.
 
+## Official transfer companions
+
+PhoneFork complements first-party transfer flows instead of trying to replace them. Use Samsung Smart Switch for private app data and OEM-managed domains, Google Messages for the Samsung Messages transition, OneDrive for Gallery cloud sync, Quick Share for one-off large files, and Samsung Wallet for account- and device-bound payment setup. For Android/iOS moves, follow the official QR/session transfer flow; PhoneFork's open ADB workflow fills in the auditable local work that those services do not cover.
+
 ## Android developer verification (Sept 2026)
 
 Google's [developer verification](https://developer.android.com/developer-verification/guides/faq) requirement applies to **Play / sideload installs of unverified developers**. It does **not** apply to packages installed via ADB. PhoneFork's planned helper APK path uses `adb install`, so the verification gate is not on the critical path. If you sideload the helper outside ADB you may be prompted by your launcher to verify the developer; that is normal.
@@ -39,7 +43,7 @@ Google's [developer verification](https://developer.android.com/developer-verifi
 ## Install
 
 The published GitHub prerelease is [v0.9.0-pre](https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.0-pre).
-This source checkout is `v0.9.1-pre` and is not published as a release; build
+This source checkout is `v0.9.2-pre` and is not published as a release; build
 from source with the commands below.
 
 Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)) — the zip is framework-dependent (~10 MB).

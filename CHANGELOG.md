@@ -2,6 +2,18 @@
 
 All notable changes to PhoneFork.
 
+## v0.9.2-pre — 2026-08-12
+
+### Added
+- README guidance now presents Smart Switch, Google Messages, OneDrive, Quick
+  Share, Wallet, and official Android/iOS transfer flows as complementary
+  first-party paths alongside PhoneFork's auditable local ADB workflow.
+
+### Fixed
+- Central .NET assembly, file, package, and informational version metadata now
+  matches the visible prerelease version and is enforced by the version
+  consistency gate.
+
 ## v0.9.1-pre — 2026-08-03
 
 ### Added

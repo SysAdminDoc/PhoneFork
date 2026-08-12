@@ -15,3 +15,15 @@
   an unapproved device.
 - Unblock: connect and authorize two Samsung devices, then run and document the
   approved migration matrix with the operator present.
+
+## Commercial-grade device corpus and test lab
+
+- Evidence checked 2026-08-12. This item is explicitly gated on real demand after
+  public releases. No demand signal, hardware budget, test-lab owner, or approved
+  support matrix is available in this task, so implementation would require
+  external resources and human prioritization.
+- Scope: build a commercial-grade device corpus and physical test lab covering
+  supported Samsung models, Android releases, One UI releases, USB/wireless ADB,
+  and migration-domain fixtures once public-release demand justifies it.
+- Unblock: establish demand, assign an owner and budget, and approve the supported
+  model/OS matrix and destructive-test policy.

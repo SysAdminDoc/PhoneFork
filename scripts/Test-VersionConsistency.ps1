@@ -31,6 +31,27 @@ if ($version -notmatch "^(?<numeric>\d+\.\d+\.\d+)(?:-.+)?$") {
 $numericVersion = $Matches["numeric"]
 $manifestVersion = "$numericVersion.0"
 
+$buildProps = Read-RepoText "Directory.Build.props"
+if ($buildProps -notmatch "<Version>(?<build>[^<]+)</Version>") {
+    Add-Failure "Directory.Build.props Version is missing."
+} elseif ($Matches["build"] -ne $version) {
+    Add-Failure "Directory.Build.props Version '$($Matches["build"])' does not match changelog '$version'."
+}
+
+foreach ($property in @("AssemblyVersion", "FileVersion")) {
+    if ($buildProps -notmatch "<$property>(?<value>[^<]+)</$property>") {
+        Add-Failure "Directory.Build.props $property is missing."
+    } elseif ($Matches["value"] -ne $manifestVersion) {
+        Add-Failure "Directory.Build.props $property '$($Matches["value"])' does not match expected numeric '$manifestVersion'."
+    }
+}
+
+if ($buildProps -notmatch "<InformationalVersion>(?<informational>[^<]+)</InformationalVersion>") {
+    Add-Failure "Directory.Build.props InformationalVersion is missing."
+} elseif ($Matches["informational"] -ne $version) {
+    Add-Failure "Directory.Build.props InformationalVersion '$($Matches["informational"])' does not match changelog '$version'."
+}
+
 $readme = Read-RepoText "README.md"
 if ($readme -notmatch "badge/version-(?<badge>.+?)-blue\.svg") {
     Add-Failure "README version badge is missing."
