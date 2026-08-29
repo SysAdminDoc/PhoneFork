@@ -2,6 +2,16 @@
 
 All notable changes to PhoneFork.
 
+## v0.9.3-pre (2026-08-29)
+
+### Changed
+
+- New app icon: adaptive, themed (monochrome) and legacy variants regenerated from the 2026-08 icon set.
+
+### Fixed
+
+- ADB shell calls now reach the helper providers and are checked by the existing shell and system UID gate.
+
 ## v0.9.2-pre — 2026-08-12
 
 ### Added

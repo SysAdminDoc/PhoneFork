@@ -6,8 +6,8 @@ Companion Android APK for PhoneFork. Surfaces categories that `adb shell` alone 
 
 Two-tier model lifted from scrcpy and adbsms:
 
-1. **`phonefork-agent.jar`** — push-and-run JAR launched as the `shell` UID via `app_process`. Stays in `/data/local/tmp/`, leaves no Settings/Apps entry. Read-only operations: settings dumps, role queries, dumpsys parsing. (F011)
-2. **`PhoneForkHelper.apk`** — signed APK with ContentProvider authorities for each category. Installs over ADB, holds READ_SMS / WRITE_SMS / READ_CONTACTS / READ_CALL_LOG / ACCESS_WIFI_STATE / etc. The host (Windows) queries it via `adb shell content query --uri content://com.sysadmindoc.phonefork.helper/<authority>`. Uninstalls after migration via `pm uninstall` (F019).
+1. **`phonefork-agent.jar`** is a push-and-run JAR launched as the `shell` UID via `app_process`. It stays in `/data/local/tmp/` and leaves no Settings/Apps entry. Read-only operations include settings dumps, role queries, and dumpsys parsing. (F011)
+2. **`PhoneForkHelper.apk`** is a signed APK with ContentProvider authorities for each category. It installs over ADB and holds READ_SMS / WRITE_SMS / READ_CONTACTS / READ_CALL_LOG / ACCESS_WIFI_STATE / etc. The Windows host queries it via `adb shell content query --uri content://com.sysadmindoc.phonefork.helper/<authority>` and uninstalls it after migration with `pm uninstall` (F019).
 
 ## Wire protocol
 
@@ -44,4 +44,4 @@ pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 
 ## Status
 
-**v0.9.2-pre.** Gradle scaffold, manifest, shell/system UID gate, and v1 JSON ContentProvider export bodies exist. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows. Restore writes remain guarded behind explicit `restore` endpoints and are intentionally not enabled until the host workflow can sequence default-app and destructive-action confirmation safely. The JAR push-and-run path follows.
+**v0.9.3-pre.** The helper now carries adaptive, themed, and package icon resources generated from the August 2026 artwork. It remains host-driven and has no launcher activity. The providers emit versioned envelopes for SMS, call log, contacts, Wi-Fi capability metadata, wallpaper metadata, ringtone defaults, and user dictionary rows.

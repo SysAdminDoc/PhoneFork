@@ -23,12 +23,12 @@
         android:name="android.hardware.telephony"
         android:required="false"/>
 
-    <!-- Android 13+ exposed app components must declare an exported attribute. The providers are exported false
-         because they are reachable through `adb shell content query/insert` regardless: the shell UID has implicit
-         provider access when the providing app is installed. No third-party app needs cross-process IPC against
-         these authorities. -->
+    <!-- ADB's shell process must cross the package boundary before the providers can inspect its UID. The providers
+         are exported for that entry point, while BaseHelperProvider rejects every caller except shell and system. -->
     <application
         android:label="PhoneForkHelper"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:enableOnBackInvokedCallback="true"
         android:hasFragileUserData="false"
@@ -38,31 +38,31 @@
         <provider
             android:name=".providers.SmsProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.sms"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.CallLogProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.calllog"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.ContactsProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.contacts"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.WifiProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.wifi"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.WallpaperProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.wallpaper"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.RingtoneProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.ringtone"
-            android:exported="false"/>
+            android:exported="true"/>
         <provider
             android:name=".providers.DictionaryProvider"
             android:authorities="com.sysadmindoc.phonefork.helper.dictionary"
-            android:exported="false"/>
+            android:exported="true"/>
 
         <!-- Self-uninstall trigger (F019): host fires `am broadcast -a com.sysadmindoc.phonefork.helper.UNINSTALL`
              which schedules a self-`pm uninstall`. Used as a finalization step after migration completes. -->

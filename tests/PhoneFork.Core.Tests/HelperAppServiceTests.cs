@@ -1,4 +1,5 @@
 using PhoneFork.Core.Services;
+using System.Xml.Linq;
 
 namespace PhoneFork.Core.Tests;
 
@@ -23,6 +24,36 @@ public class HelperAppServiceConstantsTests
     {
         // If this constant drifts, the helper APK build's applicationId must change with it.
         Assert.Equal("com.sysadmindoc.phonefork.helper", HelperAppService.PackageId);
+    }
+
+    [Fact]
+    public void HelperProvidersExposeOnlyTheUidGatedAdbEntryPoint()
+    {
+        var manifest = XDocument.Load(RepoFile("helper-apk", "app", "src", "main", "AndroidManifest.xml"));
+        XNamespace android = "http://schemas.android.com/apk/res/android";
+        var providers = manifest.Descendants("provider").ToArray();
+
+        Assert.Equal(HelperAppService.Authorities.Count, providers.Length);
+        Assert.All(providers, provider => Assert.Equal("true", provider.Attribute(android + "exported")?.Value));
+
+        var gate = File.ReadAllText(RepoFile(
+            "helper-apk", "app", "src", "main", "java", "com", "sysadmindoc", "phonefork", "helper",
+            "providers", "BaseHelperProvider.kt"));
+        Assert.Contains("Process.SHELL_UID", gate, StringComparison.Ordinal);
+        Assert.Contains("Process.SYSTEM_UID", gate, StringComparison.Ordinal);
+        Assert.Contains("callingUidOrSelf() in allowedUids", gate, StringComparison.Ordinal);
+    }
+
+    private static string RepoFile(params string[] segments)
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "PhoneFork.slnx")))
+        {
+            directory = directory.Parent;
+        }
+
+        Assert.NotNull(directory);
+        return Path.Combine(new[] { directory!.FullName }.Concat(segments).ToArray());
     }
 
     [Fact]
