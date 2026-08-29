@@ -1,6 +1,6 @@
 # Release Readiness
 
-Verified: 2026-05-17
+Verified: 2026-08-29
 
 This note is the pre-release checklist for the first public PhoneFork artifact.
 It separates local publish readiness from the public tag/release decision.
@@ -8,16 +8,12 @@ It separates local publish readiness from the public tag/release decision.
 ## Current Release State
 
 - Unsigned prerelease `v0.9.0-pre` is published at `https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.0-pre`.
+- The current source checkout is `v0.9.3-pre` and has no matching public release.
 - No signed public release is intentionally shipped yet.
 - `README.md` distinguishes the unsigned prerelease from source builds.
-- The release workflow produces framework-dependent WPF and CLI ZIPs on `v*`
-  tags.
-- The release workflow emits an SPDX 2.3 SBOM, SHA-256 checksum manifest,
-  GitHub provenance attestation, and GitHub SBOM attestation for release ZIPs.
-- Azure Artifact Signing is wired for Windows EXE/DLL payloads before ZIP
-  packaging, but inactive until repository secrets are provisioned.
-- Helper APK release signing is not wired. CI verifies helper metadata and
-  staging with a CI debug-key-signed release APK only.
+- Builds, tests, and packaging run locally. The repository has no GitHub Actions workflow.
+- Windows publish outputs remain unsigned until a local signing certificate is available.
+- Helper APK release signing is not wired. Device checks use the local sideload key.
 
 ## Local Publish Gate
 
@@ -30,11 +26,13 @@ dotnet build PhoneFork.slnx -c Release --no-restore
 dotnet test tests\PhoneFork.Core.Tests\PhoneFork.Core.Tests.csproj -c Release --no-build
 dotnet publish src\PhoneFork.App\PhoneFork.App.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\wpf
 dotnet publish src\PhoneFork.Cli\PhoneFork.Cli.csproj -c Release -r win-x64 --self-contained false -o artifacts\publish\cli
+cd helper-apk
+.\gradlew.bat clean test lint assembleRelease --no-daemon
 ```
 
 Current screenshot:
 
-- `docs/screenshots/phonefork-main-2026-05-17.png`
+- `docs/screenshots/phonefork-main-2026-08-29.png`
 
 Release notes draft:
 
@@ -45,6 +43,7 @@ Expected outputs:
 - `artifacts/publish/wpf/PhoneFork.exe`
 - `artifacts/publish/cli/phonefork.exe`
 - bundled `tools/adb.exe` beside each host output
+- `helper-apk/app/build/outputs/apk/release/PhoneForkHelper-v0.9.3-pre.apk`
 
 ## Artifact Trust Policy
 

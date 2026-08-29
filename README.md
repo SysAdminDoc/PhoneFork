@@ -1,17 +1,17 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.9.2--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.9.3--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
 
-**Dual-Samsung Android migration tool for Windows.** Drives two USB-connected Galaxy phones at the same time and copies apps, media, settings, Wi-Fi, default app roles, and applies a debloat profile — from a new device to a freshly-reset old one. No root, no Samsung account, no cloud.
+**Dual-Samsung Android migration tool for Windows.** Drives two USB-connected Galaxy phones at the same time and copies apps, media, settings, Wi-Fi, default app roles, and applies a debloat profile when moving from a new device to a freshly-reset old one. No root, no Samsung account, no cloud.
 
 Built because Samsung Smart Switch is sequential (one phone at a time), one-direction-blessed (old→new), and refuses to debloat.
 
 ## What it does
 
-![PhoneFork WPF cockpit](docs/screenshots/phonefork-main-2026-05-17.png)
+![PhoneFork WPF cockpit](docs/screenshots/phonefork-main-2026-08-29.png)
 
 | Domain | What gets copied | Mechanism |
 |---|---|---|
@@ -26,7 +26,7 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 
 Third-party app **private data** (banking, messengers, game saves, login sessions) does not transfer. Android's security model prevents reading `/data/data/<pkg>/` without root, and `adb backup` was effectively neutered in Android 12. For app-data migration, run Samsung Smart Switch alongside PhoneFork as a complementary step.
 
-Knox-bound data (Secure Folder, Samsung Wallet payment tokens, enterprise containers) is intentionally inaccessible by design — re-set those up on the destination.
+Knox-bound data (Secure Folder, Samsung Wallet payment tokens, enterprise containers) is intentionally inaccessible by design. Set those up again on the destination.
 
 For SMS, PhoneFork's pre-flight checks verify the default SMS role and the Samsung Messages -> Google Messages transition state before any helper-assisted SMS workflow.
 
@@ -43,12 +43,12 @@ Google's [developer verification](https://developer.android.com/developer-verifi
 ## Install
 
 The published GitHub prerelease is [v0.9.0-pre](https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.0-pre).
-This source checkout is `v0.9.2-pre` and is not published as a release; build
+This source checkout is `v0.9.3-pre` and is not published as a release; build
 from source with the commands below.
 
-Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)) — the zip is framework-dependent (~10 MB).
+Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)). The zip is framework-dependent (~10 MB).
 
-The bundled `tools/adb.exe` ships with the app — no Android SDK needed on your PC.
+The bundled `tools/adb.exe` ships with the app. You don't need an Android SDK on your PC.
 
 The published `v0.9.0-pre` ZIPs are unsigned. PhoneFork's current release lane
 is local-only: there is no GitHub Actions packaging or binary-signing workflow.
@@ -137,7 +137,7 @@ dotnet publish src/PhoneFork.Cli/PhoneFork.Cli.csproj -c Release -r win-x64 --se
 ## Tech
 
 - **Stack**: C# / .NET 10 / WPF / MVVM (CommunityToolkit.Mvvm 8.4.2)
-- **ADB**: [AdvancedSharpAdbClient](https://github.com/SharpAdb/AdvancedSharpAdbClient) — native binary protocol, no shellout
+- **ADB**: [AdvancedSharpAdbClient](https://github.com/SharpAdb/AdvancedSharpAdbClient), using its native binary protocol with no shellout
 - **APK parsing**: [AlphaOmega.ApkReader](https://www.nuget.org/packages/AlphaOmega.ApkReader)
 - **UI**: [MaterialDesignInXamlToolkit](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit) + [HandyControl](https://github.com/HandyOrg/HandyControl), Catppuccin Mocha theme
 - **Logging**: Serilog + CompactJsonFormatter (NDJSON)
@@ -146,14 +146,14 @@ dotnet publish src/PhoneFork.Cli/PhoneFork.Cli.csproj -c Release -r win-x64 --se
 
 ## Credits
 
-- [AppManagerNG](https://github.com/SysAdminDoc/AppManagerNG) — the 5,481-entry debloat dataset PhoneFork applies
-- [Universal Android Debloater Next Generation](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation) — upstream of the debloat dataset
-- [Shizuku](https://shizuku.rikka.app/) — the no-root Wireless-ADB elevation model
-- [scrcpy](https://github.com/Genymobile/scrcpy) — the `app_process` push-and-run helper pattern
-- [Muntashir's App Manager](https://github.com/MuntashirAkon/AppManager) — backup-format compatibility target
+- [AppManagerNG](https://github.com/SysAdminDoc/AppManagerNG), whose 5,481-entry debloat dataset PhoneFork applies
+- [Universal Android Debloater Next Generation](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), the upstream source for the debloat dataset
+- [Shizuku](https://shizuku.rikka.app/) for the no-root Wireless-ADB elevation model
+- [scrcpy](https://github.com/Genymobile/scrcpy) for the `app_process` push-and-run helper pattern
+- [Muntashir's App Manager](https://github.com/MuntashirAkon/AppManager) as the backup-format compatibility target
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
-Third-party redistributable binaries (`tools/adb.exe`, `AdbWinApi.dll`, `AdbWinUsbApi.dll`, `libwinpthread-1.dll`) are Apache-2.0 (Google `platform-tools`) — see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Third-party redistributable binaries (`tools/adb.exe`, `AdbWinApi.dll`, `AdbWinUsbApi.dll`, `libwinpthread-1.dll`) are Apache-2.0 (Google `platform-tools`). See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
