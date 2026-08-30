@@ -7,10 +7,13 @@ All notable changes to PhoneFork.
 ### Changed
 
 - New app icon: adaptive, themed (monochrome) and legacy variants regenerated from the 2026-08 icon set.
+- Checked in the official Gradle wrapper files for the helper APK so a clean clone can build it without a separate Gradle installation.
+- Release helper APKs now run through R8 code and resource shrinking while retaining every provider and receiver entry point.
 
 ### Fixed
 
 - ADB shell calls now reach the helper providers and are checked by the existing shell and system UID gate.
+- The helper staging script now finds Android's Windows batch launcher for `apksigner`, and the helper README uses the authorities declared in the manifest.
 
 ## v0.9.2-pre — 2026-08-12
 

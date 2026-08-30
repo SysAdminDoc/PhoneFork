@@ -24,20 +24,31 @@ function Resolve-AndroidTool {
         return (Resolve-Path -LiteralPath $ExplicitPath).Path
     }
 
+    $toolFiles = if ($IsWindows) {
+        @("$ToolName.exe", "$ToolName.bat", "$ToolName.cmd")
+    } else {
+        @($ToolName)
+    }
+
     $sdkRoot = $env:ANDROID_HOME
     if (-not $sdkRoot) {
         $sdkRoot = $env:ANDROID_SDK_ROOT
     }
 
     if ($sdkRoot) {
-        $toolFile = if ($IsWindows) { "$ToolName.exe" } else { $ToolName }
         $buildTools = Join-Path $sdkRoot "build-tools"
         if (Test-Path -LiteralPath $buildTools) {
-            $candidate = Get-ChildItem -LiteralPath $buildTools -Directory |
-                Sort-Object Name -Descending |
-                ForEach-Object { Join-Path $_.FullName $toolFile } |
-                Where-Object { Test-Path -LiteralPath $_ } |
-                Select-Object -First 1
+            $candidates = @(
+                foreach ($directory in (Get-ChildItem -LiteralPath $buildTools -Directory | Sort-Object Name -Descending)) {
+                    foreach ($toolFile in $toolFiles) {
+                        $path = Join-Path $directory.FullName $toolFile
+                        if (Test-Path -LiteralPath $path) {
+                            $path
+                        }
+                    }
+                }
+            )
+            $candidate = $candidates | Select-Object -First 1
 
             if ($candidate) {
                 return $candidate
@@ -45,9 +56,11 @@ function Resolve-AndroidTool {
         }
     }
 
-    $command = Get-Command $ToolName -ErrorAction SilentlyContinue
-    if ($command) {
-        return $command.Source
+    foreach ($toolFile in $toolFiles) {
+        $command = Get-Command $toolFile -ErrorAction SilentlyContinue
+        if ($command) {
+            return $command.Source
+        }
     }
 
     throw "$ToolName was not found. Set ANDROID_HOME or pass -${ToolName}Path explicitly."
