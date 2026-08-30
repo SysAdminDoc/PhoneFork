@@ -7,16 +7,16 @@ Companion Android APK for PhoneFork. Surfaces categories that `adb shell` alone 
 Two-tier model lifted from scrcpy and adbsms:
 
 1. **`phonefork-agent.jar`** is a push-and-run JAR launched as the `shell` UID via `app_process`. It stays in `/data/local/tmp/` and leaves no Settings/Apps entry. Read-only operations include settings dumps, role queries, and dumpsys parsing. (F011)
-2. **`PhoneForkHelper.apk`** is a signed APK with ContentProvider authorities for each category. It installs over ADB and holds READ_SMS / WRITE_SMS / READ_CONTACTS / READ_CALL_LOG / ACCESS_WIFI_STATE / etc. The Windows host queries it via `adb shell content query --uri content://com.sysadmindoc.phonefork.helper/<authority>` and uninstalls it after migration with `pm uninstall` (F019).
+2. **`PhoneForkHelper.apk`** is a signed APK with ContentProvider authorities for each category. It installs over ADB and holds READ_SMS / WRITE_SMS / READ_CONTACTS / READ_CALL_LOG / ACCESS_WIFI_STATE / etc. The Windows host queries it via `adb shell content query --uri content://com.sysadmindoc.phonefork.helper.<authority>` and uninstalls it after migration with `pm uninstall` (F019).
 
 ## Wire protocol
 
 JSON-shaped responses from each provider's `query()` method. Selection/projection arguments are forwarded as `Bundle` extras. Examples:
 
 ```
-adb shell content query --uri content://com.sysadmindoc.phonefork.helper/sms --projection thread_id:address:date:body
-adb shell content query --uri content://com.sysadmindoc.phonefork.helper/wifi
-adb shell content insert --uri content://com.sysadmindoc.phonefork.helper/sms/restore --bind json:s:'<base64-json>'
+adb shell content query --uri content://com.sysadmindoc.phonefork.helper.sms --projection thread_id:address:date:body
+adb shell content query --uri content://com.sysadmindoc.phonefork.helper.wifi
+adb shell content insert --uri content://com.sysadmindoc.phonefork.helper.sms/restore --bind json:s:'<base64-json>'
 ```
 
 ## Build
@@ -35,6 +35,8 @@ pwsh ../scripts/Stage-HelperApk.ps1 -ApkPath PhoneForkHelper.apk
 ```
 
 `Stage-HelperApk.ps1` verifies package name, minSdk, targetSdk, and APK signature before copying the artifact to `assets/helper/PhoneForkHelper.apk`, which is the only default path consumed by the host app and CLI. The supported local release lane assembles and lints the helper APK before an operator signs and stages it. Release signing remains a packaging step.
+
+Release builds use R8 code and resource shrinking. The project keep rules preserve the manifest providers and receiver that the Windows host calls over ADB.
 
 ## Target SDK policy
 
