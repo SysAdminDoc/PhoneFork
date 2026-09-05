@@ -20,6 +20,34 @@ public sealed class HelperAppService
         "sms", "calllog", "contacts", "wifi", "wallpaper", "ringtone", "dictionary",
     };
 
+    /// <summary>
+    /// Dangerous runtime permissions the helper declares that the host must grant explicitly (F111).
+    /// The helper ships no launcher activity, so it can never raise a runtime permission prompt;
+    /// without these grants every SMS / call-log / contacts provider read fails with a
+    /// <c>SecurityException</c> and returns a <c>permission-denied</c> envelope.
+    /// </summary>
+    public static readonly IReadOnlyList<string> RuntimePermissions = new[]
+    {
+        "android.permission.READ_SMS",
+        "android.permission.READ_CALL_LOG",
+        "android.permission.WRITE_CALL_LOG",
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS",
+    };
+
+    /// <summary>
+    /// Permissions the manifest declares that <c>pm grant</c> can never satisfy: they are
+    /// signature/privileged rather than runtime permissions. Listed so a failed grant is
+    /// reported as expected rather than retried. The manifest already marks them with
+    /// <c>tools:ignore="ProtectedPermissions"</c>.
+    /// </summary>
+    public static readonly IReadOnlyList<string> PrivilegedPermissions = new[]
+    {
+        "android.permission.WRITE_SMS",
+        "android.permission.READ_USER_DICTIONARY",
+        "android.permission.WRITE_USER_DICTIONARY",
+    };
+
     private readonly IAdbClient _client;
     private readonly ILogger _log;
 
@@ -52,12 +80,97 @@ public sealed class HelperAppService
             await sync.PushAsync(stream, remote, UnixFileStatus.DefaultFileMode, DateTimeOffset.UtcNow,
                 callback: null, useV2: false, cancellationToken: ct);
         }
-        var install = await _client.ShellAsync(device, $"pm install -r {AdbShell.Arg(remote)}", ct);
+        // -g grants every runtime permission the manifest declares. Older/OEM pm builds ignore
+        // it silently, so GrantRuntimePermissionsAsync re-grants each one individually below.
+        var install = await _client.ShellAsync(device, $"pm install -r -g {AdbShell.Arg(remote)}", ct);
         await _client.ShellAsync(device, $"rm -f {AdbShell.Arg(remote)}", ct);
 
         var ok = (install ?? "").Contains("Success", StringComparison.OrdinalIgnoreCase);
         _log.Information("Helper install on {Device}: ok={Ok} out={Out}", device.Serial, ok, (install ?? "").Trim());
+        if (ok)
+            await GrantRuntimePermissionsAsync(device, ct);
         return ok;
+    }
+
+    /// <summary>
+    /// Grants each dangerous runtime permission the helper needs (F111) and reports the result
+    /// per permission. Idempotent: <c>pm grant</c> on an already-granted permission is a no-op.
+    /// Privileged permissions in <see cref="PrivilegedPermissions"/> are not attempted.
+    /// </summary>
+    public async Task<HelperPermissionReport> GrantRuntimePermissionsAsync(
+        DeviceData device,
+        CancellationToken ct = default)
+    {
+        var granted = new List<string>(RuntimePermissions.Count);
+        var failed = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        foreach (var permission in RuntimePermissions)
+        {
+            ct.ThrowIfCancellationRequested();
+            var output = (await _client.ShellAsync(device,
+                $"pm grant {AdbShell.PackageArg(PackageId)} {AdbShell.Arg(permission)}", ct) ?? "").Trim();
+
+            // pm grant prints nothing on success and an Exception/Error line on failure.
+            if (output.Length == 0)
+            {
+                granted.Add(permission);
+            }
+            else
+            {
+                failed[permission] = output;
+                _log.Warning("Helper permission grant failed on {Device}: {Permission} -> {Output}",
+                    device.Serial, permission, output);
+            }
+        }
+
+        _log.Information("Helper runtime permissions on {Device}: {Granted}/{Total} granted",
+            device.Serial, granted.Count, RuntimePermissions.Count);
+        return new HelperPermissionReport(granted, failed);
+    }
+
+    /// <summary>
+    /// Reads back which of <see cref="RuntimePermissions"/> the helper actually holds, by parsing
+    /// <c>dumpsys package</c>'s runtime permission block. Used by the probe so the operator sees
+    /// real state rather than the grant call's return value.
+    /// </summary>
+    public async Task<HelperPermissionReport> ProbeRuntimePermissionsAsync(
+        DeviceData device,
+        CancellationToken ct = default)
+    {
+        var dump = await _client.ShellAsync(device,
+            $"dumpsys package {AdbShell.PackageArg(PackageId)}", ct) ?? "";
+        return ParsePermissionDump(dump);
+    }
+
+    /// <summary>
+    /// Parses <c>dumpsys package</c> output into a permission report. Split out from the ADB
+    /// call so the parsing is testable without a device.
+    /// </summary>
+    public static HelperPermissionReport ParsePermissionDump(string? dumpsysOutput)
+    {
+        var dump = dumpsysOutput ?? "";
+        var granted = new List<string>(RuntimePermissions.Count);
+        var missing = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        foreach (var permission in RuntimePermissions)
+        {
+            // dumpsys renders one line per permission: "<name>: granted=true, flags=[...]".
+            var index = dump.IndexOf(permission + ":", StringComparison.Ordinal);
+            if (index < 0)
+            {
+                missing[permission] = "not-listed";
+                continue;
+            }
+
+            var lineEnd = dump.IndexOf('\n', index);
+            var line = lineEnd < 0 ? dump[index..] : dump[index..lineEnd];
+            if (line.Contains("granted=true", StringComparison.Ordinal))
+                granted.Add(permission);
+            else
+                missing[permission] = "granted=false";
+        }
+
+        return new HelperPermissionReport(granted, missing);
     }
 
     /// <summary>Uninstalls the helper APK (F019). Idempotent — missing package returns true.</summary>
@@ -149,6 +262,26 @@ public sealed class HelperAppService
             .ToList();
         return new HelperResidueReport(stillInstalled, leftovers);
     }
+}
+
+/// <summary>
+/// Which of the helper's dangerous runtime permissions are held, and why the rest are not (F111).
+/// </summary>
+public sealed record HelperPermissionReport(
+    IReadOnlyList<string> Granted,
+    IReadOnlyDictionary<string, string> Failed)
+{
+    /// <summary>True when every permission the provider reads depend on is held.</summary>
+    public bool AllGranted => Failed.Count == 0;
+
+    /// <summary>
+    /// True when the three provider authorities that need dangerous permissions can work.
+    /// The wifi, wallpaper and ringtone authorities read without a runtime grant.
+    /// </summary>
+    public bool CanReadPrivilegedCategories =>
+        Granted.Contains("android.permission.READ_SMS")
+        && Granted.Contains("android.permission.READ_CALL_LOG")
+        && Granted.Contains("android.permission.READ_CONTACTS");
 }
 
 /// <summary>Result of a helper residue check (F019).</summary>

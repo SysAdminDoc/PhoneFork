@@ -112,7 +112,23 @@ public sealed class HelperProbeCommand : AsyncCommand<HelperProbeCommand.Setting
         foreach (var kv in results)
             table.AddRow(Markup.Escape(kv.Key), kv.Value ? "[green]ok[/]" : "[red]fail[/]");
         AnsiConsole.Write(table);
-        return results.Values.All(v => v) ? 0 : 1;
+
+        // Runtime permission state (F111). The helper has no launcher activity, so it cannot
+        // prompt; without these grants the sms/calllog/contacts reads fail with permission-denied.
+        var perms = await helper.ProbeRuntimePermissionsAsync(device, ct);
+        var permTable = new Table().AddColumns("Runtime permission", "State");
+        foreach (var p in HelperAppService.RuntimePermissions)
+        {
+            var state = perms.Granted.Contains(p)
+                ? "[green]granted[/]"
+                : $"[red]{Markup.Escape(perms.Failed.TryGetValue(p, out var why) ? why : "denied")}[/]";
+            permTable.AddRow(Markup.Escape(p), state);
+        }
+        AnsiConsole.Write(permTable);
+        if (!perms.CanReadPrivilegedCategories)
+            AnsiConsole.MarkupLine("[yellow]SMS, call log and contacts reads will fail until those permissions are granted. Re-run `phonefork helper install` to grant them.[/]");
+
+        return results.Values.All(v => v) && perms.CanReadPrivilegedCategories ? 0 : 1;
     }
 }
 
