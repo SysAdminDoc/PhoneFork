@@ -53,11 +53,23 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
         List<string> queue;
         if (s.Packages.Length > 0)
         {
-            queue = s.Packages.ToList();
+            // An explicit package list bypasses tier filtering, so gate the Unsafe tier here
+            // too rather than letting a named package slip past the profile guard (F110).
+            var named = s.Packages.ToList();
+            var unsafeNamed = DebloatProfiles.UnsafePackagesIn(dataset, named);
+            if (unsafeNamed.Count > 0 && !s.IncludeUnsafe)
+            {
+                AnsiConsole.MarkupLine(
+                    $"[red]Refusing to disable {unsafeNamed.Count} package(s) the dataset rates Unsafe:[/] " +
+                    Markup.Escape(string.Join(", ", unsafeNamed)));
+                AnsiConsole.MarkupLine("[yellow]Pass --include-unsafe if you accept the risk.[/]");
+                return 2;
+            }
+            queue = named;
         }
         else
         {
-            var tiers = ProfileTiers(s.Profile, s.IncludeUnsafe);
+            var tiers = DebloatProfiles.TiersFor(s.Profile, s.IncludeUnsafe);
             queue = candidates
                 .Where(c => c.IsEnabled && tiers.Contains(c.Entry.Tier))
                 .Select(c => c.Entry.PackageId)
@@ -101,18 +113,5 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
             ct);
         AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
         return result.Failed == 0 ? 0 : 2;
-    }
-
-    private static HashSet<DebloatTier> ProfileTiers(string profile, bool includeUnsafe)
-    {
-        var tiers = profile.ToLowerInvariant() switch
-        {
-            "conservative" => new HashSet<DebloatTier> { DebloatTier.Delete },
-            "recommended"  => new HashSet<DebloatTier> { DebloatTier.Delete, DebloatTier.Replace },
-            "aggressive"   => new HashSet<DebloatTier> { DebloatTier.Delete, DebloatTier.Replace, DebloatTier.Caution },
-            _              => new HashSet<DebloatTier> { DebloatTier.Delete },
-        };
-        if (includeUnsafe) tiers.Add(DebloatTier.Unsafe);
-        return tiers;
     }
 }
