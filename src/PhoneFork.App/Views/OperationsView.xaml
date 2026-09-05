@@ -111,7 +111,7 @@
                     <TextBlock Text="Backup interop inspection" FontSize="15" FontWeight="SemiBold"/>
                     <TextBlock Text="Paste a backup file or directory to classify AppManager, legacy Android .ab, or Open Android Backup material."
                                Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
-                    <TextBox Text="{Binding BackupPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                    <TextBox Text="{Binding BackupPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" AutomationProperties.Name="Backup path to inspect"/>
                     <Button Content="Inspect backup" Command="{Binding InspectBackupCommand}" HorizontalAlignment="Left"/>
                 </StackPanel>
             </Border>
@@ -142,7 +142,7 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource Card}" Padding="0" Margin="0,0,12,12">
-                <DataGrid ItemsSource="{Binding Rows}" IsReadOnly="True" CanUserAddRows="False"
+                <DataGrid ItemsSource="{Binding Rows}" IsReadOnly="True" CanUserAddRows="False" AutomationProperties.Name="Operation log"
                           RowHeight="30" Background="Transparent" BorderThickness="0">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="70"/>
@@ -155,7 +155,7 @@
             </Border>
 
             <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource Card}" Padding="0" Margin="0,0,0,12">
-                <DataGrid ItemsSource="{Binding PreflightFindings}" IsReadOnly="True" CanUserAddRows="False"
+                <DataGrid ItemsSource="{Binding PreflightFindings}" IsReadOnly="True" CanUserAddRows="False" AutomationProperties.Name="Pre-flight findings"
                           RowHeight="34" Background="Transparent" BorderThickness="0">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="75"/>
@@ -166,7 +166,7 @@
             </Border>
 
             <Border Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Card}" Padding="0">
-                <DataGrid ItemsSource="{Binding TrustedPairs}" IsReadOnly="True" CanUserAddRows="False"
+                <DataGrid ItemsSource="{Binding TrustedPairs}" IsReadOnly="True" CanUserAddRows="False" AutomationProperties.Name="Trusted device pairs"
                           RowHeight="30" Background="Transparent" BorderThickness="0">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Label" Binding="{Binding Label}" Width="1.4*"/>

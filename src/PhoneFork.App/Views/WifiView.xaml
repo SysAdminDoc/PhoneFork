@@ -65,7 +65,7 @@
                     <Button Content="Scan source" Command="{Binding ScanSourceCommand}" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
                 </DockPanel>
                 <Grid>
-                    <DataGrid ItemsSource="{Binding Ssids}" RowHeight="28" Background="Transparent" BorderThickness="0">
+                    <DataGrid ItemsSource="{Binding Ssids}" RowHeight="28" Background="Transparent" BorderThickness="0" AutomationProperties.Name="Saved Wi-Fi networks">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="SSID" Binding="{Binding Ssid}" Width="2*" IsReadOnly="True"/>
                             <DataGridTextColumn Header="Auth" Binding="{Binding Auth}" Width="80" IsReadOnly="True"/>
@@ -102,13 +102,13 @@
                 <TextBlock Text="Builds a standard Android camera-scannable network QR."
                            Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,10"/>
                 <TextBlock Text="SSID" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
-                <TextBox Text="{Binding QrSsid, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+                <TextBox Text="{Binding QrSsid, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" AutomationProperties.Name="QR network name"/>
                 <TextBlock Text="Pre-shared key" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11"/>
-                <TextBox Text="{Binding QrPsk, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+                <TextBox Text="{Binding QrPsk, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" AutomationProperties.Name="QR network password"/>
                 <DockPanel Margin="0,0,0,8">
                     <TextBlock Text="Auth" Foreground="{StaticResource ForegroundMutedBrush}" FontSize="11" VerticalAlignment="Center" Margin="0,0,8,0" DockPanel.Dock="Left"/>
                     <CheckBox Content="Hidden" IsChecked="{Binding QrHidden}" VerticalAlignment="Center" DockPanel.Dock="Right" HorizontalAlignment="Right"/>
-                    <ComboBox ItemsSource="{Binding AuthChoices}" SelectedItem="{Binding QrAuth}"/>
+                    <ComboBox ItemsSource="{Binding AuthChoices}" SelectedItem="{Binding QrAuth}" AutomationProperties.Name="QR network security type"/>
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                     <Button Content="Build QR" Command="{Binding BuildQrCommand}" Style="{StaticResource AccentButton}" Margin="0,0,8,0"/>

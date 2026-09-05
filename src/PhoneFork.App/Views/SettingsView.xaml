@@ -17,17 +17,17 @@
                                Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <Button Content="Scan"        Command="{Binding ScanCommand}"   Margin="0,0,8,0"/>
+                    <Button Content="Scan"        Command="{Binding ScanCommand}"   Margin="0,0,8,0" AutomationProperties.Name="Snapshot and diff settings on both phones"/>
                     <Button Content="Cancel" Command="{Binding CancelRunningCommand}" Margin="0,0,8,0"
                             AutomationProperties.Name="Cancel the running operation"/>
-                    <Button Content="Apply"       Command="{Binding ApplyCommand}"  Style="{StaticResource AccentButton}" Margin="0,0,16,0"/>
+                    <Button Content="Apply"       Command="{Binding ApplyCommand}"  Style="{StaticResource AccentButton}" Margin="0,0,16,0" AutomationProperties.Name="Write the selected settings keys"/>
                     <Button Content="Select All applicable" Command="{Binding SelectAllCommand}"  Margin="0,0,4,0"/>
                     <Button Content="Select None" Command="{Binding SelectNoneCommand}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
                     <TextBlock Text="Filter:" VerticalAlignment="Center" Margin="0,0,6,0"
                                Foreground="{StaticResource ForegroundMutedBrush}"/>
-                    <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" Margin="0,0,16,0"/>
+                    <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" MinWidth="200" Margin="0,0,16,0" AutomationProperties.Name="Filter settings keys"/>
                     <CheckBox Content="Show only applicable" IsChecked="{Binding ShowOnlyApplicable}" VerticalAlignment="Center" Margin="0,0,16,0"
                               ToolTip="Hide rows that are already aligned (Same) or only exist on the destination."/>
                     <CheckBox Content="Dry-run"  IsChecked="{Binding DryRun}" VerticalAlignment="Center"/>
@@ -61,7 +61,7 @@
         <!-- Diff table -->
         <Border Style="{StaticResource Card}" Padding="0">
             <Grid>
-                <DataGrid ItemsSource="{Binding FilteredRows}"
+                <DataGrid ItemsSource="{Binding FilteredRows}" AutomationProperties.Name="Settings keys to apply"
                           RowHeight="28"
                           Background="Transparent"
                           BorderThickness="0">

@@ -46,26 +46,26 @@
         <views:DeviceBar Grid.Row="1" DataContext="{Binding DeviceBar}"/>
 
         <!-- Tabs -->
-        <TabControl Grid.Row="2" Padding="0">
-            <TabItem Header="Apps">
+        <TabControl Grid.Row="2" Padding="0" AutomationProperties.Name="Migration domains">
+            <TabItem Header="Apps" AutomationProperties.Name="Apps tab">
                 <views:AppsView DataContext="{Binding Apps}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Media">
+            <TabItem Header="Media" AutomationProperties.Name="Media tab">
                 <views:MediaView DataContext="{Binding Media}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Settings">
+            <TabItem Header="Settings" AutomationProperties.Name="Settings tab">
                 <views:SettingsView DataContext="{Binding Settings}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Debloat">
+            <TabItem Header="Debloat" AutomationProperties.Name="Debloat tab">
                 <views:DebloatView DataContext="{Binding Debloat}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Wi-Fi">
+            <TabItem Header="Wi-Fi" AutomationProperties.Name="Wi-Fi tab">
                 <views:WifiView DataContext="{Binding Wifi}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Roles">
+            <TabItem Header="Roles" AutomationProperties.Name="Roles tab">
                 <views:RolesView DataContext="{Binding Roles}" Margin="0,12,0,0"/>
             </TabItem>
-            <TabItem Header="Operations">
+            <TabItem Header="Operations" AutomationProperties.Name="Operations tab">
                 <views:OperationsView DataContext="{Binding Operations}" Margin="0,12,0,0"/>
             </TabItem>
         </TabControl>
