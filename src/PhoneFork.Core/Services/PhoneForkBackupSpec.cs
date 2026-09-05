@@ -3,26 +3,38 @@ using System.Text.Json.Serialization;
 namespace PhoneFork.Core.Services;
 
 /// <summary>
-/// On-disk shape of an AppManager-compatible per-package backup directory (F029/F030).
-/// Mirrors <c>MuntashirAkon/AppManager</c>'s <c>meta.am.v5</c> schema closely enough that
-/// PhoneFork backups can be read by AppManager and vice-versa. License note: the
-/// AppManager codebase itself is GPL-3.0; PhoneFork copies the on-disk layout (data,
-/// not code) only.
+/// On-disk shape of a PhoneFork per-package APK backup directory (F029/F030/F117).
 /// </summary>
+///
+/// <remarks>
+/// This is PhoneFork's own format, not App Manager's. Earlier revisions named the metadata file
+/// <c>meta.am.v5</c> and described the layout as AppManager-compatible; that was never true.
+/// App Manager 4.1.1 writes a plaintext <c>info_v5.am.json</c> beside an encrypted
+/// <c>meta_v5.am.json</c>, with field names (<c>version</c>, <c>backup_name</c>,
+/// <c>package_name</c>, <c>data_dirs</c>, <c>is_split_apk</c>, <c>split_configs</c>,
+/// <c>apk_name</c>, <c>installer</c>) that do not match what PhoneFork emits, so neither tool can
+/// read the other's backups. PhoneFork backups round-trip through PhoneFork only.
 ///
 /// Directory layout per package, rooted under
 /// <c>%LOCALAPPDATA%\PhoneFork\backups\&lt;deviceHash&gt;\&lt;packageId&gt;\&lt;backupTimestamp&gt;\</c>:
 /// <list type="bullet">
 ///   <item><c>base.apk</c></item>
 ///   <item><c>split_*.apk</c> (one per ABI / density / locale split)</item>
-///   <item><c>meta.am.v5</c> (this <see cref="AppManagerBackupMeta"/> serialized)</item>
-///   <item><c>checksums.txt</c> — one SHA-256 per file, AppManager-format.</item>
-///   <item><c>permissions.am.tsv</c> — declared runtime permissions, tab-separated.</item>
-///   <item><c>rules.am.tsv</c> — battery optimization, net policy, SSAID etc.</item>
-///   <item><c>(future) data.tar.gz.0, ext_data.tar.gz.0, obb.tar.gz.0</c></item>
+///   <item><c>phonefork-backup.v1.json</c> (this <see cref="PhoneForkBackupMeta"/> serialized)</item>
+///   <item><c>checksums.txt</c> — one SHA-256 per file, two-space separated.</item>
 /// </list>
-public sealed record AppManagerBackupMeta
+/// </remarks>
+public sealed record PhoneForkBackupMeta
 {
+    /// <summary>Metadata file name written by this version.</summary>
+    public const string FileName = "phonefork-backup.v1.json";
+
+    /// <summary>
+    /// Metadata file name used before v0.9.4-pre. Still read so backups taken by an earlier
+    /// build keep working; never written.
+    /// </summary>
+    public const string LegacyFileName = "meta.am.v5";
+
     [JsonPropertyName("am_meta_version")] public int MetaVersion { get; init; } = 5;
     [JsonPropertyName("backup_name")] public required string BackupName { get; init; }
     [JsonPropertyName("backup_time")] public required long BackupTimeMs { get; init; }

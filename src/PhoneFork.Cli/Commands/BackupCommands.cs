@@ -12,7 +12,7 @@ public sealed class BackupInspectCommand : AsyncCommand<BackupInspectCommand.Set
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PATH>")]
-        [Description("AppManager backup directory, backup root, Open Android Backup directory, or legacy .ab file.")]
+        [Description("PhoneFork backup directory, backup root, Open Android Backup directory, or legacy .ab file.")]
         public required string Path { get; init; }
 
         [CommandOption("--json")]
@@ -47,11 +47,11 @@ public sealed class BackupInspectCommand : AsyncCommand<BackupInspectCommand.Set
         }
         else if (Directory.Exists(path))
         {
-            var reader = new AppManagerBackupReader(log);
+            var reader = new PhoneForkBackupReader(log);
             foreach (var dir in reader.EnumerateBackupDirs(path).DefaultIfEmpty(path).Distinct())
             {
                 ct.ThrowIfCancellationRequested();
-                if (!File.Exists(System.IO.Path.Combine(dir, "meta.am.v5"))) continue;
+                if (PhoneForkBackupReader.ResolveMetaPath(dir) is null) continue;
                 try
                 {
                     var handle = await reader.ReadAsync(dir, ct);
@@ -127,7 +127,7 @@ public sealed class BackupInspectCommand : AsyncCommand<BackupInspectCommand.Set
     }
 }
 
-public sealed class BackupExportAppManagerCommand : AsyncCommand<BackupExportAppManagerCommand.Settings>
+public sealed class BackupExportCommand : AsyncCommand<BackupExportCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
@@ -156,7 +156,7 @@ public sealed class BackupExportAppManagerCommand : AsyncCommand<BackupExportApp
 
         var catalog = new AppCatalogService(host.Client, log);
         var installer = new AppInstallerService(host.Client, log);
-        var writer = new AppManagerBackupWriter(log);
+        var writer = new PhoneForkBackupWriter(log);
         var apps = await catalog.EnumerateUserAppsAsync(device, ct);
         if (settings.Packages.Length > 0)
         {
@@ -183,18 +183,18 @@ public sealed class BackupExportAppManagerCommand : AsyncCommand<BackupExportApp
             }
         }
 
-        AnsiConsole.MarkupLine($"[bold]{written.Count} AppManager-compatible backup(s) written.[/]");
+        AnsiConsole.MarkupLine($"[bold]{written.Count} PhoneFork backup(s) written.[/]");
         return written.Count == apps.Count ? 0 : 2;
     }
 
     private static string ToolVersion()
     {
-        var assemblyVersion = typeof(BackupExportAppManagerCommand).Assembly.GetName().Version?.ToString();
+        var assemblyVersion = typeof(BackupExportCommand).Assembly.GetName().Version?.ToString();
         return string.IsNullOrWhiteSpace(assemblyVersion) ? "phonefork" : $"phonefork-cli/{assemblyVersion}";
     }
 }
 
-public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallAppManagerCommand.Settings>
+public sealed class BackupInstallCommand : AsyncCommand<BackupInstallCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
@@ -203,7 +203,7 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
         public required string To { get; init; }
 
         [CommandOption("--backup <PATH>")]
-        [Description("Single AppManager-compatible backup directory containing meta.am.v5.")]
+        [Description("Single PhoneFork backup directory containing phonefork-backup.v1.json.")]
         public required string Backup { get; init; }
 
         [CommandOption("--reinstall")]
@@ -229,7 +229,7 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
             return 1;
         }
 
-        var reader = new AppManagerBackupReader(log);
+        var reader = new PhoneForkBackupReader(log);
         var handle = await reader.ReadAsync(settings.Backup, ct);
         var localApks = handle.ResolveApkPaths();
         var table = new Table().RoundedBorder().AddColumn("Package").AddColumn("Version").AddColumn("APKs").AddColumn("Mode");
@@ -300,7 +300,7 @@ public sealed class BackupInstallAppManagerCommand : AsyncCommand<BackupInstallA
                         failureDetails: result.Success ? null : new[] { $"{packageName}: {result.Error ?? "(unknown)"}" },
                         artifacts: new[] { backupArtifact }),
                 },
-                warnings: new[] { $"Installed from AppManager-compatible backup with {apkCount} APK file(s)." },
+                warnings: new[] { $"Installed from a PhoneFork backup with {apkCount} APK file(s)." },
                 artifacts: new[] { backupArtifact }),
             ct);
     }

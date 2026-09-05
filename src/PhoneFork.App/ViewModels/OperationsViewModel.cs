@@ -213,7 +213,7 @@ public partial class OperationsViewModel : ObservableObject
         var path = BackupPath.Trim();
         if (string.IsNullOrWhiteSpace(path))
         {
-            Status = "Paste an AppManager backup directory, Open Android Backup directory, or .ab file path first.";
+            Status = "Paste a PhoneFork backup directory, Open Android Backup directory, or .ab file path first.";
             AddRow("Backup interop", "Blocked", Status, "Warning");
             return;
         }
@@ -442,7 +442,7 @@ public partial class OperationsViewModel : ObservableObject
     private async Task InspectBackupDirectoryAsync(string path, CancellationToken ct)
     {
         var found = false;
-        var appManager = new AppManagerBackupReader(_log);
+        var appManager = new PhoneForkBackupReader(_log);
         var dirs = appManager.EnumerateBackupDirs(path).Take(20).ToArray();
         foreach (var dir in dirs)
         {
@@ -450,11 +450,11 @@ public partial class OperationsViewModel : ObservableObject
             try
             {
                 var handle = await appManager.ReadAsync(dir, ct);
-                AddRow("Backup interop", "AppManager", $"{handle.Meta.PackageName}: {handle.Meta.Apks.Count} APK entries, {handle.ChecksumsByFileName.Count} checksum rows, {handle.BackupTime:yyyy-MM-dd HH:mm}.");
+                AddRow("Backup interop", "PhoneFork backup", $"{handle.Meta.PackageName}: {handle.Meta.Apks.Count} APK entries, {handle.ChecksumsByFileName.Count} checksum rows, {handle.BackupTime:yyyy-MM-dd HH:mm}.");
             }
             catch (Exception ex)
             {
-                AddRow("Backup interop", "AppManager invalid", $"{dir}: {ex.Message}", "Warning");
+                AddRow("Backup interop", "PhoneFork backup invalid", $"{dir}: {ex.Message}", "Warning");
             }
         }
 
@@ -467,7 +467,7 @@ public partial class OperationsViewModel : ObservableObject
 
         Status = found
             ? $"Backup inspection complete for {path}."
-            : $"No AppManager or Open Android Backup markers found under {path}.";
+            : $"No PhoneFork or Open Android Backup markers found under {path}.";
         AddRow("Backup interop", found ? "Complete" : "No markers", Status, found ? "Info" : "Warning");
     }
 

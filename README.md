@@ -72,8 +72,8 @@ phonefork settings diff --src source.json --dst dest.json [--show-safety]
 phonefork settings apply --from <src> --to <dst> [--allow-multi-user] [--include-uncatalogued-settings]
 phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed feed.json --overlay-sha256 <sha256>] [--allow-multi-user]
 phonefork backup inspect <path> [--json]
-phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
-phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run] [--allow-multi-user]
+phonefork backup export --device <src> --out backups [--package <pkg>]
+phonefork backup install --to <dst> --backup <dir> [--dry-run] [--allow-multi-user]
 phonefork helper install   --device <serial>       # installs and grants runtime permissions
 phonefork helper export    --device <serial> --category sms --out helper-export
 phonefork helper agent     --device <serial> [--op ping]   # push-and-run agent, shell UID
@@ -149,7 +149,7 @@ dotnet publish src/PhoneFork.Cli/PhoneFork.Cli.csproj -c Release -r win-x64 --se
 - [Universal Android Debloater Next Generation](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), the upstream source for the debloat dataset
 - [Shizuku](https://shizuku.rikka.app/) for the no-root Wireless-ADB elevation model
 - [scrcpy](https://github.com/Genymobile/scrcpy) for the `app_process` push-and-run helper pattern
-- [Muntashir's App Manager](https://github.com/MuntashirAkon/AppManager) as the backup-format compatibility target
+- [Muntashir's App Manager](https://github.com/MuntashirAkon/AppManager), whose backup layout informed PhoneFork's own archive format. The two formats are not interchangeable: App Manager writes an encrypted meta_v5.am.json beside a plaintext info_v5.am.json, and PhoneFork writes phonefork-backup.v1.json. Neither tool reads the other's backups.
 
 ## License
 

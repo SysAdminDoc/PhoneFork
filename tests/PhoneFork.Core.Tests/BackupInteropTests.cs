@@ -39,13 +39,13 @@ public class AppManagerBackupRoundTripTests : IDisposable
             IsSystem = false,
         };
 
-        var writer = new AppManagerBackupWriter(NullLog());
+        var writer = new PhoneForkBackupWriter(NullLog());
         var dir = await writer.WriteAsync(_root, "R5CY34G070L", app, new[] { srcApk }, "0.8.0", default);
-        Assert.True(File.Exists(Path.Combine(dir, "meta.am.v5")));
+        Assert.True(File.Exists(Path.Combine(dir, PhoneForkBackupMeta.FileName)));
         Assert.True(File.Exists(Path.Combine(dir, "checksums.txt")));
         Assert.True(File.Exists(Path.Combine(dir, "fake-base.apk")));
 
-        var reader = new AppManagerBackupReader(NullLog());
+        var reader = new PhoneForkBackupReader(NullLog());
         var handle = await reader.ReadAsync(dir);
         Assert.Equal("com.example.fake", handle.Meta.PackageName);
         Assert.Equal(5, handle.Meta.MetaVersion);
@@ -54,7 +54,7 @@ public class AppManagerBackupRoundTripTests : IDisposable
         Assert.Equal(Path.Combine(dir, "fake-base.apk"), Assert.Single(handle.ResolveApkPaths()));
 
         // Hashed serial only — no raw on disk.
-        var diskContents = File.ReadAllText(Path.Combine(dir, "meta.am.v5"));
+        var diskContents = File.ReadAllText(Path.Combine(dir, PhoneForkBackupMeta.FileName));
         Assert.DoesNotContain("R5CY34G070L", diskContents);
         Assert.Contains(SerialHash.Of("R5CY34G070L"), diskContents);
     }
@@ -76,14 +76,14 @@ public class AppManagerBackupRoundTripTests : IDisposable
             IsSystem = false,
         };
 
-        var writer = new AppManagerBackupWriter(NullLog());
+        var writer = new PhoneForkBackupWriter(NullLog());
         var dir = await writer.WriteAsync(_root, "R5CY", app, new[] { srcApk }, "0.8.0", default);
 
         // Tamper with the APK after the writer ran.
         var apkInBackup = Path.Combine(dir, "fake-base.apk");
         await File.WriteAllBytesAsync(apkInBackup, new byte[] { 0xff, 0xfe, 0xfd, 0xfc });
 
-        var reader = new AppManagerBackupReader(NullLog());
+        var reader = new PhoneForkBackupReader(NullLog());
         await Assert.ThrowsAsync<InvalidDataException>(() => reader.ReadAsync(dir));
     }
 }
@@ -183,5 +183,96 @@ public class RetentionSweepTests : IDisposable
         Assert.True(Directory.Exists(drop));
         Assert.True(Directory.Exists(newest));
         Assert.Single(removed);
+    }
+}
+
+/// <summary>
+/// F117 — the backup format is PhoneFork's own, not App Manager's. The metadata file was renamed
+/// off the misleading meta.am.v5 name, and backups written by an earlier build must keep loading.
+/// </summary>
+public class PhoneForkBackupNamingTests : IDisposable
+{
+    private readonly string _root = Path.Combine(Path.GetTempPath(), $"phonefork-backup-naming-{Guid.NewGuid():N}");
+
+    private string WriteBackup(string metaFileName, string packageName)
+    {
+        var dir = Path.Combine(_root, packageName, "20260905T000000Z");
+        Directory.CreateDirectory(dir);
+
+        var apk = Path.Combine(dir, "base.apk");
+        File.WriteAllText(apk, "not-a-real-apk");
+        var sha = Convert.ToHexString(
+            System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(apk))).ToLowerInvariant();
+
+        var meta = new PhoneForkBackupMeta
+        {
+            BackupName = packageName,
+            BackupTimeMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            PackageName = packageName,
+            Apks = new[] { new ApkFileEntry { FileName = "base.apk", SizeBytes = new FileInfo(apk).Length, Sha256 = sha } },
+        };
+        File.WriteAllText(Path.Combine(dir, metaFileName),
+            System.Text.Json.JsonSerializer.Serialize(meta));
+        File.WriteAllLines(Path.Combine(dir, "checksums.txt"), new[] { $"{sha}  base.apk" });
+        return dir;
+    }
+
+    [Fact]
+    public void TheCurrentMetadataFileNameIsNotAppManagers()
+    {
+        // meta.am.v5 implied a compatibility with App Manager that never existed: it writes a
+        // plaintext info_v5.am.json beside an encrypted meta_v5.am.json with different fields.
+        Assert.Equal("phonefork-backup.v1.json", PhoneForkBackupMeta.FileName);
+        Assert.Equal("meta.am.v5", PhoneForkBackupMeta.LegacyFileName);
+        Assert.NotEqual(PhoneForkBackupMeta.FileName, PhoneForkBackupMeta.LegacyFileName);
+    }
+
+    [Fact]
+    public async Task ABackupWrittenTodayLoadsBack()
+    {
+        var dir = WriteBackup(PhoneForkBackupMeta.FileName, "com.example.current");
+
+        var handle = await new PhoneForkBackupReader(NullLog()).ReadAsync(dir);
+
+        Assert.Equal("com.example.current", handle.Meta.PackageName);
+    }
+
+    [Fact]
+    public async Task ABackupFromAnEarlierBuildStillLoads()
+    {
+        var dir = WriteBackup(PhoneForkBackupMeta.LegacyFileName, "com.example.legacy");
+
+        var handle = await new PhoneForkBackupReader(NullLog()).ReadAsync(dir);
+
+        Assert.Equal("com.example.legacy", handle.Meta.PackageName);
+    }
+
+    [Fact]
+    public void EnumerateFindsBothNamingsExactlyOnce()
+    {
+        WriteBackup(PhoneForkBackupMeta.FileName, "com.example.current");
+        WriteBackup(PhoneForkBackupMeta.LegacyFileName, "com.example.legacy");
+
+        var dirs = new PhoneForkBackupReader(NullLog()).EnumerateBackupDirs(_root);
+
+        Assert.Equal(2, dirs.Count);
+        Assert.Equal(dirs.Count, dirs.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+    }
+
+    [Fact]
+    public void ADirectoryWithNoMetadataResolvesToNull()
+    {
+        var empty = Path.Combine(_root, "empty");
+        Directory.CreateDirectory(empty);
+
+        Assert.Null(PhoneForkBackupReader.ResolveMetaPath(empty));
+    }
+
+    private static Serilog.ILogger NullLog() => Serilog.Core.Logger.None;
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_root)) Directory.Delete(_root, recursive: true);
+        GC.SuppressFinalize(this);
     }
 }
