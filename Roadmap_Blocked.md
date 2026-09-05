@@ -27,3 +27,44 @@
   and migration-domain fixtures once public-release demand justifies it.
 - Unblock: establish demand, assign an owner and budget, and approve the supported
   model/OS matrix and destructive-test policy.
+
+## F120 Run the helper provider pagination test
+
+- Blocked 2026-09-05 on build resources, not on the work itself.
+- The refactor shipped: `exportRows` now delegates its offset/limit arithmetic to `PageWindow`
+  (`helper-apk/app/src/main/java/.../providers/PageWindow.kt`), and `PageWindowTest` covers 1,001
+  rows at limit 500, exact multiples of the page size, off-by-one boundaries, page sizes 1 to 7 over
+  20 rows, and parameter clamping. What has never run is the test itself.
+- Attempts, all 2026-09-05:
+  1. `:agent:agentJar` via the build governor failed with a bare `25.0.2`. Cause: `JAVA_HOME` points
+     at Android Studio's JBR, a JDK 25 build Gradle 8.14.4 cannot parse. Fixed by overriding
+     `JAVA_HOME` to Temurin 21.
+  2. `:app:testDebugUnitTest` refused by the governor: 2.79 GB free against a 3 GB floor, with the
+     build lock held by another repo's session.
+  3. Same task, retried later: 0.02 GB free, lock held again; the governor acquired the lock and the
+     build exited 1 with its output swallowed.
+  4. Compiling `PageWindow.kt` and its test directly with `kotlin-compiler-embeddable` from the
+     Gradle cache, bypassing the daemon. Got past `KMappedMarker` by adding stdlib, reflect,
+     script-runtime and daemon-embeddable, then hit `kotlinx.coroutines.CoroutineScope`. Assembling
+     the full compiler classpath by hand is a dependency hunt with no end in sight.
+- Worth knowing: the defect this item was filed against appears not to exist. The original loop was
+  hand-traced twice, once by the author and once by an adversarial review pass, for 1,001 rows at
+  limit 500 and for exact-multiple and off-by-one cases; both traces returned every row exactly once
+  with no gap at a page boundary. The refactor is still worth keeping for testability and for the
+  clamping it added, but expect the test to pass on the first green run rather than expose a bug.
+- Unblock: run the governor for `:app:testDebugUnitTest` with
+  `JAVA_HOME` set to a JDK 21 while the machine has more than 3 GB free and no other session holds
+  the build lock. One green run closes this.
+
+## F125 Validate against One UI 8.5 and One UI 9 / Android 17
+
+- Blocked 2026-09-05. Needs physical hardware this environment does not have, and inherits the same
+  constraint as the two-phone smoke test above.
+- Scope: record, per One UI version, whether `cmd wifi list-networks`, `cmd role get-role-holders`,
+  `settings list`, `pm disable-user` and `pm install-create` still behave as PhoneFork expects, and
+  either handle any divergence in code or name it as a known limitation in README.md.
+- Specifically untested today: the `oneUi: ">=8.5"` override predicates in
+  `assets/debloat/overrides.json` have never run against a device that matches them, and the
+  Advanced Protection probe added in F114 reads candidate settings keys that no real device has
+  confirmed.
+- Unblock: connect a device on One UI 8.5 or One UI 9 and run the matrix with the operator present.
