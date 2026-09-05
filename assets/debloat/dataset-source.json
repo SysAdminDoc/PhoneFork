@@ -1,0 +1,15 @@
+{
+  "$schema": "phonefork-debloat-source-v1",
+  "upstreamRepo": "Universal-Debloater-Alliance/universal-android-debloater-next-generation",
+  "upstreamPath": "resources/assets/uad_lists.json",
+  "upstreamCommit": "d1297f17b73b84f355b2a1f9df4a734d592c63a7",
+  "upstreamSha256": "0fd756ad820ee34e282c32500b55f0d032cd495ece50266bb9be6176a465d7ef",
+  "upstreamEntries": 5372,
+  "capturedAt": "2026-09-05",
+  "removalVocabulary": [
+    "Recommended",
+    "Advanced",
+    "Expert",
+    "Unsafe"
+  ]
+}

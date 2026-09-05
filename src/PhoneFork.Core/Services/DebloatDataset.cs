@@ -27,14 +27,7 @@ public sealed record DebloatOverride
     [JsonPropertyName("expiresAt")] public string? ExpiresAt { get; init; }
     [JsonPropertyName("reviewAfter")] public string? ReviewAfter { get; init; }
 
-    public DebloatTier? ParsedTier => (Tier ?? Action)?.ToLowerInvariant() switch
-    {
-        "delete" => DebloatTier.Delete,
-        "replace" => DebloatTier.Replace,
-        "caution" => DebloatTier.Caution,
-        "unsafe" => DebloatTier.Unsafe,
-        _ => null,
-    };
+    public DebloatTier? ParsedTier => DebloatEntry.ParseTier(Tier ?? Action);
 
     public bool IsExpired(DateOnly today) =>
         DateOnly.TryParse(ExpiresAt, out var expires) && expires < today;

@@ -46,13 +46,22 @@ public sealed record DebloatEntry
     [JsonPropertyName("required_by")] public IReadOnlyList<string>? RequiredBy { get; init; }
 
     [JsonIgnore] public DebloatList List { get; init; }
-    [JsonIgnore] public DebloatTier Tier => Removal switch
+    [JsonIgnore] public DebloatTier Tier => ParseTier(Removal) ?? DebloatTier.Unsafe;
+
+    /// <summary>
+    /// Maps an upstream removal value onto a <see cref="DebloatTier"/>, accepting both the
+    /// current UAD-NG vocabulary (Recommended / Advanced / Expert / Unsafe, renamed upstream
+    /// during 2026) and the older AppManagerNG spelling (delete / replace / caution / unsafe)
+    /// that earlier PhoneFork dataset snapshots and override feeds still use.
+    /// Returns null when the value is not recognised so callers can decide how to fail.
+    /// </summary>
+    public static DebloatTier? ParseTier(string? removal) => removal?.Trim().ToLowerInvariant() switch
     {
-        "delete"  => DebloatTier.Delete,
-        "replace" => DebloatTier.Replace,
-        "caution" => DebloatTier.Caution,
-        "unsafe"  => DebloatTier.Unsafe,
-        _         => DebloatTier.Unsafe,
+        "recommended" or "delete"  => DebloatTier.Delete,
+        "advanced" or "replace"    => DebloatTier.Replace,
+        "expert" or "caution"      => DebloatTier.Caution,
+        "unsafe"                   => DebloatTier.Unsafe,
+        _                          => null,
     };
 
     public string DisplayLabel => string.IsNullOrWhiteSpace(Label) ? PackageId : Label;
