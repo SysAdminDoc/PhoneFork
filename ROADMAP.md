@@ -12,20 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F118 Warn when Android 17 SMS OTP filtering can truncate an SMS export
-  Why: Android 17 withholds `SMS_RECEIVED_ACTION` and filters SMS provider queries for three hours for apps that are not the intended WebOTP recipient, for all apps regardless of target API level. The helper is not the default SMS handler, so an export run soon after an OTP arrives loses those rows with no error at all.
-  Evidence: https://developer.android.com/about/versions/17/behavior-changes-all SMS OTP protection section; `helper-apk/app/src/main/java/.../providers/Providers.kt` `SmsProvider` queries `Telephony.Sms.CONTENT_URI`.
-  Touches: `helper-apk/app/src/main/java/.../providers/Providers.kt`, `src/PhoneFork.Core/Services/HelperProviderContract.cs`, `src/PhoneFork.Core/Services/MessageTransitionService.cs`
-  Acceptance: on API 37 and above the SMS provider adds a `warnings` entry naming the three-hour OTP delay, and the host surfaces it in the export output and receipt; the CLI export exits non-zero only on real failure, not on this warning.
-  Complexity: S
-
-- [ ] P1 — F119 Remove the unreachable restore branch in the helper or implement restore
-  Why: `rejectRestoreWithoutConfirmation` returns `null` on every path, including the one guarded by `confirmRestore`, so the confirmation logic is dead code that reads as a working gate.
-  Evidence: `helper-apk/app/src/main/java/.../providers/Providers.kt`, `rejectRestoreWithoutConfirmation`; `restoreDisabled()` already refuses restore queries separately.
-  Touches: `helper-apk/app/src/main/java/.../providers/Providers.kt`
-  Acceptance: either the function is reduced to an unconditional refusal that matches `restoreDisabled()`'s wording, or restore is implemented behind the confirmation flag with a test proving the confirmed path inserts and the unconfirmed path does not. See Open Question 2 in RESEARCH.md.
-  Complexity: S
-
 ### P2
 
 - [ ] P2 — F120 Fix the helper provider pagination boundary

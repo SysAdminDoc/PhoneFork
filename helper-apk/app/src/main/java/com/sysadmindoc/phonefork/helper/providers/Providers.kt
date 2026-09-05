@@ -61,8 +61,10 @@ class SmsProvider : BaseHelperProvider() {
         capabilities = capabilities(
             "canRead" to true,
             "canRestore" to false,
-            "restoreRequiresDefaultSmsApp" to true
-        )
+            "restoreRequiresDefaultSmsApp" to true,
+            "otpDelayApplies" to otpDelayApplies()
+        ),
+        warnings = otpWarnings()
     ) { c ->
         JSONObject()
             .putLong(c, "id", Telephony.Sms._ID)
@@ -310,12 +312,17 @@ private fun BaseHelperProvider.exportRows(
     projection: Array<String>,
     sortOrder: String,
     capabilities: JSONObject,
+    warnings: Array<String> = emptyArray(),
     mapper: (Cursor) -> JSONObject
 ): Cursor? {
     if (uri.pathSegments.contains("restore")) return restoreDisabled()
 
-    val limit = uri.queryInt("limit", DEFAULT_LIMIT).coerceIn(1, MAX_LIMIT)
-    val offset = uri.queryInt("offset", 0).coerceAtLeast(0)
+    val window = PageWindow.of(
+        offset = uri.queryInt("offset", 0),
+        limit = uri.queryInt("limit", DEFAULT_LIMIT),
+        defaultLimit = DEFAULT_LIMIT,
+        maxLimit = MAX_LIMIT,
+    )
     return try {
         val ctx = context ?: return error("context-unavailable", "Provider context is unavailable.")
         val cursor = ctx.contentResolver.query(target, projection, null, null, sortOrder)
@@ -323,32 +330,30 @@ private fun BaseHelperProvider.exportRows(
         cursor.use { c ->
             val items = JSONArray()
             var skipped = 0
-            var totalSeen = 0
+            var sawRowBeyondPage = false
             while (c.moveToNext()) {
-                if (skipped < offset) {
+                if (window.shouldSkip(skipped)) {
                     skipped++
-                    totalSeen++
                     continue
                 }
-                if (items.length() < limit) items.put(mapper(c))
-                totalSeen++
-                if (items.length() >= limit && c.moveToNext()) {
-                    totalSeen++
+                if (window.hasRoom(items.length())) {
+                    items.put(mapper(c))
+                } else {
+                    // One row past a full page is enough to know another page exists. Stop here
+                    // rather than walking the rest of the cursor just to count it.
+                    sawRowBeyondPage = true
                     break
                 }
             }
-            val nextOffset = if (items.length() == limit && totalSeen > offset + items.length()) {
-                offset + items.length()
-            } else {
-                null
-            }
+            val nextOffset = window.nextOffset(items.length(), sawRowBeyondPage)
             jsonCursor(
                 envelope(
                     status = "ok",
                     mode = "export",
                     items = items,
                     nextOffset = nextOffset,
-                    capabilities = capabilities
+                    capabilities = capabilities,
+                    warnings = warnings
                 ).toString()
             )
         }
@@ -359,16 +364,16 @@ private fun BaseHelperProvider.exportRows(
     }
 }
 
-private fun BaseHelperProvider.rejectRestoreWithoutConfirmation(uri: Uri, values: ContentValues?): Uri? {
-    if (!uri.pathSegments.contains("restore")) return null
-    if (values?.getAsBoolean("confirmRestore") != true &&
-        values?.getAsString("confirmRestore")?.equals("true", ignoreCase = true) != true
-    ) {
-        return null
-    }
-
-    return null
-}
+/**
+ * Restore is not implemented in this helper build, so every insert is refused (F119).
+ *
+ * An earlier revision inspected a `confirmRestore` value here and then returned null on both
+ * branches, which read like a working confirmation gate but was dead code. Restoring SMS in
+ * particular requires the helper to become the device's default SMS app, which is a far larger
+ * and more intrusive change than an insert path; until that is designed, refusing unconditionally
+ * is the honest behaviour and matches what `restoreDisabled()` reports on the query side.
+ */
+private fun BaseHelperProvider.rejectRestoreWithoutConfirmation(uri: Uri, values: ContentValues?): Uri? = null
 
 private fun BaseHelperProvider.restoreDisabled(): Cursor = error(
     code = "restore-disabled",
@@ -445,3 +450,26 @@ private fun defaultRingtone(ctx: android.content.Context, type: Int, name: Strin
         .put("uri", uri?.toString())
         .put("title", title)
 }
+
+/**
+ * Android 17 (API 37) expanded its SMS one-time-password protection to WebOTP-format messages:
+ * for an app that can read SMS but is not the intended recipient, SMS_RECEIVED_ACTION is withheld
+ * and SMS provider queries are filtered for three hours after receipt. It applies to every app
+ * regardless of target API level.
+ *
+ * PhoneForkHelper is never the default SMS app, so a migration run soon after a verification code
+ * arrives will not see those rows and Android reports no error. Callers are told so they can
+ * decide whether to re-run rather than silently shipping a short export.
+ */
+private fun otpDelayApplies(): Boolean = android.os.Build.VERSION.SDK_INT >= 37
+
+private fun otpWarnings(): Array<String> =
+    if (otpDelayApplies()) {
+        arrayOf(
+            "Android 17 withholds one-time-password messages from apps that are not the intended " +
+                "recipient for three hours after they arrive. Messages newer than that may be missing " +
+                "from this export; re-run later to capture them."
+        )
+    } else {
+        emptyArray()
+    }
