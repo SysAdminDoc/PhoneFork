@@ -1,11 +1,14 @@
 using System.Windows;
 using System.Windows.Interop;
 using PhoneFork.App.ViewModels;
+using PhoneFork.Core.Services;
 
 namespace PhoneFork.App.Views;
 
 public partial class MainWindow : Window
 {
+    private readonly WindowStateStore _windowState;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -17,6 +20,61 @@ public partial class MainWindow : Window
             App.Current.WirelessPolicy,
             App.Current.TrustedPairs,
             App.Current.Log);
+
+        // F129 - a migration often spans several launches, so reopen where the user left off.
+        _windowState = new WindowStateStore(App.Current.Log);
+        RestoreWindowState();
+        Closing += (_, _) => SaveWindowState();
+    }
+
+    private void RestoreWindowState()
+    {
+        var saved = _windowState.Load();
+        if (saved is null) return;
+
+        // Only honour a position that still lands on the current desktop. A window last closed on
+        // a monitor that has since been unplugged would otherwise open where it cannot be reached.
+        var virtualScreen = new[]
+        {
+            (SystemParameters.VirtualScreenLeft,
+             SystemParameters.VirtualScreenTop,
+             SystemParameters.VirtualScreenWidth,
+             SystemParameters.VirtualScreenHeight),
+        };
+
+        if (WindowStateStore.IsOnAnyDisplay(saved, virtualScreen))
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = saved.Left;
+            Top = saved.Top;
+            Width = Math.Max(saved.Width, MinWidth);
+            Height = Math.Max(saved.Height, MinHeight);
+        }
+
+        if (saved.Maximized)
+            WindowState = WindowState.Maximized;
+
+        if (saved.SelectedTab >= 0 && saved.SelectedTab < DomainTabs.Items.Count)
+            DomainTabs.SelectedIndex = saved.SelectedTab;
+    }
+
+    private void SaveWindowState()
+    {
+        // RestoreBounds carries the pre-maximise rectangle; Left/Top/Width/Height would report the
+        // maximised frame and lose the size to restore to.
+        var bounds = WindowState == WindowState.Normal
+            ? new Rect(Left, Top, Width, Height)
+            : RestoreBounds;
+
+        _windowState.Save(new WindowStateSnapshot
+        {
+            Left = bounds.Left,
+            Top = bounds.Top,
+            Width = bounds.Width,
+            Height = bounds.Height,
+            Maximized = WindowState == WindowState.Maximized,
+            SelectedTab = DomainTabs.SelectedIndex,
+        });
     }
 
     private void TryApplyDarkTitleBar()
