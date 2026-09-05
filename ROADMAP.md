@@ -10,13 +10,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P0
 
-- [ ] P0 — F112 Expose the helper export path in the CLI and the Operations tab
-  Why: `HelperAppService.QueryAsync` has zero callers in the repo, so SMS, call log, contacts, dictionary, ringtone and wallpaper data can be read by the helper but never reaches the user. The helper is currently install/probe/uninstall only.
-  Evidence: repo-wide search for `.QueryAsync(` finds only the definition; helper callers are limited to `src/PhoneFork.Cli/Commands/HelperCommands.cs:43,75,103,140` and `src/PhoneFork.App/ViewModels/OperationsViewModel.cs:292,304,327`.
-  Touches: `src/PhoneFork.Cli/Commands/HelperCommands.cs`, `src/PhoneFork.Cli/Program.cs`, `src/PhoneFork.App/ViewModels/OperationsViewModel.cs`, `src/PhoneFork.App/Views/OperationsView.xaml`
-  Acceptance: `phonefork helper export --device <serial> --category sms|calllog|contacts|dictionary|ringtone|wallpaper --out <path> [--json]` writes the paged v1 envelopes to disk, follows `nextOffset` to completion, and emits a migration receipt; the Operations tab offers the same per-category export with the resulting file path shown in the status line.
-  Complexity: M
-
 ### P1
 
 - [ ] P1 — F113 Add a Cancel control to every long-running GUI operation

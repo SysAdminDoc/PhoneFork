@@ -122,6 +122,8 @@ app.Configure(config =>
             .WithDescription("Push and install PhoneForkHelper.apk onto a device.");
         helper.AddCommand<HelperUninstallCommand>("uninstall")
             .WithDescription("Uninstall PhoneForkHelper (idempotent).");
+        helper.AddCommand<HelperExportCommand>("export")
+            .WithDescription("Page a helper provider to completion and write its rows to JSON.");
         helper.AddCommand<HelperProbeCommand>("probe")
             .WithDescription("Health-check every helper provider authority.");
         helper.AddCommand<HelperResidueCommand>("residue")

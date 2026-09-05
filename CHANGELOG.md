@@ -15,6 +15,7 @@ All notable changes to PhoneFork.
 - `scripts/Update-DebloatDataset.ps1` regenerates the embedded debloat dataset from a pinned upstream commit and records its provenance in `assets/debloat/dataset-source.json`.
 - `Test-VersionConsistency.ps1` warns when the debloat snapshot is over 90 days old and fails the check past a year.
 - `phonefork helper probe` now reports per-permission grant state read back from `dumpsys package`, and exits non-zero when SMS, call log or contacts reads cannot work.
+- `phonefork helper export` pages a helper provider to completion and writes its rows to JSON, with `--category`, `--out` and `--json`. The Operations tab gained the same per-device Export button. The helper's read path previously had no user-facing surface at all.
 
 ## v0.9.3-pre (2026-08-29)
 

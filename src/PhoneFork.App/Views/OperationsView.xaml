@@ -49,7 +49,11 @@
                     <TextBlock Text="Install, probe, or remove the helper APK on either assigned phone. Shizuku checks are read-only."
                                Foreground="{StaticResource ForegroundMutedBrush}" TextWrapping="Wrap" Margin="0,3,0,12"/>
                     <TextBlock Text="Helper APK path" Foreground="{StaticResource ForegroundMutedBrush}"/>
-                    <TextBox Text="{Binding HelperApkPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"/>
+                    <TextBox Text="{Binding HelperApkPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"
+                             AutomationProperties.Name="Helper APK path"/>
+                    <TextBlock Text="Helper export folder" Foreground="{StaticResource ForegroundMutedBrush}"/>
+                    <TextBox Text="{Binding HelperExportPath, UpdateSourceTrigger=PropertyChanged}" Margin="0,4,0,12"
+                             AutomationProperties.Name="Helper export folder"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -60,6 +64,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="Install" Command="{Binding InstallHelperSourceCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Probe" Command="{Binding ProbeHelperSourceCommand}" Margin="0,0,6,0"/>
+                                <Button Content="Export" Command="{Binding ExportHelperSourceCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Uninstall" Command="{Binding UninstallHelperSourceCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Shizuku" Command="{Binding CheckShizukuSourceCommand}"/>
                             </StackPanel>
@@ -69,6 +74,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="Install" Command="{Binding InstallHelperDestinationCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Probe" Command="{Binding ProbeHelperDestinationCommand}" Margin="0,0,6,0"/>
+                                <Button Content="Export" Command="{Binding ExportHelperDestinationCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Uninstall" Command="{Binding UninstallHelperDestinationCommand}" Margin="0,0,6,0"/>
                                 <Button Content="Shizuku" Command="{Binding CheckShizukuDestinationCommand}"/>
                             </StackPanel>
