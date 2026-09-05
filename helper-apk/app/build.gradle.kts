@@ -14,8 +14,8 @@ android {
         applicationId = "com.sysadmindoc.phonefork.helper"
         minSdk = 30
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.9.3-pre"
+        versionCode = 5
+        versionName = "0.9.4-pre"
 
         // The helper has no launcher activity and remains host-driven.
         // The host (Windows) drives every code path via `adb shell content query/insert/update`

@@ -1,6 +1,6 @@
 # PhoneFork
 
-[![Version](https://img.shields.io/badge/version-0.9.3--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
+[![Version](https://img.shields.io/badge/version-0.9.4--pre-blue.svg)](https://github.com/SysAdminDoc/PhoneFork/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
@@ -42,7 +42,7 @@ Google's [developer verification](https://developer.android.com/developer-verifi
 
 ## Install
 
-The current GitHub prerelease is [v0.9.3-pre](https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.3-pre). Download the WPF ZIP for the desktop app, or the CLI ZIP for terminal use.
+The current GitHub prerelease is [v0.9.4-pre](https://github.com/SysAdminDoc/PhoneFork/releases/tag/v0.9.4-pre). Download the WPF ZIP for the desktop app, or the CLI ZIP for terminal use.
 
 Requires the **.NET 10 Desktop Runtime** ([download](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)). The zip is framework-dependent (~10 MB).
 
