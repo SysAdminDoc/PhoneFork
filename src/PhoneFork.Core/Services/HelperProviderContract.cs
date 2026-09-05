@@ -11,6 +11,20 @@ public static class HelperProviderContract
 {
     public const string Schema = "phonefork.helper.v1";
 
+    /// <summary>
+    /// Authority reported by the app_process agent (F115). The agent speaks the same v1 envelope
+    /// as the ContentProviders but is not one of them: it has no content:// URI, so it belongs in
+    /// envelope validation without being in <see cref="HelperAppService.Authorities"/>, which
+    /// <see cref="BuildQueryUri"/> uses to build provider URIs.
+    /// </summary>
+    public const string AgentAuthority = "agent";
+
+    /// <summary>Authorities that may appear in an inbound envelope.</summary>
+    public static bool IsKnownAuthority(string? authority) =>
+        authority is not null
+        && (HelperAppService.Authorities.Contains(authority)
+            || string.Equals(authority, AgentAuthority, StringComparison.Ordinal));
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -59,7 +73,7 @@ public static class HelperProviderContract
             throw new FormatException("Helper provider returned no envelope.");
         if (!string.Equals(envelope.Schema, Schema, StringComparison.Ordinal))
             throw new FormatException($"Unsupported helper provider schema: {envelope.Schema}");
-        if (!HelperAppService.Authorities.Contains(envelope.Authority))
+        if (!IsKnownAuthority(envelope.Authority))
             throw new FormatException($"Unknown helper authority in envelope: {envelope.Authority}");
         if (envelope.Items.ValueKind is not JsonValueKind.Array)
             throw new FormatException("Helper provider envelope must contain an items array.");

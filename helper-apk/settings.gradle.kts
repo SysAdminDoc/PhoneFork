@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "PhoneForkHelper"
 include(":app")
+include(":agent")

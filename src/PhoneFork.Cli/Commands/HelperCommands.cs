@@ -288,3 +288,89 @@ public sealed class HelperExportCommand : AsyncCommand<HelperExportCommand.Setti
         return results.All(r => r.Success) ? 0 : 1;
     }
 }
+
+/// <summary>
+/// <c>phonefork helper agent</c> — push the app_process agent JAR, invoke one op, and remove it
+/// again (F115). The agent runs as the shell user and installs nothing, so it reaches privileges
+/// no helper APK can obtain and leaves only the JAR, which this command deletes.
+/// </summary>
+public sealed class HelperAgentCommand : AsyncCommand<HelperAgentCommand.Settings>
+{
+    public sealed class Settings : CommandSettings
+    {
+        [CommandOption("-d|--device <SERIAL>")] [Description("Target device serial.")]
+        public required string Serial { get; init; }
+
+        [CommandOption("--op <NAME>")] [Description("Agent operation to invoke. Default: ping.")]
+        public string Op { get; init; } = "ping";
+
+        [CommandOption("--jar <PATH>")] [Description("Path to phonefork-agent.jar. Defaults to assets/helper/phonefork-agent.jar next to the CLI.")]
+        public string? JarPath { get; init; }
+
+        [CommandOption("--keep")] [Description("Leave the agent JAR on the device instead of removing it after the call.")]
+        public bool Keep { get; init; }
+    }
+
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
+    {
+        var jar = s.JarPath ?? ResolveAgentJar();
+        if (!File.Exists(jar))
+        {
+            AnsiConsole.MarkupLine(
+                $"[red]Agent JAR not found:[/] {Markup.Escape(jar)}. " +
+                "Build it with `scripts/Build-AgentJar.ps1`, then stage it with `scripts/Stage-HelperApk.ps1`.");
+            return 2;
+        }
+
+        var (host, _, log) = AdbBootstrap.Initialize();
+        var device = host.GetDevices().FirstOrDefault(d => d.Serial == s.Serial);
+        if (device is null)
+        {
+            AnsiConsole.MarkupLine($"[red]Device offline:[/] {Markup.Escape(s.Serial)}");
+            return 2;
+        }
+
+        var agent = new AppProcessAgentService(host.Client, log);
+        try
+        {
+            AnsiConsole.MarkupLine($"[grey]Pushing {Markup.Escape(Path.GetFileName(jar))} to {Markup.Escape(AppProcessAgentService.RemoteJarPath)}…[/]");
+            await agent.PushAgentAsync(device, jar, ct);
+
+            var request = $"{{\"op\":\"{s.Op}\"}}";
+            var raw = await agent.InvokeAsync(device, request, ct);
+            var json = raw.Trim();
+
+            if (!HelperProviderContract.TryParseEnvelope(json, out var envelope))
+            {
+                AnsiConsole.MarkupLine("[red]Agent returned an unparseable payload:[/]");
+                AnsiConsole.WriteLine(json);
+                return 1;
+            }
+
+            AnsiConsole.WriteLine(json);
+            if (!envelope!.IsOk)
+            {
+                AnsiConsole.MarkupLine($"[red]Agent op failed:[/] {Markup.Escape(envelope.Error?.Message ?? envelope.Status)}");
+                return 1;
+            }
+            return 0;
+        }
+        finally
+        {
+            if (!s.Keep)
+            {
+                await agent.RemoveAgentAsync(device, ct);
+                var residue = await new HelperAppService(host.Client, log).ResidueCheckAsync(device, ct);
+                AnsiConsole.MarkupLine(residue.TempFilesLeft.Count == 0
+                    ? "[grey]Agent removed; no /data/local/tmp leftovers.[/]"
+                    : $"[yellow]Leftovers in /data/local/tmp:[/] {Markup.Escape(string.Join(", ", residue.TempFilesLeft))}");
+            }
+        }
+    }
+
+    internal static string ResolveAgentJar()
+    {
+        var here = Path.GetDirectoryName(AppContext.BaseDirectory) ?? Environment.CurrentDirectory;
+        return Path.Combine(here, "assets", "helper", "phonefork-agent.jar");
+    }
+}

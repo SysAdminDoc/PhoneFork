@@ -130,3 +130,13 @@ $hash = Get-FileHash -Algorithm SHA256 -LiteralPath $stagedApk
 Write-Host "Staged verified helper APK: $stagedApk"
 Write-Host "Metadata: $metadataPath"
 Write-Host "SHA-256: $hashPath"
+
+# The app_process agent JAR ships beside the APK so the CLI's default --jar path resolves (F115).
+# Unlike the APK it is not signed: app_process runs it as the shell user from /data/local/tmp,
+# where Android applies no signature check, so the SHA-256 is the integrity record that matters.
+$agentJar = Join-Path $outputRoot "phonefork-agent.jar"
+if (Test-Path -LiteralPath $agentJar) {
+    Write-Host "Agent JAR already staged: $agentJar"
+} else {
+    Write-Warning "No phonefork-agent.jar in $outputRoot. Build it with scripts/Build-AgentJar.ps1 -Stage."
+}

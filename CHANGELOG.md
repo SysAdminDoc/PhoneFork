@@ -17,6 +17,7 @@ All notable changes to PhoneFork.
 - `Test-VersionConsistency.ps1` warns when the debloat snapshot is over 90 days old and fails the check past a year.
 - `phonefork helper probe` now reports per-permission grant state read back from `dumpsys package`, and exits non-zero when SMS, call log or contacts reads cannot work.
 - Pre-flight now probes Android Advanced Protection on both phones and reports it as on, off or unknown, naming the operations it breaks (package installs, helper install, USB data while locked, wireless debugging). An unreadable setting is reported as unknown, never as off. `phonefork honesty` shows the same finding.
+- The `app_process` push-and-run agent now exists. `helper-apk/agent` compiles a plain-Java `Agent` class against `android.jar`, dexes it with d8 and packages `classes.dex` into `phonefork-agent.jar`, following scrcpy's pattern. `scripts/Build-AgentJar.ps1 -Stage` builds and stages it; `phonefork helper agent` pushes it, invokes an op, prints the v1 envelope and removes it again. The agent runs as the shell user and installs nothing.
 - `phonefork helper export` pages a helper provider to completion and writes its rows to JSON, with `--category`, `--out` and `--json`. The Operations tab gained the same per-device Export button. The helper's read path previously had no user-facing surface at all.
 
 ## v0.9.3-pre (2026-08-29)

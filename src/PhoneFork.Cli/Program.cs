@@ -126,6 +126,8 @@ app.Configure(config =>
             .WithDescription("Page a helper provider to completion and write its rows to JSON.");
         helper.AddCommand<HelperProbeCommand>("probe")
             .WithDescription("Health-check every helper provider authority.");
+        helper.AddCommand<HelperAgentCommand>("agent")
+            .WithDescription("Push, invoke and remove the app_process agent JAR (runs as the shell user).");
         helper.AddCommand<HelperResidueCommand>("residue")
             .WithDescription("Verify the helper is gone after migration (F019).");
     });
