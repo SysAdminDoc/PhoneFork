@@ -38,14 +38,13 @@ public sealed class HonestyCommand : AsyncCommand<HonestyCommand.Settings>
         var svc = new SamsungHonestyService(host.Client, log);
         var report = await svc.ProbeAsync(device, ct);
 
-        if (report.Findings.Count == 0)
-        {
-            AnsiConsole.MarkupLine("[green]No Samsung honesty flags detected on this device.[/]");
-            return 0;
-        }
+        // F114 - Advanced Protection blocks package installs and USB data while locked, so it
+        // belongs alongside the Samsung honesty flags rather than surfacing as an ADB failure.
+        var advancedProtection = await new AdvancedProtectionService(host.Client, log).ProbeAsync(device, ct);
+        var findings = report.Findings.Concat(new[] { advancedProtection.ToFinding("selected") }).ToList();
 
         var table = new Table().AddColumns("Level", "Title", "Package", "Detail");
-        foreach (var f in report.Findings)
+        foreach (var f in findings)
         {
             var levelMarkup = f.Level switch
             {
@@ -60,8 +59,10 @@ public sealed class HonestyCommand : AsyncCommand<HonestyCommand.Settings>
                 Markup.Escape(f.Detail));
         }
         AnsiConsole.Write(table);
-        AnsiConsole.MarkupLine(
-            $"[grey]Blockers: {report.BlockerCount}  Warnings: {report.WarningCount}  Info: {report.InfoCount}[/]");
-        return report.HasBlockers ? 1 : 0;
+        var blockers = findings.Count(f => f.Level == HonestyLevel.Blocker);
+        var warnings = findings.Count(f => f.Level == HonestyLevel.Warning);
+        var info = findings.Count(f => f.Level == HonestyLevel.Info);
+        AnsiConsole.MarkupLine($"[grey]Blockers: {blockers}  Warnings: {warnings}  Info: {info}[/]");
+        return blockers > 0 ? 1 : 0;
     }
 }
