@@ -68,3 +68,20 @@
   Advanced Protection probe added in F114 reads candidate settings keys that no real device has
   confirmed.
 - Unblock: connect a device on One UI 8.5 or One UI 9 and run the matrix with the operator present.
+
+## F123 Grow the settings safety corpus beyond the current 38 safe rules
+
+- Blocked 2026-09-05 on a missing fixture, not on the rule-writing.
+- The acceptance is measured against "a captured S25-to-S22 diff fixture", and no such fixture is in
+  the repository. CLAUDE.md records that a real capture happened during v0.3.0 hardware validation
+  (1,062 keys on the S25 against 967 on the S22, 271 applicable), but only those counts were kept;
+  the key list itself was never committed.
+- Why this cannot be worked around: writing rules against a synthetic key list and then measuring
+  coverage against that same list proves nothing. The 60 percent target is only meaningful against
+  keys a real Samsung device actually reports.
+- Current state for whoever picks this up: `SamsungSettingsCorpus` holds 38 Safe, 6 Review and 14
+  Blocked rules. Everything else resolves to Unknown and is skipped unless the caller passes
+  `--include-uncatalogued-settings`, which gives up the safety gate wholesale.
+- Unblock: run `phonefork settings dump --device <serial> --out settings.json` on both phones, commit
+  the resulting diff as a test fixture with any personal values scrubbed, then grow the corpus
+  against it and add the coverage assertion.

@@ -14,13 +14,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P2
 
-- [ ] P2 — F123 Grow the settings safety corpus beyond the current 38 safe rules
-  Why: the corpus holds 38 Safe, 6 Review and 14 Blocked rules against a hardware-measured 271-key applicable diff, so most real keys resolve to Unknown and are skipped unless the user passes `--include-uncatalogued-settings`, which gives up the safety gate wholesale.
-  Evidence: rule counts in `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`; the 1,062 vs 967 key snapshot and 271 applicable figure recorded for v0.3.0 in CLAUDE.md.
-  Touches: `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`, `tests/PhoneFork.Core.Tests/DifferTests.cs`
-  Acceptance: the corpus classifies at least 60 percent of the keys in a captured S25-to-S22 diff fixture as Safe, Review or Blocked rather than Unknown; each new rule carries a rationale and a source id; a test asserts the Unknown share of that fixture stays under 40 percent.
-  Complexity: L
-
 - [ ] P2 — F124 Add an ADB transport fake and test the App and Cli projects
   Why: all 163 tests are pure Core unit tests with no transport double, and neither `src/PhoneFork.App` nor `src/PhoneFork.Cli` has a test project. That is why the missing cancel affordance and the unreachable helper export both went unnoticed.
   Evidence: `dotnet test -c Release` on 2026-09-04 reports 163 passed in 242 ms from a single assembly, `PhoneFork.Core.Tests.dll`; `tests/` contains one project.
