@@ -2,7 +2,7 @@
 
 All notable changes to PhoneFork.
 
-## Unreleased
+## v0.9.4-pre (2026-09-05)
 
 ### Fixed
 
