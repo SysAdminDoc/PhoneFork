@@ -172,3 +172,119 @@ public sealed class HelperResidueCommand : AsyncCommand<HelperResidueCommand.Set
         return 1;
     }
 }
+
+/// <summary>
+/// <c>phonefork helper export</c> — page a helper ContentProvider to completion and write the
+/// rows to disk (F112). Without this the helper's read path had no user-facing surface at all.
+/// </summary>
+public sealed class HelperExportCommand : AsyncCommand<HelperExportCommand.Settings>
+{
+    public sealed class Settings : CommandSettings
+    {
+        [CommandOption("-d|--device <SERIAL>")] [Description("Source device serial.")]
+        public required string Serial { get; init; }
+
+        [CommandOption("--category <NAME>")]
+        [Description("Authority to export (repeatable): sms, calllog, contacts, dictionary, ringtone, wallpaper, wifi. Default: all of them.")]
+        public string[] Categories { get; init; } = Array.Empty<string>();
+
+        [CommandOption("--out <DIR>")] [Description("Directory to write <category>.json into. Default: ./helper-export.")]
+        public string OutputDirectory { get; init; } = "helper-export";
+
+        [CommandOption("--json")] [Description("Emit the per-category summary as JSON instead of a table.")]
+        public bool Json { get; init; }
+    }
+
+    protected override async Task<int> ExecuteAsync(CommandContext context, Settings s, CancellationToken ct)
+    {
+        // Validate the requested categories before touching ADB so a typo is caught
+        // without a device attached.
+        var requested = s.Categories.Length > 0
+            ? s.Categories.Select(c => c.Trim().ToLowerInvariant()).Distinct(StringComparer.Ordinal).ToList()
+            : HelperAppService.Authorities.ToList();
+
+        var unknown = requested.Where(c => !HelperAppService.Authorities.Contains(c)).ToList();
+        if (unknown.Count > 0)
+        {
+            AnsiConsole.MarkupLine(
+                $"[red]Unknown categor(y/ies):[/] {Markup.Escape(string.Join(", ", unknown))}. " +
+                $"Valid: {Markup.Escape(string.Join(", ", HelperAppService.Authorities))}.");
+            return 2;
+        }
+
+        var (host, _, log) = AdbBootstrap.Initialize();
+        var device = host.GetDevices().FirstOrDefault(d => d.Serial == s.Serial);
+        if (device is null)
+        {
+            AnsiConsole.MarkupLine($"[red]Device offline:[/] {Markup.Escape(s.Serial)}");
+            return 2;
+        }
+
+        var helper = new HelperAppService(host.Client, log);
+        if (!await helper.IsInstalledAsync(device, ct))
+        {
+            AnsiConsole.MarkupLine("[yellow]Helper not installed.[/] Run `phonefork helper install -d <serial>` first.");
+            return 1;
+        }
+
+        var permissions = await helper.ProbeRuntimePermissionsAsync(device, ct);
+        if (!permissions.CanReadPrivilegedCategories)
+            AnsiConsole.MarkupLine("[yellow]SMS, call log and contacts reads will fail: those runtime permissions are not granted. Re-run `phonefork helper install`.[/]");
+
+        var exporter = new HelperExportService(helper, log);
+        var results = new List<HelperExportResult>(requested.Count);
+        foreach (var category in requested)
+        {
+            ct.ThrowIfCancellationRequested();
+            var outPath = Path.Combine(s.OutputDirectory, HelperExportService.DefaultFileName(category));
+            results.Add(await exporter.ExportAsync(device, category, outPath,
+                s.Json ? null : new Progress<string>(m => AnsiConsole.MarkupLine($"[grey]{Markup.Escape(m)}[/]")),
+                ct));
+        }
+
+        if (s.Json)
+        {
+            AnsiConsole.WriteLine(System.Text.Json.JsonSerializer.Serialize(
+                results, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+        }
+        else
+        {
+            var table = new Table().AddColumns("Category", "Rows", "Pages", "Output");
+            foreach (var r in results)
+            {
+                table.AddRow(
+                    Markup.Escape(r.Authority),
+                    r.Success ? r.ItemCount.ToString() : "[red]—[/]",
+                    r.Pages.ToString(),
+                    Markup.Escape(r.Success ? r.OutputPath ?? "" : r.Error ?? "failed"));
+            }
+            AnsiConsole.Write(table);
+            foreach (var warning in results.SelectMany(r => r.Warnings).Distinct(StringComparer.Ordinal))
+                AnsiConsole.MarkupLine($"[yellow]warning:[/] {Markup.Escape(warning)}");
+        }
+
+        var receiptPath = await new MigrationReceiptService(log).WriteAsync(
+            MigrationReceiptService.Create(
+                operation: "helper-export",
+                dryRun: false,
+                devices: new[] { MigrationReceiptService.Device("source", device) },
+                categories: results.Select(r => MigrationReceiptService.Category(
+                    $"helper-{r.Authority}",
+                    planned: 1,
+                    succeeded: r.Success ? 1 : 0,
+                    skipped: 0,
+                    failed: r.Success ? 0 : 1,
+                    failureDetails: r.Success ? null : new[] { r.Error ?? "failed" },
+                    warnings: r.Warnings,
+                    artifacts: r.OutputPath is null
+                        ? null
+                        : new[] { new MigrationReceiptArtifact("helper-export", r.OutputPath) })),
+                warnings: permissions.CanReadPrivilegedCategories
+                    ? null
+                    : new[] { "Helper runtime permissions were incomplete; privileged categories could not be read." }),
+            ct);
+        AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");
+
+        return results.All(r => r.Success) ? 0 : 1;
+    }
+}

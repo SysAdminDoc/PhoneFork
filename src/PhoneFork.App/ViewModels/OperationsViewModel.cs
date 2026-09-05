@@ -79,6 +79,7 @@ public partial class OperationsViewModel : ObservableObject
     [ObservableProperty] private string _status = "Use this panel for helper, pre-flight, Smart Switch, backup, trust, and verification operations.";
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private string _helperApkPath = ResolveDefaultHelperApk();
+    [ObservableProperty] private string _helperExportPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PhoneFork", "helper-export");
     [ObservableProperty] private string _backupPath = "";
     [ObservableProperty] private string _sourceLine = "Source not assigned.";
     [ObservableProperty] private string _destinationLine = "Destination not assigned.";
@@ -155,6 +156,14 @@ public partial class OperationsViewModel : ObservableObject
     [RelayCommand]
     private async Task UninstallHelperDestinationAsync(CancellationToken ct) =>
         await UninstallHelperAsync(DeviceRole.Destination, ct);
+
+    [RelayCommand]
+    private async Task ExportHelperSourceAsync(CancellationToken ct) =>
+        await ExportHelperAsync(DeviceRole.Source, ct);
+
+    [RelayCommand]
+    private async Task ExportHelperDestinationAsync(CancellationToken ct) =>
+        await ExportHelperAsync(DeviceRole.Destination, ct);
 
     [RelayCommand]
     private async Task CheckShizukuSourceAsync(CancellationToken ct) =>
@@ -331,6 +340,61 @@ public partial class OperationsViewModel : ObservableObject
                 ? $"Helper removed cleanly from {label}."
                 : $"Helper uninstall on {label} needs review. Installed={residue.HelperInstalled}, tmp leftovers={residue.TempFilesLeft.Count}.";
             AddRow("Helper", ok && residue.IsClean ? "Removed" : "Review", Status, ok && residue.IsClean ? "Info" : "Warning");
+        }, ct);
+    }
+
+    /// <summary>
+    /// Pages every helper authority to completion and writes one JSON file per category (F112).
+    /// Without this the helper's read path had no GUI surface at all.
+    /// </summary>
+    private async Task ExportHelperAsync(DeviceRole role, CancellationToken ct)
+    {
+        if (!TryGetRoleDevice(role, out var device, out var label)) return;
+
+        var outDir = HelperExportPath.Trim();
+        if (outDir.Length == 0)
+        {
+            Status = "Set an export folder first.";
+            AddRow("Helper export", "Blocked", Status, "Warning");
+            return;
+        }
+
+        await RunBusyAsync($"Exporting helper data from {label}...", async token =>
+        {
+            var svc = new HelperAppService(_host.Client, _log);
+            if (!await svc.IsInstalledAsync(device, token))
+            {
+                Status = $"Helper is not installed on {label}.";
+                AddRow("Helper export", "Missing", Status, "Warning");
+                return;
+            }
+
+            var permissions = await svc.ProbeRuntimePermissionsAsync(device, token);
+            if (!permissions.CanReadPrivilegedCategories)
+                AddRow("Helper export", "Permissions",
+                    "SMS, call log and contacts reads will fail: those runtime permissions are not granted. Re-install the helper.",
+                    "Warning");
+
+            var exporter = new HelperExportService(svc, _log);
+            var results = new List<HelperExportResult>(HelperAppService.Authorities.Count);
+            foreach (var authority in HelperAppService.Authorities)
+            {
+                token.ThrowIfCancellationRequested();
+                var outPath = Path.Combine(outDir, HelperExportService.DefaultFileName(authority));
+                var result = await exporter.ExportAsync(device, authority, outPath, progress: null, token);
+                results.Add(result);
+                AddRow(
+                    "Helper export",
+                    result.Success ? "Exported" : "Failed",
+                    result.Success
+                        ? $"{authority}: {result.ItemCount} row(s) over {result.Pages} page(s) -> {result.OutputPath}"
+                        : $"{authority}: {result.Error}",
+                    result.Success ? "Info" : "Warning");
+            }
+
+            var ok = results.Count(r => r.Success);
+            var rows = results.Where(r => r.Success).Sum(r => r.ItemCount);
+            Status = $"Helper export from {label}: {ok}/{results.Count} categories, {rows} row(s). Files in {outDir}.";
         }, ct);
     }
 
