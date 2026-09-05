@@ -2,6 +2,20 @@
 
 All notable changes to PhoneFork.
 
+## Unreleased
+
+### Fixed
+
+- Debloat safety data was four months stale. The embedded AppManagerNG/UAD-NG dataset is repinned to upstream commit `d1297f17` (5,372 entries), and PhoneFork now reads upstream's current removal vocabulary (Recommended / Advanced / Expert / Unsafe) as well as the older delete / replace / caution / unsafe spelling. 188 packages had drifted to a more dangerous classification upstream, 176 of them inside the default Conservative profile.
+- `debloat apply --package` bypassed profile tier filtering, so a package rated Unsafe could be disabled with no warning. It is now refused unless `--include-unsafe` is passed.
+- The helper APK was installed without its runtime permissions, so every SMS, call log and contacts read failed with `permission-denied`. Install now uses `pm install -r -g` and grants each dangerous permission explicitly.
+
+### Added
+
+- `scripts/Update-DebloatDataset.ps1` regenerates the embedded debloat dataset from a pinned upstream commit and records its provenance in `assets/debloat/dataset-source.json`.
+- `Test-VersionConsistency.ps1` warns when the debloat snapshot is over 90 days old and fails the check past a year.
+- `phonefork helper probe` now reports per-permission grant state read back from `dumpsys package`, and exits non-zero when SMS, call log or contacts reads cannot work.
+
 ## v0.9.3-pre (2026-08-29)
 
 ### Changed

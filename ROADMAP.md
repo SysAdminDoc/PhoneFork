@@ -10,13 +10,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P0
 
-- [ ] P0 — F111 Grant the helper APK its runtime permissions during install
-  Why: `pm install -r` grants no dangerous permissions and the helper ships no launcher activity, so it can never prompt. Every SMS, call-log and contacts query returns a `permission-denied` envelope, making the entire v0.7.0 read path non-functional on real hardware.
-  Evidence: `src/PhoneFork.Core/Services/HelperAppService.cs:54`; `helper-apk/app/src/main/AndroidManifest.xml` declares `READ_SMS`, `READ_CALL_LOG`, `READ_CONTACTS`; `helper-apk/app/src/main/java/.../providers/Providers.kt` `exportRows` returns `permission-denied` on `SecurityException`.
-  Touches: `src/PhoneFork.Core/Services/HelperAppService.cs`, `tests/PhoneFork.Core.Tests/HelperAppServiceTests.cs`
-  Acceptance: install uses `pm install -r -g` and then issues an explicit `pm grant <pkg> <permission>` per runtime permission, logging each result; a post-install probe reports per-permission granted state; on a connected device `phonefork helper probe` shows the sms, calllog and contacts authorities returning `status: ok` rather than `permission-denied`. Note that `WRITE_SMS`, `READ_USER_DICTIONARY` and `WRITE_USER_DICTIONARY` are privileged rather than runtime permissions and will not grant; the manifest already marks them with `tools:ignore="ProtectedPermissions"`, so treat their failure as expected and do not retry them.
-  Complexity: S
-
 - [ ] P0 — F112 Expose the helper export path in the CLI and the Operations tab
   Why: `HelperAppService.QueryAsync` has zero callers in the repo, so SMS, call log, contacts, dictionary, ringtone and wallpaper data can be read by the helper but never reaches the user. The helper is currently install/probe/uninstall only.
   Evidence: repo-wide search for `.QueryAsync(` finds only the definition; helper callers are limited to `src/PhoneFork.Cli/Commands/HelperCommands.cs:43,75,103,140` and `src/PhoneFork.App/ViewModels/OperationsViewModel.cs:292,304,327`.
