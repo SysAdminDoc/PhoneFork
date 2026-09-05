@@ -42,13 +42,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Acceptance: a documented compatibility matrix records, per One UI version tested, whether `cmd wifi list-networks`, `cmd role get-role-holders`, `settings list`, `pm disable-user` and `pm install-create` behave as PhoneFork expects; any divergence is either handled in code or named as a known limitation in README.md. Note: this overlaps the physical-hardware gate already tracked in Roadmap_Blocked.md and inherits that constraint for anything needing a second device.
   Complexity: M
 
-- [ ] P2 — F126 Bring dependencies current and move the test project off deprecated xunit
-  Why: eight packages are behind latest and `xunit` 2.9.3 is flagged Legacy by NuGet in favour of `xunit.v3`.
-  Evidence: `dotnet list package --outdated` and `--deprecated` on 2026-09-04: Spectre.Console 0.55.2 to 0.57.2, Serilog 4.3.1 to 4.4.0, CliWrap 3.10.1 to 3.10.5, JsonSchema.Net 9.2.1 to 9.4.0, Microsoft.Xaml.Behaviors.Wpf 1.1.142 to 1.1.158, Microsoft.NET.Test.Sdk 18.5.1 to 18.9.0, xunit.runner.visualstudio 3.1.5 to 4.0.0, coverlet.collector 10.0.0 to 10.0.1.
-  Touches: `src/PhoneFork.Core/PhoneFork.Core.csproj`, `src/PhoneFork.App/PhoneFork.App.csproj`, `src/PhoneFork.Cli/PhoneFork.Cli.csproj`, `tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj`
-  Acceptance: `dotnet list package --outdated` reports no updates for production projects, `--deprecated` is clean, `dotnet build -c Release` and the full test suite pass, and the Spectre.Console 0.55 to 0.57 upgrade is checked against every command class for breaking API changes.
-  Complexity: M
-
 - [ ] P2 — F127 Refresh the dated research documents in docs/
   Why: every file in `docs/` except `release-readiness.md` carries a 2026-05-14 to 2026-05-17 evidence date, and several statements are now wrong: `research-delta-2026-05-14.md` names scrcpy v4.0 as current, and `competitor-research.md` predates One UI 8.5, One UI 9 and Smart Switch's wireless parity.
   Evidence: file headers in `docs/community-signal.md`, `docs/competitor-research.md`, `docs/migration-feasibility.md`, `docs/oss-dependencies.md`, `docs/oss-references.md`, `docs/research-delta-2026-05-14.md`; scrcpy v4.1 published 2026-07-12; App Manager v4.1.1 published 2026-09-04.

@@ -22,7 +22,7 @@ cd PhoneFork
 # Host (.NET 10):
 dotnet restore PhoneFork.slnx
 dotnet build PhoneFork.slnx -c Release
-dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release
+dotnet test --project tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release
 
 # Helper APK (Android, Kotlin/Gradle):
 cd helper-apk
@@ -56,7 +56,7 @@ cd helper-apk
 Every new service or pure function gets a test. The current suite is 85+ tests at ~150 ms total — keep it fast.
 
 ```bash
-dotnet test tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release
+dotnet test --project tests/PhoneFork.Core.Tests/PhoneFork.Core.Tests.csproj -c Release
 ```
 
 `InternalsVisibleTo="PhoneFork.Core.Tests"` is set on the Core project so tests can reach `internal` helpers without making them public.
