@@ -49,7 +49,7 @@ public partial class MediaViewModel : ObservableObject
 
     private bool CanApply() => !IsBusy && _lastPlan is not null && _lastPlan.TotalFilesToTransfer > 0;
 
-    [RelayCommand(CanExecute = nameof(CanScan))]
+    [RelayCommand(CanExecute = nameof(CanScan), IncludeCancelCommand = true)]
     private async Task ScanAsync(CancellationToken ct)
     {
         var srcPhone = _devices.RoleHolder(DeviceRole.Source);
@@ -110,7 +110,7 @@ public partial class MediaViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanApply))]
+    [RelayCommand(CanExecute = nameof(CanApply), IncludeCancelCommand = true)]
     private async Task ApplyAsync(CancellationToken ct)
     {
         if (_lastPlan is null) return;
@@ -190,7 +190,20 @@ public partial class MediaViewModel : ObservableObject
 
     partial void OnIsBusyChanged(bool value)
     {
+        CancelRunningCommand.NotifyCanExecuteChanged();
         ScanCommand.NotifyCanExecuteChanged();
         ApplyCommand.NotifyCanExecuteChanged();
     }
-}
+
+    /// <summary>
+    /// Cancels whichever long-running command is in flight (F113). Scan and Apply are
+    /// mutually exclusive because both are gated on <see cref="IsBusy"/>, so one control serves both.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void CancelRunning()
+    {
+        if (ScanCancelCommand.CanExecute(null)) ScanCancelCommand.Execute(null);
+        if (ApplyCancelCommand.CanExecute(null)) ApplyCancelCommand.Execute(null);
+    }
+
+    private bool CanCancel() => IsBusy;}

@@ -19,6 +19,8 @@
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan Source"      Command="{Binding ScanCommand}"     Margin="0,0,8,0"
                             AutomationProperties.Name="Scan source phone user apps"/>
+                    <Button Content="Cancel" Command="{Binding CancelRunningCommand}" Margin="0,0,8,0"
+                            AutomationProperties.Name="Cancel the running operation"/>
                     <Button Content="Migrate Selected" Command="{Binding MigrateCommand}"  Style="{StaticResource AccentButton}" Margin="0,0,16,0"
                             AutomationProperties.Name="Migrate selected applications"/>
                     <Button Content="Select All"       Command="{Binding SelectAllCommand}" Margin="0,0,4,0"/>

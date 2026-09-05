@@ -79,7 +79,7 @@ public partial class DebloatViewModel : ObservableObject
     private bool CanScan() => !IsBusy && _devices.RoleHolder(DeviceRole.Destination) is not null;
     private bool CanApply() => !IsBusy && Rows.Any(r => r.IsSelected);
 
-    [RelayCommand(CanExecute = nameof(CanScan))]
+    [RelayCommand(CanExecute = nameof(CanScan), IncludeCancelCommand = true)]
     private async Task ScanAsync(CancellationToken ct)
     {
         var dstPhone = _devices.RoleHolder(DeviceRole.Destination);
@@ -123,7 +123,7 @@ public partial class DebloatViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanApply))]
+    [RelayCommand(CanExecute = nameof(CanApply), IncludeCancelCommand = true)]
     private async Task ApplyAsync(CancellationToken ct)
     {
         var dstPhone = _devices.RoleHolder(DeviceRole.Destination);
@@ -202,6 +202,7 @@ public partial class DebloatViewModel : ObservableObject
 
     partial void OnIsBusyChanged(bool value)
     {
+        CancelRunningCommand.NotifyCanExecuteChanged();
         ScanCommand.NotifyCanExecuteChanged();
         ApplyCommand.NotifyCanExecuteChanged();
     }
@@ -227,4 +228,16 @@ public partial class DebloatViewModel : ObservableObject
     // Shared with the CLI so a tier upstream reclassifies as Unsafe drops out of both at once (F110).
     private static HashSet<DebloatTier> ProfileTiers(DebloatProfile profile)
         => DebloatProfiles.TiersFor(profile.ToString());
-}
+
+    /// <summary>
+    /// Cancels whichever long-running command is in flight (F113). Scan and Apply are
+    /// mutually exclusive because both are gated on <see cref="IsBusy"/>, so one control serves both.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void CancelRunning()
+    {
+        if (ScanCancelCommand.CanExecute(null)) ScanCancelCommand.Execute(null);
+        if (ApplyCancelCommand.CanExecute(null)) ApplyCancelCommand.Execute(null);
+    }
+
+    private bool CanCancel() => IsBusy;}

@@ -42,7 +42,7 @@ public partial class AppsViewModel : ObservableObject
                                  && Rows.Any(r => r.IsSelected)
                                  && !IsBusy;
 
-    [RelayCommand(CanExecute = nameof(CanScan))]
+    [RelayCommand(CanExecute = nameof(CanScan), IncludeCancelCommand = true)]
     private async Task ScanAsync(CancellationToken ct)
     {
         var src = _devices.RoleHolder(DeviceRole.Source);
@@ -76,7 +76,7 @@ public partial class AppsViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanMigrate))]
+    [RelayCommand(CanExecute = nameof(CanMigrate), IncludeCancelCommand = true)]
     private async Task MigrateAsync(CancellationToken ct)
     {
         var src = _devices.RoleHolder(DeviceRole.Source);
@@ -167,6 +167,7 @@ public partial class AppsViewModel : ObservableObject
 
     partial void OnIsBusyChanged(bool value)
     {
+        CancelRunningCommand.NotifyCanExecuteChanged();
         ScanCommand.NotifyCanExecuteChanged();
         MigrateCommand.NotifyCanExecuteChanged();
     }
@@ -190,4 +191,16 @@ public partial class AppsViewModel : ObservableObject
         SelectedCount = Rows.Count(r => r.IsSelected);
         MigrateCommand.NotifyCanExecuteChanged();
     }
-}
+
+    /// <summary>
+    /// Cancels whichever long-running command is in flight (F113). Scan and Migrate are
+    /// mutually exclusive because both are gated on <see cref="IsBusy"/>, so one control serves both.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void CancelRunning()
+    {
+        if (ScanCancelCommand.CanExecute(null)) ScanCancelCommand.Execute(null);
+        if (MigrateCancelCommand.CanExecute(null)) MigrateCancelCommand.Execute(null);
+    }
+
+    private bool CanCancel() => IsBusy;}
