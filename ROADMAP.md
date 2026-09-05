@@ -12,13 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F117 Resolve the AppManager backup compatibility claim
-  Why: `AppManagerBackupWriter` writes `meta.am.v5` with an `am_meta_version` field, while App Manager 4.1.1 writes `info_v5.am.json` plus an encrypted `meta_v5.am.json` and shares no field names. The current format is a private PhoneFork format wearing another project's name, so the documented round-trip does not exist.
-  Evidence: `src/PhoneFork.Core/Services/AppManagerBackupWriter.cs:93-95` and `AppManagerBackupReader.cs:42`; https://raw.githubusercontent.com/MuntashirAkon/AppManager/master/app/src/main/java/io/github/muntashirakon/AppManager/backup/MetadataManager.java (`currentBackupMetaVersion = 5`, `info_v5.am.json`, `meta_v5.am.json`) and `.../struct/BackupMetadataV5.java` field list.
-  Touches: `src/PhoneFork.Core/Services/AppManagerBackupSpec.cs`, `AppManagerBackupWriter.cs`, `AppManagerBackupReader.cs`, `src/PhoneFork.Cli/Commands/BackupCommands.cs`, `README.md`, `CLAUDE.md`, `tests/PhoneFork.Core.Tests/BackupInteropTests.cs`
-  Acceptance: either the writer emits `info_v5.am.json` and `meta_v5.am.json` using App Manager's field names and a backup produced by PhoneFork is listed by App Manager 4.1.1 on a device, or the commands and format are renamed to PhoneFork's own archive and every "AppManager-compatible" and "round-trip" claim is removed from README.md and CLAUDE.md. See Open Question 1 in RESEARCH.md.
-  Complexity: L
-
 - [ ] P1 — F118 Warn when Android 17 SMS OTP filtering can truncate an SMS export
   Why: Android 17 withholds `SMS_RECEIVED_ACTION` and filters SMS provider queries for three hours for apps that are not the intended WebOTP recipient, for all apps regardless of target API level. The helper is not the default SMS handler, so an export run soon after an OTP arrives loses those rows with no error at all.
   Evidence: https://developer.android.com/about/versions/17/behavior-changes-all SMS OTP protection section; `helper-apk/app/src/main/java/.../providers/Providers.kt` `SmsProvider` queries `Telephony.Sms.CONTENT_URI`.

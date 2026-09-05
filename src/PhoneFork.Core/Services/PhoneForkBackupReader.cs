@@ -5,9 +5,9 @@ using Serilog;
 namespace PhoneFork.Core.Services;
 
 /// <summary>Result of reading one backup directory.</summary>
-public sealed record AppManagerBackupHandle(
+public sealed record PhoneForkBackupHandle(
     string Directory,
-    AppManagerBackupMeta Meta,
+    PhoneForkBackupMeta Meta,
     IReadOnlyDictionary<string, string> ChecksumsByFileName)
 {
     public DateTimeOffset BackupTime => DateTimeOffset.FromUnixTimeMilliseconds(Meta.BackupTimeMs);
@@ -20,50 +20,69 @@ public sealed record AppManagerBackupHandle(
 /// Reads AppManager-compatible backup directories (F030). Validates the on-disk
 /// SHA-256 checksums against the checksums.txt manifest before returning a handle.
 /// </summary>
-public sealed class AppManagerBackupReader
+public sealed class PhoneForkBackupReader
 {
     private static readonly JsonSerializerOptions JsonOpts = new();
 
     private readonly ILogger _log;
 
-    public AppManagerBackupReader(ILogger log)
+    public PhoneForkBackupReader(ILogger log)
     {
-        _log = log.ForContext<AppManagerBackupReader>();
+        _log = log.ForContext<PhoneForkBackupReader>();
     }
 
     /// <summary>
     /// Load a single backup directory and verify checksums.
     /// </summary>
-    public async Task<AppManagerBackupHandle> ReadAsync(string backupDir, CancellationToken ct = default)
+    public async Task<PhoneForkBackupHandle> ReadAsync(string backupDir, CancellationToken ct = default)
     {
         if (!Directory.Exists(backupDir))
             throw new DirectoryNotFoundException(backupDir);
 
-        var metaPath = Path.Combine(backupDir, "meta.am.v5");
-        if (!File.Exists(metaPath))
-            throw new FileNotFoundException("meta.am.v5 missing", metaPath);
+        var metaPath = ResolveMetaPath(backupDir)
+            ?? throw new FileNotFoundException(
+                $"{PhoneForkBackupMeta.FileName} missing",
+                Path.Combine(backupDir, PhoneForkBackupMeta.FileName));
 
         await using var metaStream = File.OpenRead(metaPath);
-        var meta = await JsonSerializer.DeserializeAsync<AppManagerBackupMeta>(metaStream, JsonOpts, ct)
-            ?? throw new InvalidOperationException($"meta.am.v5 in {backupDir} did not deserialize.");
+        var meta = await JsonSerializer.DeserializeAsync<PhoneForkBackupMeta>(metaStream, JsonOpts, ct)
+            ?? throw new InvalidOperationException($"{Path.GetFileName(metaPath)} in {backupDir} did not deserialize.");
 
         var checksums = await LoadChecksumsAsync(Path.Combine(backupDir, "checksums.txt"), ct);
         await VerifyChecksumsAsync(backupDir, checksums, ct);
 
-        return new AppManagerBackupHandle(backupDir, meta, checksums);
+        return new PhoneForkBackupHandle(backupDir, meta, checksums);
     }
 
     /// <summary>
-    /// Enumerate every <c>meta.am.v5</c> beneath <paramref name="root"/> without
-    /// verifying checksums. Cheap; useful for retention sweeps.
+    /// Metadata file for a backup directory, preferring the current name and falling back to the
+    /// pre-v0.9.4-pre <c>meta.am.v5</c> so older local backups keep loading. Null when neither
+    /// is present.
+    /// </summary>
+    public static string? ResolveMetaPath(string backupDir)
+    {
+        foreach (var name in new[] { PhoneForkBackupMeta.FileName, PhoneForkBackupMeta.LegacyFileName })
+        {
+            var candidate = Path.Combine(backupDir, name);
+            if (File.Exists(candidate)) return candidate;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Enumerate every backup directory beneath <paramref name="root"/> without verifying
+    /// checksums, matching both the current and legacy metadata file names. Cheap; useful for
+    /// retention sweeps.
     /// </summary>
     public IReadOnlyList<string> EnumerateBackupDirs(string root)
     {
         if (!Directory.Exists(root)) return Array.Empty<string>();
-        return Directory.EnumerateFiles(root, "meta.am.v5", SearchOption.AllDirectories)
+        return new[] { PhoneForkBackupMeta.FileName, PhoneForkBackupMeta.LegacyFileName }
+            .SelectMany(name => Directory.EnumerateFiles(root, name, SearchOption.AllDirectories))
             .Select(Path.GetDirectoryName)
             .Where(d => d is not null)
             .Select(d => d!)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
 

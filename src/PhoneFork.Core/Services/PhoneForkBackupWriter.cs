@@ -10,15 +10,15 @@ namespace PhoneFork.Core.Services;
 /// Takes a list of local APK file paths (base + splits) already pulled from the
 /// device, a package id, and the per-device metadata that the host already knows.
 /// </summary>
-public sealed class AppManagerBackupWriter
+public sealed class PhoneForkBackupWriter
 {
     private static readonly JsonSerializerOptions JsonOpts = new() { WriteIndented = true };
 
     private readonly ILogger _log;
 
-    public AppManagerBackupWriter(ILogger log)
+    public PhoneForkBackupWriter(ILogger log)
     {
-        _log = log.ForContext<AppManagerBackupWriter>();
+        _log = log.ForContext<PhoneForkBackupWriter>();
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public sealed class AppManagerBackupWriter
             checksumLines.Add($"{sha}  {name}");
         }
 
-        var meta = new AppManagerBackupMeta
+        var meta = new PhoneForkBackupMeta
         {
             BackupName = $"{app.PackageName}_{backupTimeMs}",
             BackupTimeMs = backupTimeMs,
@@ -90,7 +90,7 @@ public sealed class AppManagerBackupWriter
             },
         };
 
-        await File.WriteAllTextAsync(Path.Combine(dir, "meta.am.v5"),
+        await File.WriteAllTextAsync(Path.Combine(dir, PhoneForkBackupMeta.FileName),
             JsonSerializer.Serialize(meta, JsonOpts), ct);
         await File.WriteAllLinesAsync(Path.Combine(dir, "checksums.txt"),
             checksumLines, ct);
