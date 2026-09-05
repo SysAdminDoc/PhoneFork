@@ -58,10 +58,7 @@ public class AccessibilityNameTests
     [Fact]
     public void EveryViewCarriesAtLeastOneAutomationName()
     {
-        // PlaceholderView is unused scaffolding and is excluded; if it is ever bound to a tab
-        // this test should start covering it.
         var bare = Directory.EnumerateFiles(ViewsDirectory(), "*.xaml")
-            .Where(f => Path.GetFileName(f) != "PlaceholderView.xaml")
             .Where(f => !File.ReadAllText(f).Contains("AutomationProperties.Name", StringComparison.Ordinal))
             .Select(Path.GetFileName)
             .ToList();

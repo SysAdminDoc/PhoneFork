@@ -76,17 +76,17 @@ abstract class BaseHelperProvider : ContentProvider() {
         return onDelete(uri, selection, selectionArgs)
     }
 
-    // Subclasses override these for category bodies. The default remains a
-    // versioned error envelope so accidental new providers are explicit.
-    protected open fun onQuery(
+    // Every category supplies its own body. Abstract rather than defaulting to a
+    // "not-implemented" envelope: all seven providers already override this, so the default was
+    // unreachable, and a new provider that forgets one should fail to compile rather than ship
+    // and return an error at runtime.
+    protected abstract fun onQuery(
         uri: Uri,
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?
-    ): Cursor? = jsonCursor(
-        """{"schema":"phonefork.helper.v1","authority":"$authorityName","status":"error","mode":"query","count":0,"items":[],"error":{"code":"not-implemented","message":"Provider body is not implemented."}}"""
-    )
+    ): Cursor?
 
     protected open fun onInsert(uri: Uri, values: ContentValues?): Uri? = null
     protected open fun onUpdate(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int = 0
