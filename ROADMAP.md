@@ -56,13 +56,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Acceptance: each doc either carries a refreshed evidence date with corrected version numbers, or a dated header stating it is a historical snapshot and pointing at RESEARCH.md; no doc states a version number contradicted by RESEARCH.md.
   Complexity: S
 
-- [ ] P2 — F128 Delete dead files and unreachable helper defaults
-  Why: `PlaceholderView.xaml` is referenced only by generated `obj/` output because all seven tabs bind real views, `assets/helper-apk-stub/` is an empty directory, and `BaseHelperProvider.onQuery`'s `not-implemented` default is unreachable now that all seven providers override it.
-  Evidence: repo search for `PlaceholderView` outside `obj/` finds no usage; `ls assets/helper-apk-stub` is empty; `helper-apk/app/src/main/java/.../providers/Providers.kt` overrides `onQuery` in every concrete provider.
-  Touches: `src/PhoneFork.App/Views/PlaceholderView.xaml`, `src/PhoneFork.App/Views/PlaceholderView.xaml.cs`, `assets/helper-apk-stub/`, `helper-apk/app/src/main/java/.../providers/BaseHelperProvider.kt`
-  Acceptance: the files are removed, `dotnet build -c Release` and the helper release build both succeed, and the helper's `not-implemented` default is either removed or documented as the guard for a future provider with a test that reaches it.
-  Complexity: S
-
 ### P3
 
 - [ ] P3 — F129 Persist window size, position and last-selected tab
