@@ -17,7 +17,7 @@ public sealed record PhoneForkBackupHandle(
 }
 
 /// <summary>
-/// Reads AppManager-compatible backup directories (F030). Validates the on-disk
+/// Reads PhoneFork backup directories (F030). Validates the on-disk
 /// SHA-256 checksums against the checksums.txt manifest before returning a handle.
 /// </summary>
 public sealed class PhoneForkBackupReader

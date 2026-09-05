@@ -67,23 +67,18 @@ public class AccessibilityNameTests
     }
 
     /// <summary>
-    /// Reads AutomationProperties.Name whether it is written as an attribute or as an element.
+    /// Reads AutomationProperties.Name, which XLinq surfaces as an attribute whose local name is
+    /// that literal dotted string.
+    ///
+    /// Deliberately does NOT accept a bare <c>Name="…"</c>: that is FrameworkElement.Name, used to
+    /// reference a control from code-behind, and WPF never exposes it to accessibility tools.
+    /// Treating it as a name would let the very ordinary act of adding <c>Name="FooGrid"</c> to a
+    /// DataGrid pass this gate while shipping a control no screen reader can identify.
     /// </summary>
-    private static string? NameOf(XElement element)
-    {
-        var attribute = element.Attributes()
-            .FirstOrDefault(a => a.Name.LocalName is "Name" && a.Name.NamespaceName.Length == 0
-                                 && a.Parent is not null)
-            ?.Value;
-
-        // The common form is the attached attribute AutomationProperties.Name="…", which XLinq
-        // surfaces with that literal local name and no namespace.
-        var attached = element.Attributes()
+    private static string? NameOf(XElement element) =>
+        element.Attributes()
             .FirstOrDefault(a => a.Name.LocalName == "AutomationProperties.Name")
             ?.Value;
-
-        return attached ?? attribute;
-    }
 
     private static string ViewsDirectory()
     {

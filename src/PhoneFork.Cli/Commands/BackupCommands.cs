@@ -57,7 +57,7 @@ public sealed class BackupInspectCommand : AsyncCommand<BackupInspectCommand.Set
                     var handle = await reader.ReadAsync(dir, ct);
                     findings.Add(new
                     {
-                        Format = "appmanager-v5",
+                        Format = "phonefork-backup-v1",
                         Directory = handle.Directory,
                         handle.Meta.PackageName,
                         handle.Meta.VersionName,
@@ -70,7 +70,7 @@ public sealed class BackupInspectCommand : AsyncCommand<BackupInspectCommand.Set
                 }
                 catch (Exception ex)
                 {
-                    findings.Add(new { Format = "appmanager-v5", Directory = dir, Error = ex.Message });
+                    findings.Add(new { Format = "phonefork-backup-v1", Directory = dir, Error = ex.Message });
                 }
             }
 
@@ -283,10 +283,10 @@ public sealed class BackupInstallCommand : AsyncCommand<BackupInstallCommand.Set
         Settings settings,
         CancellationToken ct)
     {
-        var backupArtifact = new MigrationReceiptArtifact("appmanager-backup", settings.Backup);
+        var backupArtifact = new MigrationReceiptArtifact("phonefork-backup", settings.Backup);
         return await new MigrationReceiptService(log).WriteAsync(
             MigrationReceiptService.Create(
-                operation: "backup-install-appmanager",
+                operation: "backup-install",
                 dryRun: settings.DryRun,
                 devices: new[] { MigrationReceiptService.Device("destination", destination) },
                 categories: new[]
