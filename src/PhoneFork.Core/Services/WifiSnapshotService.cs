@@ -9,9 +9,10 @@ namespace PhoneFork.Core.Services;
 /// <summary>
 /// Best-effort SSID enumeration without root or a privileged helper APK. Reads
 /// <c>cmd wifi list-networks</c> and falls back to parsing <c>dumpsys wifi</c> for SSIDs.
-/// PSKs are NOT recoverable through this path — Android 13+ redacts them from
-/// <c>dumpsys</c>, and <c>WifiManager.getPrivilegedConfiguredNetworks()</c> requires either
-/// Shizuku elevation or a system-signed app (both deferred to v0.7 helper APK).
+/// PSKs are NOT recoverable through this path: Android 13+ redacts them from <c>dumpsys</c>.
+/// For saved keys use <see cref="WifiPskExportService"/>, which reaches
+/// <c>WifiManager.getPrivilegedConfiguredNetworks()</c> through the app_process agent running as
+/// the shell user (Android 11+), with no root and no Shizuku install required.
 /// </summary>
 public sealed class WifiSnapshotService
 {
@@ -70,7 +71,7 @@ public sealed class WifiSnapshotService
             }
         }
 
-        _log.Information("Wi-Fi SSIDs on {Serial}: {Count} (PSKs not recoverable without helper APK)", device.Serial, result.Count);
+        _log.Information("Wi-Fi SSIDs on {Serial}: {Count} (PSKs need the app_process agent)", device.Serial, result.Count);
         return result;
     }
 }

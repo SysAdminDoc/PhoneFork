@@ -19,7 +19,7 @@ Built because Samsung Smart Switch is sequential (one phone at a time), one-dire
 | **Media** | DCIM, Pictures, Movies, Download, Documents, Music, Ringtones, Notifications, Alarms | Incremental manifest diff + `adb pull/push` |
 | **Settings** | AOSP `secure`/`system`/`global` + reviewed safe Samsung One UI keys (AOD, edge panels, display, sound, navigation) | `settings list` snapshot diff + safety-corpus-gated `settings put` |
 | **Debloat** | Apply [AppManagerNG](https://github.com/SysAdminDoc/AppManagerNG)'s 5,481-entry curated bloat list | `pm disable-user --user 0` (reversible) |
-| **Wi-Fi** | Saved-network visibility where Android permits + QR-bridge fallback; helper-assisted PSK export is planned | `cmd wifi` / shell probes where available, or `WIFI:T=WPA;S=…;P=…;;` QR |
+| **Wi-Fi** | Saved networks, including pre-shared keys on Android 11+ via the app_process agent, plus a QR-bridge fallback | `getPrivilegedConfiguredNetworks()` as the shell user, `cmd wifi` otherwise, or a `WIFI:T=WPA;S=…;P=…;;` QR |
 | **Roles** | Default dialer, SMS, browser, launcher, assistant | `cmd role add-role-holder` |
 
 ## What it cannot do (and why)

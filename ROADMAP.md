@@ -12,13 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F116 Export saved Wi-Fi PSKs through the agent JAR
-  Why: the README lists helper-assisted PSK export as planned and `WifiSnapshotService` documents the block. Android 11 and later grant the shell user the permission behind `WifiManager.getPrivilegedConfiguredNetworks()`, which the agent JAR runs as, so this is reachable without root and without Shizuku being installed.
-  Evidence: `src/PhoneFork.Core/Services/WifiSnapshotService.cs:9-15` states PSKs need Shizuku or a system-signed app; https://github.com/zacharee/WiFiList documents `getPrivilegedConfiguredNetworks()` working from the shell process on Android 11+.
-  Touches: `helper-apk/agent/` (after F115), `src/PhoneFork.Core/Services/WifiSnapshotService.cs`, `src/PhoneFork.Cli/Commands/WifiListCommand.cs`, `src/PhoneFork.App/ViewModels/WifiViewModel.cs`
-  Acceptance: `phonefork wifi list --device <serial> --with-psk` returns saved networks with SSID, auth type and PSK sourced from the agent; each returned network can be rendered to a `WIFI:` QR through the existing `WifiQrService`; PSK values never appear in the NDJSON audit log or in a receipt; when the agent is unavailable the command degrades to the existing SSID-only path with a stated reason.
-  Complexity: M
-
 - [ ] P1 — F117 Resolve the AppManager backup compatibility claim
   Why: `AppManagerBackupWriter` writes `meta.am.v5` with an `am_meta_version` field, while App Manager 4.1.1 writes `info_v5.am.json` plus an encrypted `meta_v5.am.json` and shares no field names. The current format is a private PhoneFork format wearing another project's name, so the documented round-trip does not exist.
   Evidence: `src/PhoneFork.Core/Services/AppManagerBackupWriter.cs:93-95` and `AppManagerBackupReader.cs:42`; https://raw.githubusercontent.com/MuntashirAkon/AppManager/master/app/src/main/java/io/github/muntashirakon/AppManager/backup/MetadataManager.java (`currentBackupMetaVersion = 5`, `info_v5.am.json`, `meta_v5.am.json`) and `.../struct/BackupMetadataV5.java` field list.
