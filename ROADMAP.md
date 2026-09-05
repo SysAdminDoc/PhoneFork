@@ -12,13 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F114 Detect Android Advanced Protection Mode in pre-flight
-  Why: Advanced Protection blocks the sideloading permission, disables USB data signaling while the device is locked, and is rolling out an option that disables Developer Options entirely. Any of these breaks PhoneFork outright, and nothing in the codebase looks for it, so the user sees an opaque ADB failure instead of an explanation.
-  Evidence: `src/PhoneFork.Core/Services/PreflightService.cs:118-140` probes only patch level, `oem_unlock_allowed` and two Knox properties; https://www.androidauthority.com/android-advanced-protection-3556885/ and https://www.androidauthority.com/android-advanced-protection-mode-developer-options-3679725/
-  Touches: `src/PhoneFork.Core/Services/PreflightService.cs`, `src/PhoneFork.Core/Models/SecurityPosture.cs`, `src/PhoneFork.Cli/Commands/HonestyCommand.cs`, `src/PhoneFork.App/ViewModels/OperationsViewModel.cs`
-  Acceptance: pre-flight reads the Advanced Protection state via `settings get global` and `dumpsys` probes, reports it per device as on/off/unknown with the specific consequences named, and the report explains which PhoneFork operations will fail when it is on. Unknown is reported as unknown, never as off.
-  Complexity: M
-
 - [ ] P1 — F115 Build and ship the `app_process` agent JAR
   Why: `AppProcessAgentService` implements push, invoke and remove but no `phonefork-agent.jar` exists and `helper-apk/settings.gradle.kts` declares only `:app`, so the whole shell-UID read path is scaffolding with no payload. It is the only route to privileged reads that leaves no installed package behind.
   Evidence: `src/PhoneFork.Core/Services/AppProcessAgentService.cs` is referenced only by constant assertions in `tests/PhoneFork.Core.Tests/HelperAppServiceTests.cs:168-175`; `helper-apk/settings.gradle.kts` contains `include(":app")` only; pattern source https://github.com/Genymobile/scrcpy

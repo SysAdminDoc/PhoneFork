@@ -21,11 +21,18 @@ public sealed record PreflightReport(
     SecurityPosture DestinationPosture,
     CscPosture? Csc,
     bool DestinationOemUnlockAvailable,
-    string? KnoxState)
+    string? KnoxState,
+    AdvancedProtectionReport SourceAdvancedProtection,
+    AdvancedProtectionReport DestinationAdvancedProtection)
 {
     public IEnumerable<HonestyFinding> AllFindings => SamsungHonesty.Findings
         .Concat(Messages.Findings)
-        .Concat(GalleryOneDrive.Findings);
+        .Concat(GalleryOneDrive.Findings)
+        .Concat(new[]
+        {
+            SourceAdvancedProtection.ToFinding("source"),
+            DestinationAdvancedProtection.ToFinding("destination"),
+        });
     public bool HasBlockers => AllFindings.Any(f => f.Level == HonestyLevel.Blocker);
     public int WarningCount => AllFindings.Count(f => f.Level == HonestyLevel.Warning);
     public int BlockerCount => AllFindings.Count(f => f.Level == HonestyLevel.Blocker);
@@ -79,8 +86,16 @@ public sealed class PreflightService
         var oemUnlock = await ProbeOemUnlockAsync(destination, ct);
         var knox = await ProbeKnoxAsync(destination, ct);
 
+        // F114 — Advanced Protection blocks package installs and USB data while locked, so it
+        // has to be named here rather than surfacing as an opaque ADB failure mid-migration.
+        var advancedProtection = new AdvancedProtectionService(_client, _log);
+        var srcAdvancedProtection = await advancedProtection.ProbeAsync(source, ct);
+        var dstAdvancedProtection = await advancedProtection.ProbeAsync(destination, ct);
+
         return new PreflightReport(samsungHonesty, messages, galleryOneDrive, srcPosture, dstPosture, csc,
-            DestinationOemUnlockAvailable: oemUnlock, KnoxState: knox);
+            DestinationOemUnlockAvailable: oemUnlock, KnoxState: knox,
+            SourceAdvancedProtection: srcAdvancedProtection,
+            DestinationAdvancedProtection: dstAdvancedProtection);
     }
 
     /// <summary>
