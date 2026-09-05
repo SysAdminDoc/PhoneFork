@@ -1,5 +1,9 @@
 # PhoneFork — OSS Dependencies
 
+> **Historical snapshot.** The evidence below was gathered on the date in this document's header and
+> has not been re-verified since. Current findings live in `RESEARCH.md` at the repository root;
+> where the two disagree, RESEARCH.md wins. Known drift as of 2026-09-05 is noted inline.
+
 Research snapshot 2026-05-14. Stack: C# / .NET 10 / WPF / MVVM (CommunityToolkit.Mvvm) / Catppuccin Mocha. Two USB-connected Samsung phones, S25U → S22U migration. Status legend: **A** = actively maintained, **D** = dormant/archive, **F** = fork-of-fork-only.
 
 ---

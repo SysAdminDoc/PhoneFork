@@ -1,5 +1,9 @@
 # Android-to-Android Migration Tooling — Feasibility Research
 
+> **Historical snapshot.** The evidence below was gathered on the date in this document's header and
+> has not been re-verified since. Current findings live in `RESEARCH.md` at the repository root;
+> where the two disagree, RESEARCH.md wins. Known drift as of 2026-09-05 is noted inline.
+
 **Use case:** Samsung Galaxy S25 Ultra (new, Android 16 / One UI 8) → Samsung Galaxy S22 Ultra (freshly factory-reset, Android 16 / One UI 8). **NEW → OLD direction**, both Samsung, both same OS. Target deliverable: a Windows desktop app.
 
 ---

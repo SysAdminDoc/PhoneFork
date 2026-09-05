@@ -42,13 +42,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Acceptance: a documented compatibility matrix records, per One UI version tested, whether `cmd wifi list-networks`, `cmd role get-role-holders`, `settings list`, `pm disable-user` and `pm install-create` behave as PhoneFork expects; any divergence is either handled in code or named as a known limitation in README.md. Note: this overlaps the physical-hardware gate already tracked in Roadmap_Blocked.md and inherits that constraint for anything needing a second device.
   Complexity: M
 
-- [ ] P2 — F127 Refresh the dated research documents in docs/
-  Why: every file in `docs/` except `release-readiness.md` carries a 2026-05-14 to 2026-05-17 evidence date, and several statements are now wrong: `research-delta-2026-05-14.md` names scrcpy v4.0 as current, and `competitor-research.md` predates One UI 8.5, One UI 9 and Smart Switch's wireless parity.
-  Evidence: file headers in `docs/community-signal.md`, `docs/competitor-research.md`, `docs/migration-feasibility.md`, `docs/oss-dependencies.md`, `docs/oss-references.md`, `docs/research-delta-2026-05-14.md`; scrcpy v4.1 published 2026-07-12; App Manager v4.1.1 published 2026-09-04.
-  Touches: `docs/*.md`
-  Acceptance: each doc either carries a refreshed evidence date with corrected version numbers, or a dated header stating it is a historical snapshot and pointing at RESEARCH.md; no doc states a version number contradicted by RESEARCH.md.
-  Complexity: S
-
 ### P3
 
 - [ ] P3 — F129 Persist window size, position and last-selected tab
