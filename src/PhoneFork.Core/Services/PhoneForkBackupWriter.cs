@@ -6,7 +6,8 @@ using Serilog;
 namespace PhoneFork.Core.Services;
 
 /// <summary>
-/// Writes a PhoneFork backup directory in AppManager-compatible v5 layout (F029).
+/// Writes a PhoneFork backup directory (F029). This is PhoneFork's own format, not App Manager's;
+/// see <see cref="PhoneForkBackupMeta"/> for why the two are not interchangeable.
 /// Takes a list of local APK file paths (base + splits) already pulled from the
 /// device, a package id, and the per-device metadata that the host already knows.
 /// </summary>
@@ -95,7 +96,7 @@ public sealed class PhoneForkBackupWriter
         await File.WriteAllLinesAsync(Path.Combine(dir, "checksums.txt"),
             checksumLines, ct);
 
-        _log.Information("AppManager-format backup written: pkg={Pkg} dir={Dir} apks={Apks}",
+        _log.Information("PhoneFork backup written: pkg={Pkg} dir={Dir} apks={Apks}",
             app.PackageName, dir, apkEntries.Count);
         return dir;
     }

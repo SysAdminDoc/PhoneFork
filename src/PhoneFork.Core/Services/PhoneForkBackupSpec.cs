@@ -61,8 +61,9 @@ public sealed record ApkFileEntry
 }
 
 /// <summary>
-/// Subset of AppManager's "what's included" flags. PhoneFork emits the same shape so
-/// AppManager doesn't complain when it reads our directories.
+/// Which payload kinds a backup directory contains. The field names follow App Manager's
+/// "what's included" flags because that vocabulary is a good fit, but the archives are not
+/// interchangeable: see <see cref="PhoneForkBackupMeta"/>.
 /// </summary>
 public sealed record BackupFlags
 {
