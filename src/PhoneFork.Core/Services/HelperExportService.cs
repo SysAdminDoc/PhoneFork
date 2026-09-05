@@ -145,11 +145,27 @@ public sealed class HelperExportService
         string outputPath,
         CancellationToken ct)
     {
-        var directory = Path.GetDirectoryName(Path.GetFullPath(outputPath));
+        var fullPath = Path.GetFullPath(outputPath);
+        var directory = Path.GetDirectoryName(fullPath);
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
 
-        await using var stream = File.Create(outputPath);
+        // Write to a sibling temp file and move into place, so an I/O failure part-way through
+        // cannot leave a truncated export sitting at the path the operator will trust.
+        var tempPath = fullPath + ".partial";
+        await WriteDocumentAsync(authority, items, warnings, tempPath, ct);
+        File.Move(tempPath, fullPath, overwrite: true);
+        return fullPath;
+    }
+
+    private static async Task WriteDocumentAsync(
+        string authority,
+        IReadOnlyList<JsonElement> items,
+        IReadOnlyList<string> warnings,
+        string path,
+        CancellationToken ct)
+    {
+        await using var stream = File.Create(path);
         await using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
 
         writer.WriteStartObject();
@@ -168,7 +184,6 @@ public sealed class HelperExportService
 
         writer.WriteEndObject();
         await writer.FlushAsync(ct);
-        return Path.GetFullPath(outputPath);
     }
 
     /// <summary>

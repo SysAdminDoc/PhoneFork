@@ -74,7 +74,24 @@ $buckets = @{
 $grouped = @{}
 foreach ($file in $buckets.Values) { $grouped[$file] = [System.Collections.Generic.List[object]]::new() }
 
+# Upstream keys its file case-sensitively, so a handful of packages appear twice under spellings
+# that differ only in case (for example com.qualcomm.qti.uceShimService and ...uceshimservice).
+# Android package names are matched case-sensitively by `pm`, so both spellings are kept, but
+# when the variants disagree on removal the safest of them wins for all of them. Otherwise the
+# shipped dataset would rate the same package two different ways.
+$severity = @{ 'Recommended' = 0; 'Advanced' = 1; 'Expert' = 2; 'Unsafe' = 3 }
+$safestRemoval = @{}
+foreach ($packageId in $upstream.Keys) {
+    $key = $packageId.ToLowerInvariant()
+    $removal = [string]$upstream[$packageId].removal
+    if (-not $severity.ContainsKey($removal)) { continue }
+    if (-not $safestRemoval.ContainsKey($key) -or $severity[$removal] -gt $severity[$safestRemoval[$key]]) {
+        $safestRemoval[$key] = $removal
+    }
+}
+
 $unknownLists = [System.Collections.Generic.HashSet[string]]::new()
+$reconciled = 0
 foreach ($packageId in ($upstream.Keys | Sort-Object)) {
     $row = $upstream[$packageId]
     $listName = [string]$row.list
@@ -87,7 +104,14 @@ foreach ($packageId in ($upstream.Keys | Sort-Object)) {
     # generated files stay close in size to the hand-captured ones they replace.
     $entry = [ordered]@{ id = $packageId }
     if ($row.description) { $entry['description'] = [string]$row.description }
-    $entry['removal'] = [string]$row.removal
+    $removal = [string]$row.removal
+    $safest = $safestRemoval[$packageId.ToLowerInvariant()]
+    if ($safest -and $safest -ne $removal) {
+        Write-Warning "Case-variant conflict for '$packageId': $removal -> $safest (safest of the variants)."
+        $removal = $safest
+        $reconciled++
+    }
+    $entry['removal'] = $removal
     if ($row.labels -and $row.labels.Count -gt 0) { $entry['tags'] = @($row.labels) }
     if ($row.dependencies -and $row.dependencies.Count -gt 0) { $entry['dependencies'] = @($row.dependencies) }
     if ($row.neededBy -and $row.neededBy.Count -gt 0) { $entry['required_by'] = @($row.neededBy) }
@@ -97,6 +121,9 @@ foreach ($packageId in ($upstream.Keys | Sort-Object)) {
 
 if ($unknownLists.Count -gt 0) {
     Write-Warning "Unrecognised upstream list buckets folded into misc.json: $($unknownLists -join ', ')"
+}
+if ($reconciled -gt 0) {
+    Write-Host "Reconciled $reconciled case-variant entr(y/ies) to the safest tier of their group."
 }
 
 foreach ($file in ($buckets.Values | Sort-Object)) {

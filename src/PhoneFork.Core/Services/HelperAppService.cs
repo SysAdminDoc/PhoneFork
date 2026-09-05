@@ -148,7 +148,11 @@ public sealed class HelperAppService
     /// </summary>
     public static HelperPermissionReport ParsePermissionDump(string? dumpsysOutput)
     {
-        var dump = dumpsysOutput ?? "";
+        // Only the FIRST "runtime permissions:" block is read. On a device with a work profile or
+        // secondary users, dumpsys emits one block per user; PhoneFork targets Android user 0,
+        // which dumpsys always emits first, so scanning the whole dump could otherwise report
+        // another user's grants as if they were user 0's.
+        var dump = Section(dumpsysOutput ?? "");
         var granted = new List<string>(RuntimePermissions.Count);
         var missing = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -171,6 +175,19 @@ public sealed class HelperAppService
         }
 
         return new HelperPermissionReport(granted, missing);
+
+        // Narrows the dump to the first runtime-permission block, or returns it whole when the
+        // device does not emit that header (older or OEM dumpsys layouts).
+        static string Section(string text)
+        {
+            const string header = "runtime permissions:";
+            var start = text.IndexOf(header, StringComparison.Ordinal);
+            if (start < 0) return text;
+            start += header.Length;
+
+            var next = text.IndexOf(header, start, StringComparison.Ordinal);
+            return next < 0 ? text[start..] : text[start..next];
+        }
     }
 
     /// <summary>Uninstalls the helper APK (F019). Idempotent — missing package returns true.</summary>
