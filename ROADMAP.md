@@ -10,13 +10,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P0
 
-- [ ] P0 — F109 Refresh the embedded debloat dataset and support the current upstream removal taxonomy
-  Why: the embedded copy is from 2026-05-14; upstream renamed `delete/replace/caution/unsafe` to `Recommended/Advanced/Expert/Unsafe`, so `DebloatDataset.ParsedTier` returns null for every entry in a current upstream dump and the overlay refresh path cannot ingest the data it exists to refresh.
-  Evidence: live diff of `assets/debloat/*.json` against `https://raw.githubusercontent.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation/main/resources/assets/uad_lists.json` on 2026-09-04 (5,478 embedded vs 5,372 upstream entries; taxonomy counts Recommended 3,001 / Advanced 1,151 / Expert 923 / Unsafe 297); `src/PhoneFork.Core/Services/DebloatDataset.cs:31-37`.
-  Touches: `src/PhoneFork.Core/Services/DebloatDataset.cs`, `src/PhoneFork.Core/Models/DebloatEntry.cs`, `assets/debloat/*.json`, `tests/PhoneFork.Core.Tests/DebloatOverrideTests.cs`
-  Acceptance: `ParsedTier` maps both the legacy lowercase values and `Recommended`/`Advanced`/`Expert`/`Unsafe`; the embedded dataset is regenerated from an upstream commit whose SHA is recorded in the repo; a test feeds a current upstream-shaped record of each new value and asserts a non-null tier; `com.samsung.oda.service` resolves to the Replace/Advanced tier rather than Delete.
-  Complexity: M
-
 - [ ] P0 — F110 Re-review the 188 packages upstream now rates more dangerous than the embedded dataset
   Why: 176 of them sit in the default Conservative profile (Delete tier only), so a default run today disables packages upstream has since reclassified, including four now rated Unsafe.
   Evidence: same 2026-09-04 diff; the four are `com.android.networkstack.tethering.inprocess`, `jp.co.omronsoft.iwnnime.ml`, `com.lenovo.ue.device`, `com.google.android.overlay.gmsconfig.photos`. Upstream description for `com.samsung.oda.service`: "Disabling causes SIM Manager to instantly crash on dual sim setup." Profile definitions at `src/PhoneFork.App/ViewModels/DebloatViewModel.cs:229-231` and `src/PhoneFork.Cli/Commands/DebloatApplyCommand.cs:17`.
