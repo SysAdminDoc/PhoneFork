@@ -21,13 +21,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Acceptance: a test over a fake cursor of 1,001 rows paged at `limit=500` returns 1,001 distinct ids across three pages with no gaps and no repeats; the same test fails if the extra `moveToNext()` is restored.
   Complexity: S
 
-- [ ] P2 — F121 Surface upstream package dependency warnings before a debloat apply
-  Why: upstream now ships `dependencies` and `neededBy` per package, which turns "disabling this breaks that" from a description users skim into a checkable pre-apply warning. `com.samsung.oda.service` is `neededBy` `com.samsung.android.app.telephonyui`.
-  Evidence: live `uad_lists.json` records carry `dependencies`, `neededBy` and `labels`; PhoneFork's `DebloatEntry` model has no equivalent fields.
-  Touches: `src/PhoneFork.Core/Models/DebloatEntry.cs`, `src/PhoneFork.Core/Services/DebloatDataset.cs`, `src/PhoneFork.Core/Services/DebloatScanner.cs`, `src/PhoneFork.App/Views/DebloatView.xaml`, `src/PhoneFork.Cli/Commands/DebloatApplyCommand.cs`
-  Acceptance: the parsed dataset carries `neededBy`; the queue preview lists, per selected package, any still-enabled package that needs it; the CLI prints the same list before applying and the GUI shows it in the plan area.
-  Complexity: M
-
 - [ ] P2 — F122 Add accessibility names to the eight views that have none
   Why: only `AppsView.xaml` (2) and `DeviceBar.xaml` (11) carry `AutomationProperties`. Debloat, Media, Operations, Roles, Settings, Wi-Fi, MainWindow and PlaceholderView have zero, so a screen-reader user cannot identify the buttons that disable packages or write settings.
   Evidence: per-file `AutomationProperties` counts across `src/PhoneFork.App/Views/*.xaml` on 2026-09-04.
