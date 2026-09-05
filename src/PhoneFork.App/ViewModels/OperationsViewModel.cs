@@ -325,6 +325,20 @@ public partial class OperationsViewModel : ObservableObject
                 ? $"Helper healthy on {label}: {ok}/{results.Count} authorities."
                 : $"Helper partial on {label}: {ok}/{results.Count} healthy. Failed: {failed}.";
             AddRow("Helper", ok == results.Count ? "Healthy" : "Partial", Status, ok == results.Count ? "Info" : "Warning");
+
+            // A healthy authority still returns permission-denied without its runtime grant, so
+            // report grant state alongside health rather than only in the CLI (F111).
+            var permissions = await svc.ProbeRuntimePermissionsAsync(device, token);
+            var missing = string.Join(", ", HelperAppService.RuntimePermissions
+                .Where(p => !permissions.Granted.Contains(p))
+                .Select(p => p.Replace("android.permission.", "", StringComparison.Ordinal)));
+            AddRow(
+                "Helper",
+                permissions.CanReadPrivilegedCategories ? "Permissions" : "Permissions missing",
+                permissions.AllGranted
+                    ? $"All {HelperAppService.RuntimePermissions.Count} runtime permissions granted on {label}."
+                    : $"Not granted on {label}: {missing}. SMS, call log and contacts reads will fail. Re-install the helper.",
+                permissions.CanReadPrivilegedCategories ? "Info" : "Warning");
         }, ct);
     }
 

@@ -217,3 +217,55 @@ public class DebloatProfileSafetyTests
         Assert.Empty(DebloatProfiles.UnsafePackagesIn(dataset, new[] { "com.example.not.in.dataset" }));
     }
 }
+
+/// <summary>
+/// Guards the internal consistency of the shipped dataset. Upstream keys its file
+/// case-sensitively, so a few packages appear under spellings differing only in case. Android
+/// matches package names case-sensitively so both are kept, but they must not disagree about
+/// how dangerous the package is.
+/// </summary>
+public class DebloatDatasetConsistencyTests
+{
+    [Fact]
+    public void CaseVariantPackageIdsAgreeOnTier()
+    {
+        var dataset = DebloatDataset.Load();
+
+        var conflicts = dataset.Entries
+            .GroupBy(e => e.PackageId, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Select(e => e.Tier).Distinct().Count() > 1)
+            .Select(g => $"{g.Key}: " + string.Join(" vs ", g.Select(e => $"{e.PackageId}={e.Removal}")))
+            .ToList();
+
+        Assert.Empty(conflicts);
+    }
+
+    [Fact]
+    public void EveryEntryCarriesAPackageIdAndARemovalValue()
+    {
+        var dataset = DebloatDataset.Load();
+
+        Assert.All(dataset.Entries, e =>
+        {
+            Assert.False(string.IsNullOrWhiteSpace(e.PackageId));
+            Assert.False(string.IsNullOrWhiteSpace(e.Removal));
+        });
+    }
+
+    [Fact]
+    public void EveryPackageIdIsShellSafe()
+    {
+        // Package ids reach the device inside `pm` command lines via AdbShell.PackageArg,
+        // which rejects anything outside [A-Za-z0-9_.]. A dataset entry that fails that
+        // check would throw mid-apply rather than being skipped.
+        var dataset = DebloatDataset.Load();
+
+        var rejected = dataset.Entries
+            .Where(e => !AdbShell.IsPackageName(e.PackageId))
+            .Select(e => e.PackageId)
+            .Take(10)
+            .ToList();
+
+        Assert.Empty(rejected);
+    }
+}

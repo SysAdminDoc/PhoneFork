@@ -122,3 +122,92 @@ public class HelperPermissionTests
         return Path.Combine(dir!.FullName, relativePath.Replace('/', Path.DirectorySeparatorChar));
     }
 }
+
+/// <summary>
+/// Multi-user dumps carry one runtime-permission block per Android user. PhoneFork targets
+/// user 0, which dumpsys emits first, so the parser must not read a later user's grants.
+/// </summary>
+public class HelperPermissionMultiUserTests
+{
+    private const string MultiUserDump = """
+        Packages:
+          Package [com.sysadmindoc.phonefork.helper]
+            User 0:
+              runtime permissions:
+                android.permission.READ_SMS: granted=true
+                android.permission.READ_CALL_LOG: granted=true
+                android.permission.WRITE_CALL_LOG: granted=true
+                android.permission.READ_CONTACTS: granted=true
+                android.permission.WRITE_CONTACTS: granted=true
+            User 10:
+              runtime permissions:
+                android.permission.READ_SMS: granted=false
+                android.permission.READ_CALL_LOG: granted=false
+                android.permission.WRITE_CALL_LOG: granted=false
+                android.permission.READ_CONTACTS: granted=false
+                android.permission.WRITE_CONTACTS: granted=false
+        """;
+
+    [Fact]
+    public void ReadsUserZeroNotASecondaryUser()
+    {
+        var report = HelperAppService.ParsePermissionDump(MultiUserDump);
+
+        Assert.True(report.AllGranted);
+        Assert.True(report.CanReadPrivilegedCategories);
+    }
+
+    [Fact]
+    public void ASecondaryUserGrantDoesNotMaskAUserZeroDenial()
+    {
+        // Same dump with the two users' states swapped: user 0 denied, user 10 granted.
+        var swapped = MultiUserDump
+            .Replace("granted=true", "TEMP", StringComparison.Ordinal)
+            .Replace("granted=false", "granted=true", StringComparison.Ordinal)
+            .Replace("TEMP", "granted=false", StringComparison.Ordinal);
+
+        var report = HelperAppService.ParsePermissionDump(swapped);
+
+        Assert.False(report.AllGranted);
+        Assert.False(report.CanReadPrivilegedCategories);
+        Assert.Empty(report.Granted);
+    }
+
+    [Fact]
+    public void APermissionAbsentFromUserZeroIsNotSatisfiedByASecondaryUsersGrant()
+    {
+        // The case that actually requires section anchoring: user 0's block simply omits
+        // READ_SMS, while user 10 holds it. An unanchored scan finds user 10's granted=true
+        // and wrongly reports the helper as able to read SMS on the user PhoneFork targets.
+        var dump = """
+            Packages:
+              Package [com.sysadmindoc.phonefork.helper]
+                User 0:
+                  runtime permissions:
+                    android.permission.READ_CALL_LOG: granted=true
+                    android.permission.WRITE_CALL_LOG: granted=true
+                    android.permission.READ_CONTACTS: granted=true
+                    android.permission.WRITE_CONTACTS: granted=true
+                User 10:
+                  runtime permissions:
+                    android.permission.READ_SMS: granted=true
+            """;
+
+        var report = HelperAppService.ParsePermissionDump(dump);
+
+        Assert.DoesNotContain("android.permission.READ_SMS", report.Granted);
+        Assert.Equal("not-listed", report.Failed["android.permission.READ_SMS"]);
+        Assert.False(report.CanReadPrivilegedCategories);
+    }
+
+    [Fact]
+    public void FallsBackToTheWholeDumpWhenNoRuntimeSectionHeaderExists()
+    {
+        // Older and some OEM dumpsys layouts omit the header; the parser must still work.
+        var headerless = "  android.permission.READ_SMS: granted=true\n";
+
+        var report = HelperAppService.ParsePermissionDump(headerless);
+
+        Assert.Contains("android.permission.READ_SMS", report.Granted);
+    }
+}
