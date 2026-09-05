@@ -74,6 +74,9 @@ phonefork debloat apply --device <serial> --profile aggressive [--overlay-feed f
 phonefork backup inspect <path> [--json]
 phonefork backup export-appmanager --device <src> --out backups [--package <pkg>]
 phonefork backup install-appmanager --to <dst> --backup <dir> [--dry-run] [--allow-multi-user]
+phonefork helper install   --device <serial>       # installs and grants runtime permissions
+phonefork helper export    --device <serial> --category sms --out helper-export
+phonefork helper agent     --device <serial> [--op ping]   # push-and-run agent, shell UID
 phonefork platform-watch [--json]
 phonefork pair <ip:pair-port> <code>
 phonefork connect <ip:connect-port>
@@ -117,6 +120,7 @@ cd PhoneFork
 dotnet build -c Release
 dotnet test -c Release
 pwsh scripts/Test-VersionConsistency.ps1
+pwsh scripts/Build-AgentJar.ps1 -Stage   # builds helper-apk/agent into assets/helper/
 dotnet run --project src/PhoneFork.App
 ```
 

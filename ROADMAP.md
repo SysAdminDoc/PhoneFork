@@ -12,13 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F115 Build and ship the `app_process` agent JAR
-  Why: `AppProcessAgentService` implements push, invoke and remove but no `phonefork-agent.jar` exists and `helper-apk/settings.gradle.kts` declares only `:app`, so the whole shell-UID read path is scaffolding with no payload. It is the only route to privileged reads that leaves no installed package behind.
-  Evidence: `src/PhoneFork.Core/Services/AppProcessAgentService.cs` is referenced only by constant assertions in `tests/PhoneFork.Core.Tests/HelperAppServiceTests.cs:168-175`; `helper-apk/settings.gradle.kts` contains `include(":app")` only; pattern source https://github.com/Genymobile/scrcpy
-  Touches: `helper-apk/settings.gradle.kts`, new `helper-apk/agent/` Gradle module, `scripts/Stage-HelperApk.ps1`, `src/PhoneFork.Core/Services/AppProcessAgentService.cs`
-  Acceptance: a new Gradle module produces `phonefork-agent.jar` with a `com.sysadmindoc.phonefork.helper.Agent` main class that accepts a single JSON argv element and prints a v1 JSON envelope; the staging script copies it beside the helper APK; `phonefork helper agent ping --device <serial>` pushes, invokes, prints the envelope, and removes the JAR, and a residue check afterwards is clean.
-  Complexity: L
-
 - [ ] P1 — F116 Export saved Wi-Fi PSKs through the agent JAR
   Why: the README lists helper-assisted PSK export as planned and `WifiSnapshotService` documents the block. Android 11 and later grant the shell user the permission behind `WifiManager.getPrivilegedConfiguredNetworks()`, which the agent JAR runs as, so this is reachable without root and without Shizuku being installed.
   Evidence: `src/PhoneFork.Core/Services/WifiSnapshotService.cs:9-15` states PSKs need Shizuku or a system-signed app; https://github.com/zacharee/WiFiList documents `getPrivilegedConfiguredNetworks()` working from the shell process on Android 11+.

@@ -50,10 +50,12 @@ desktop.ini
 helper-apk/.gradle/
 helper-apk/build/
 helper-apk/app/build/
+helper-apk/agent/build/
 helper-apk/local.properties
 helper-apk/*.jks
 helper-apk/keystore.properties
 assets/helper/*.apk
+assets/helper/*.jar
 assets/helper/*.metadata.txt
 assets/helper/*.sha256
 
