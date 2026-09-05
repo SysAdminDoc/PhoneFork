@@ -21,13 +21,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Acceptance: a test over a fake cursor of 1,001 rows paged at `limit=500` returns 1,001 distinct ids across three pages with no gaps and no repeats; the same test fails if the extra `moveToNext()` is restored.
   Complexity: S
 
-- [ ] P2 — F122 Add accessibility names to the eight views that have none
-  Why: only `AppsView.xaml` (2) and `DeviceBar.xaml` (11) carry `AutomationProperties`. Debloat, Media, Operations, Roles, Settings, Wi-Fi, MainWindow and PlaceholderView have zero, so a screen-reader user cannot identify the buttons that disable packages or write settings.
-  Evidence: per-file `AutomationProperties` counts across `src/PhoneFork.App/Views/*.xaml` on 2026-09-04.
-  Touches: `src/PhoneFork.App/Views/DebloatView.xaml`, `MediaView.xaml`, `OperationsView.xaml`, `RolesView.xaml`, `SettingsView.xaml`, `WifiView.xaml`, `MainWindow.xaml`
-  Acceptance: every interactive control that is not self-labelling by its `Content` has an `AutomationProperties.Name`; every `DataGrid` and tab has an `AutomationProperties.Name`; Accessibility Insights for Windows reports no missing-name errors on any tab.
-  Complexity: M
-
 - [ ] P2 — F123 Grow the settings safety corpus beyond the current 38 safe rules
   Why: the corpus holds 38 Safe, 6 Review and 14 Blocked rules against a hardware-measured 271-key applicable diff, so most real keys resolve to Unknown and are skipped unless the user passes `--include-uncatalogued-settings`, which gives up the safety gate wholesale.
   Evidence: rule counts in `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`; the 1,062 vs 967 key snapshot and 271 applicable figure recorded for v0.3.0 in CLAUDE.md.

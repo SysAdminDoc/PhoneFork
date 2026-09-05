@@ -243,7 +243,8 @@
                                     <ComboBox ItemsSource="{Binding Source={StaticResource RolesEnum}}"
                                               SelectedItem="{Binding Role, Mode=TwoWay}"
                                               IsEnabled="{Binding IsAuthorized}"
-                                              MinWidth="140"/>
+                                              MinWidth="140"
+                                              AutomationProperties.Name="Assign this phone as source or destination"/>
                                 </DockPanel>
                             </StackPanel>
                         </Border>
