@@ -12,13 +12,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P1
 
-- [ ] P1 — F113 Add a Cancel control to every long-running GUI operation
-  Why: 33 view-model commands already accept a `CancellationToken` and Core honours it, but no command sets `IncludeCancelCommand` and no XAML exposes a cancel affordance, so app installs, media pushes and debloat runs cannot be stopped once started.
-  Evidence: 33 matches for `private async Task .*CancellationToken ct` under `src/PhoneFork.App/ViewModels`; zero matches for `IncludeCancelCommand` in `src/`; zero matches for `Cancel` in `src/PhoneFork.App/Views/*.xaml`.
-  Touches: `src/PhoneFork.App/ViewModels/*.cs`, `src/PhoneFork.App/Views/AppsView.xaml`, `MediaView.xaml`, `SettingsView.xaml`, `DebloatView.xaml`, `RolesView.xaml`, `OperationsView.xaml`
-  Acceptance: every command that writes to a device declares `[RelayCommand(IncludeCancelCommand = true)]` and its view binds a Cancel button that is enabled only while `IsBusy`; cancelling mid-run stops before the next package or file, leaves the destination in a consistent state, and writes a receipt whose category counts reflect the partial run.
-  Complexity: M
-
 - [ ] P1 — F114 Detect Android Advanced Protection Mode in pre-flight
   Why: Advanced Protection blocks the sideloading permission, disables USB data signaling while the device is locked, and is rolling out an option that disables Developer Options entirely. Any of these breaks PhoneFork outright, and nothing in the codebase looks for it, so the user sees an opaque ADB failure instead of an explanation.
   Evidence: `src/PhoneFork.Core/Services/PreflightService.cs:118-140` probes only patch level, `oem_unlock_allowed` and two Knox properties; https://www.androidauthority.com/android-advanced-protection-3556885/ and https://www.androidauthority.com/android-advanced-protection-mode-developer-options-3679725/

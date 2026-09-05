@@ -18,6 +18,8 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                     <Button Content="Scan"            Command="{Binding ScanCommand}"    Margin="0,0,8,0"/>
+                    <Button Content="Cancel" Command="{Binding CancelRunningCommand}" Margin="0,0,8,0"
+                            AutomationProperties.Name="Cancel the running operation"/>
                     <Button Content="Apply Sync"      Command="{Binding ApplyCommand}"   Style="{StaticResource AccentButton}" Margin="0,0,16,0"/>
                     <Button Content="Select All"      Command="{Binding SelectAllCommand}"  Margin="0,0,4,0"/>
                     <Button Content="Select None"     Command="{Binding SelectNoneCommand}"/>

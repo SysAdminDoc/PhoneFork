@@ -40,7 +40,7 @@ public partial class RolesViewModel : ObservableObject
 
     private bool CanApply() => !IsBusy && Rows.Any(r => r.IsSelected && !string.IsNullOrEmpty(r.SourceHolder));
 
-    [RelayCommand(CanExecute = nameof(CanScan))]
+    [RelayCommand(CanExecute = nameof(CanScan), IncludeCancelCommand = true)]
     private async Task ScanAsync(CancellationToken ct)
     {
         var srcPhone = _devices.RoleHolder(DeviceRole.Source);
@@ -82,7 +82,7 @@ public partial class RolesViewModel : ObservableObject
         }
     }
 
-    [RelayCommand(CanExecute = nameof(CanApply))]
+    [RelayCommand(CanExecute = nameof(CanApply), IncludeCancelCommand = true)]
     private async Task ApplyAsync(CancellationToken ct)
     {
         var dstPhone = _devices.RoleHolder(DeviceRole.Destination);
@@ -161,6 +161,7 @@ public partial class RolesViewModel : ObservableObject
 
     partial void OnIsBusyChanged(bool value)
     {
+        CancelRunningCommand.NotifyCanExecuteChanged();
         ScanCommand.NotifyCanExecuteChanged();
         ApplyCommand.NotifyCanExecuteChanged();
     }
@@ -182,4 +183,16 @@ public partial class RolesViewModel : ObservableObject
         TotalSelected = Rows.Count(r => r.IsSelected);
         ApplyCommand.NotifyCanExecuteChanged();
     }
-}
+
+    /// <summary>
+    /// Cancels whichever long-running command is in flight (F113). Scan and Apply are
+    /// mutually exclusive because both are gated on <see cref="IsBusy"/>, so one control serves both.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void CancelRunning()
+    {
+        if (ScanCancelCommand.CanExecute(null)) ScanCancelCommand.Execute(null);
+        if (ApplyCancelCommand.CanExecute(null)) ApplyCancelCommand.Execute(null);
+    }
+
+    private bool CanCancel() => IsBusy;}

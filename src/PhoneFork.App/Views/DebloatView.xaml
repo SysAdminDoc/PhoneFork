@@ -23,6 +23,8 @@
                     <TextBlock Text="Profile:" VerticalAlignment="Center" Margin="0,0,6,0"
                                Foreground="{StaticResource ForegroundMutedBrush}"/>
                     <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding Profile}" MinWidth="140" Margin="0,0,16,0"/>
+                    <Button Content="Cancel" Command="{Binding CancelRunningCommand}" Margin="0,0,8,0"
+                            AutomationProperties.Name="Cancel the running operation"/>
                     <Button Content="Disable Selected" Command="{Binding ApplyCommand}" Style="{StaticResource AccentButton}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
