@@ -77,6 +77,17 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
         }
 
         AnsiConsole.MarkupLine($"[bold]Queue:[/] {queue.Count} package(s). Profile: {Markup.Escape(s.Profile)} (include-unsafe={s.IncludeUnsafe}).");
+
+        // F121 - upstream records which packages depend on each entry. Show the ones that will
+        // stay enabled while something they need is disabled, before anything is written.
+        var dependencyWarnings = DebloatDependencyCheck.Evaluate(dataset, queue, candidates);
+        if (dependencyWarnings.Count > 0)
+        {
+            AnsiConsole.MarkupLine($"[yellow]{dependencyWarnings.Count} queued package(s) are needed by something that stays enabled:[/]");
+            foreach (var warning in dependencyWarnings)
+                AnsiConsole.MarkupLine($"  [yellow]-[/] {Markup.Escape(warning.Describe())}");
+        }
+
         if (s.DryRun) AnsiConsole.MarkupLine("[yellow]Dry-run — no writes.[/]");
 
         var svc = new DebloatService(host.Client, log);
@@ -108,7 +119,9 @@ public sealed class DebloatApplyCommand : AsyncCommand<DebloatApplyCommand.Setti
                         failureDetails: result.Results.Where(r => !r.Success).Select(r => $"{r.PackageId}: {r.Output}"),
                         artifacts: artifacts),
                 },
-                warnings: s.IncludeUnsafe ? new[] { "Unsafe debloat tier was included by explicit CLI option." } : null,
+                warnings: (s.IncludeUnsafe ? new[] { "Unsafe debloat tier was included by explicit CLI option." } : Array.Empty<string>())
+                    .Concat(dependencyWarnings.Select(w => w.Describe()))
+                    .ToArray(),
                 artifacts: artifacts),
             ct);
         AnsiConsole.MarkupLine($"[grey]Receipt:[/] {Markup.Escape(receiptPath)}");

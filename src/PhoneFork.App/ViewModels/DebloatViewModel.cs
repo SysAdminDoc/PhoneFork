@@ -36,6 +36,12 @@ public partial class DebloatViewModel : ObservableObject
     [ObservableProperty] private int _totalSelected;
     [ObservableProperty] private string _lastSnapshotPath = "";
     [ObservableProperty] private bool _hasRows;
+    [ObservableProperty] private string _dependencyWarningLine = "";
+
+    // Kept from the last scan so Apply can cross-check the queue against the dependency
+    // graph without re-reading the device (F121).
+    private DebloatDataset? _lastDataset;
+    private IReadOnlyList<DebloatCandidate> _lastCandidates = Array.Empty<DebloatCandidate>();
 
     public DebloatViewModel(DeviceService devices, AdbHostService host, ILogger log)
     {
@@ -98,6 +104,10 @@ public partial class DebloatViewModel : ObservableObject
             var scanner = new DebloatScanner(_host.Client, _log, dataset);
             var candidates = await scanner.ScanAsync(dstData, ct);
 
+            _lastDataset = dataset;
+            _lastCandidates = candidates;
+            DependencyWarningLine = "";
+
             var defaultTiers = ProfileTiers(Profile);
             Rows.Clear();
             HasRows = false;
@@ -135,6 +145,16 @@ public partial class DebloatViewModel : ObservableObject
         try
         {
             var picked = Rows.Where(r => r.IsSelected).Select(r => r.PackageId).ToList();
+
+            // F121 - warn about packages that something still enabled depends on, before writing.
+            var dependencyWarnings = _lastDataset is null
+                ? Array.Empty<DebloatDependencyWarning>()
+                : DebloatDependencyCheck.Evaluate(_lastDataset, picked, _lastCandidates).ToArray();
+            DependencyWarningLine = dependencyWarnings.Length == 0
+                ? ""
+                : $"{dependencyWarnings.Length} selected package(s) are needed by something that stays enabled: "
+                  + string.Join("  ", dependencyWarnings.Select(w => w.Describe()));
+
             Status = $"Applying disable-user on {picked.Count} package(s)…";
             var svc = new DebloatService(_host.Client, _log);
             var result = await svc.ApplyAsync(dstData, picked, DryRun,

@@ -122,6 +122,15 @@ public sealed class DebloatDataset
         ByPackageId = dict;
     }
 
+    /// <summary>
+    /// Builds a dataset from an in-memory entry list, for callers that need a small fixture
+    /// instead of the 5,000-entry embedded resource.
+    /// </summary>
+    public static DebloatDataset FromEntries(
+        IReadOnlyList<DebloatEntry> entries,
+        IReadOnlyList<DebloatOverride>? overrides = null)
+        => new(entries, overrides ?? Array.Empty<DebloatOverride>());
+
     public static DebloatDataset Load(ILogger? log = null)
     {
         var asm = Assembly.GetExecutingAssembly();
