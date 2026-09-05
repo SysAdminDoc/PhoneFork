@@ -99,6 +99,32 @@ if (Test-Path -LiteralPath $releaseWorkflowPath) {
     Write-Host "No GitHub release workflow found; accepting the local-only release lane."
 }
 
+# F110 — the embedded debloat dataset gates a destructive operation, and upstream reclassifies
+# packages continuously. Refuse to ship a snapshot that has gone unreviewed for a year, and
+# nag well before that. Refresh with scripts/Update-DebloatDataset.ps1.
+$datasetSourcePath = Join-Path $repoRoot "assets/debloat/dataset-source.json"
+if (-not (Test-Path -LiteralPath $datasetSourcePath)) {
+    Add-Failure "assets/debloat/dataset-source.json is missing; the debloat dataset has no recorded provenance."
+} else {
+    $datasetSource = Get-Content -LiteralPath $datasetSourcePath -Raw | ConvertFrom-Json
+    if (-not $datasetSource.upstreamCommit -or $datasetSource.upstreamCommit -notmatch '^[0-9a-f]{40}$') {
+        Add-Failure "Debloat dataset provenance has no valid upstream commit SHA."
+    }
+    $capturedAt = [datetime]::MinValue
+    if (-not [datetime]::TryParse($datasetSource.capturedAt, [ref]$capturedAt)) {
+        Add-Failure "Debloat dataset provenance has an unparseable capturedAt '$($datasetSource.capturedAt)'."
+    } else {
+        $ageDays = [int]((Get-Date).Date - $capturedAt.Date).TotalDays
+        if ($ageDays -gt 365) {
+            Add-Failure "Debloat dataset snapshot is $ageDays days old (captured $($capturedAt.ToString('yyyy-MM-dd'))). Run scripts/Update-DebloatDataset.ps1."
+        } elseif ($ageDays -gt 90) {
+            Write-Warning "Debloat dataset snapshot is $ageDays days old (captured $($capturedAt.ToString('yyyy-MM-dd'))). Consider scripts/Update-DebloatDataset.ps1."
+        } else {
+            Write-Host "Debloat dataset snapshot is $ageDays day(s) old (upstream $($datasetSource.upstreamCommit.Substring(0,8)))."
+        }
+    }
+}
+
 if ($failures.Count -gt 0) {
     $failures | ForEach-Object { Write-Error $_ }
     throw "Version consistency check failed with $($failures.Count) issue(s)."

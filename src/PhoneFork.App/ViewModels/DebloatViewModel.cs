@@ -224,11 +224,7 @@ public partial class DebloatViewModel : ObservableObject
         ApplyCommand.NotifyCanExecuteChanged();
     }
 
-    private static HashSet<DebloatTier> ProfileTiers(DebloatProfile profile) => profile switch
-    {
-        DebloatProfile.Conservative => new HashSet<DebloatTier> { DebloatTier.Delete },
-        DebloatProfile.Recommended  => new HashSet<DebloatTier> { DebloatTier.Delete, DebloatTier.Replace },
-        DebloatProfile.Aggressive   => new HashSet<DebloatTier> { DebloatTier.Delete, DebloatTier.Replace, DebloatTier.Caution },
-        _ => new HashSet<DebloatTier> { DebloatTier.Delete },
-    };
+    // Shared with the CLI so a tier upstream reclassifies as Unsafe drops out of both at once (F110).
+    private static HashSet<DebloatTier> ProfileTiers(DebloatProfile profile)
+        => DebloatProfiles.TiersFor(profile.ToString());
 }

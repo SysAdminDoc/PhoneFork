@@ -129,3 +129,91 @@ public class DebloatTaxonomyTests
         return Path.Combine(dir!.FullName, "assets", "debloat", "dataset-source.json");
     }
 }
+
+/// <summary>
+/// F110 — no named profile may reach the Unsafe tier implicitly, and the packages upstream
+/// moved to Unsafe during 2026 must be excluded from every profile in the shipped dataset.
+/// </summary>
+public class DebloatProfileSafetyTests
+{
+    /// <summary>Packages upstream reclassified to Unsafe after PhoneFork's 2026-05-14 snapshot.</summary>
+    private static readonly string[] ReclassifiedUnsafe =
+    {
+        "com.android.networkstack.tethering.inprocess",
+        "jp.co.omronsoft.iwnnime.ml",
+        "com.lenovo.ue.device",
+        "com.google.android.overlay.gmsconfig.photos",
+    };
+
+    [Theory]
+    [InlineData("Conservative")]
+    [InlineData("Recommended")]
+    [InlineData("Aggressive")]
+    [InlineData("aggressive")]
+    [InlineData("not-a-profile")]
+    [InlineData(null)]
+    public void NoProfileSelectsTheUnsafeTier(string? profile)
+    {
+        Assert.DoesNotContain(DebloatTier.Unsafe, DebloatProfiles.TiersFor(profile));
+    }
+
+    [Fact]
+    public void IncludeUnsafeIsTheOnlyRouteToTheUnsafeTier()
+    {
+        foreach (var name in DebloatProfiles.Names)
+            Assert.Contains(DebloatTier.Unsafe, DebloatProfiles.TiersFor(name, includeUnsafe: true));
+    }
+
+    [Fact]
+    public void ProfilesAreOrderedByWideningTierCoverage()
+    {
+        var conservative = DebloatProfiles.TiersFor(DebloatProfiles.Conservative);
+        var recommended = DebloatProfiles.TiersFor(DebloatProfiles.Recommended);
+        var aggressive = DebloatProfiles.TiersFor(DebloatProfiles.Aggressive);
+
+        Assert.ProperSubset(recommended, conservative);
+        Assert.ProperSubset(aggressive, recommended);
+    }
+
+    [Fact]
+    public void ReclassifiedPackagesAreUnsafeInTheShippedDataset()
+    {
+        var dataset = DebloatDataset.Load();
+        foreach (var id in ReclassifiedUnsafe)
+        {
+            Assert.True(dataset.ByPackageId.TryGetValue(id, out var entry), $"{id} is missing from the dataset");
+            Assert.Equal(DebloatTier.Unsafe, entry!.Tier);
+        }
+    }
+
+    [Fact]
+    public void ReclassifiedPackagesAreSelectedByNoProfile()
+    {
+        var dataset = DebloatDataset.Load();
+        foreach (var name in DebloatProfiles.Names)
+        {
+            var tiers = DebloatProfiles.TiersFor(name);
+            foreach (var id in ReclassifiedUnsafe)
+                Assert.DoesNotContain(dataset.ByPackageId[id].Tier, tiers);
+        }
+    }
+
+    [Fact]
+    public void ExplicitlyNamedUnsafePackagesAreDetectedForGating()
+    {
+        var dataset = DebloatDataset.Load();
+        var named = ReclassifiedUnsafe.Concat(new[] { "com.samsung.oda.service" });
+
+        var flagged = DebloatProfiles.UnsafePackagesIn(dataset, named);
+
+        Assert.Equal(ReclassifiedUnsafe.OrderBy(s => s), flagged.OrderBy(s => s));
+        Assert.DoesNotContain("com.samsung.oda.service", flagged);
+    }
+
+    [Fact]
+    public void UnsafeScanIgnoresPackagesTheDatasetDoesNotKnow()
+    {
+        var dataset = DebloatDataset.Load();
+        Assert.Empty(DebloatProfiles.UnsafePackagesIn(dataset, new[] { "com.example.not.in.dataset" }));
+    }
+}

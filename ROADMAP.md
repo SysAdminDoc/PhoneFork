@@ -10,13 +10,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P0
 
-- [ ] P0 — F110 Re-review the 188 packages upstream now rates more dangerous than the embedded dataset
-  Why: 176 of them sit in the default Conservative profile (Delete tier only), so a default run today disables packages upstream has since reclassified, including four now rated Unsafe.
-  Evidence: same 2026-09-04 diff; the four are `com.android.networkstack.tethering.inprocess`, `jp.co.omronsoft.iwnnime.ml`, `com.lenovo.ue.device`, `com.google.android.overlay.gmsconfig.photos`. Upstream description for `com.samsung.oda.service`: "Disabling causes SIM Manager to instantly crash on dual sim setup." Profile definitions at `src/PhoneFork.App/ViewModels/DebloatViewModel.cs:229-231` and `src/PhoneFork.Cli/Commands/DebloatApplyCommand.cs:17`.
-  Touches: `assets/debloat/overrides.json`, `assets/debloat/*.json`, `src/PhoneFork.Core/Services/DebloatScanner.cs`
-  Acceptance: after F109 lands, a scan of the refreshed dataset reports zero packages whose embedded tier is less dangerous than upstream's; the four now-Unsafe packages are excluded from every profile including Aggressive unless `--include-unsafe` is passed.
-  Complexity: S
-
 - [ ] P0 — F111 Grant the helper APK its runtime permissions during install
   Why: `pm install -r` grants no dangerous permissions and the helper ships no launcher activity, so it can never prompt. Every SMS, call-log and contacts query returns a `permission-denied` envelope, making the entire v0.7.0 read path non-functional on real hardware.
   Evidence: `src/PhoneFork.Core/Services/HelperAppService.cs:54`; `helper-apk/app/src/main/AndroidManifest.xml` declares `READ_SMS`, `READ_CALL_LOG`, `READ_CONTACTS`; `helper-apk/app/src/main/java/.../providers/Providers.kt` `exportRows` returns `permission-denied` on `SecurityException`.
