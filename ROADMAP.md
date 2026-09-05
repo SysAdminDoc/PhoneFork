@@ -30,13 +30,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P3
 
-- [ ] P3 — F129 Persist window size, position and last-selected tab
-  Why: nothing in `src/PhoneFork.App` reads or writes window state, so a migration session that spans several launches restarts at the default size and the Apps tab every time.
-  Evidence: repo search for `WindowState`, `RestoreBounds` and `Properties.Settings` under `src/PhoneFork.App` returns nothing.
-  Touches: `src/PhoneFork.App/Views/MainWindow.xaml.cs`, `src/PhoneFork.App/App.xaml.cs`
-  Acceptance: window bounds, maximised state and the selected tab persist to a JSON file under `%LOCALAPPDATA%\PhoneFork\`; a saved position entirely off the current monitor set falls back to the primary display rather than opening off-screen.
-  Complexity: S
-
 - [ ] P3 — F130 Add a light theme alongside Catppuccin Mocha
   Why: the theme is a single hand-rolled dictionary with 58 colour and brush keys and no light variant, and every view already resolves colours through `StaticResource` with zero hardcoded hex, so the swap is cheap.
   Evidence: `src/PhoneFork.App/Themes/CatppuccinMocha.xaml` is the only theme file; zero hex literals across `src/PhoneFork.App/Views/*.xaml`.

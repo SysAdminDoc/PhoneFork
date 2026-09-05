@@ -46,7 +46,7 @@
         <views:DeviceBar Grid.Row="1" DataContext="{Binding DeviceBar}"/>
 
         <!-- Tabs -->
-        <TabControl Grid.Row="2" Padding="0" AutomationProperties.Name="Migration domains">
+        <TabControl x:Name="DomainTabs" Grid.Row="2" Padding="0" AutomationProperties.Name="Migration domains">
             <TabItem Header="Apps" AutomationProperties.Name="Apps tab">
                 <views:AppsView DataContext="{Binding Apps}" Margin="0,12,0,0"/>
             </TabItem>
