@@ -14,13 +14,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
 
 ### P2
 
-- [ ] P2 — F120 Fix the helper provider pagination boundary
-  Why: `exportRows` calls `c.moveToNext()` inside the `items.length() >= limit` guard before breaking, which advances the cursor an extra row and perturbs `totalSeen`, so `nextOffset` can skip a record at every page boundary. On a several-thousand-message SMS export that silently drops data.
-  Evidence: `helper-apk/app/src/main/java/.../providers/Providers.kt`, `exportRows` loop and `nextOffset` computation.
-  Touches: `helper-apk/app/src/main/java/.../providers/Providers.kt`, new `helper-apk/app/src/test/`
-  Acceptance: a test over a fake cursor of 1,001 rows paged at `limit=500` returns 1,001 distinct ids across three pages with no gaps and no repeats; the same test fails if the extra `moveToNext()` is restored.
-  Complexity: S
-
 - [ ] P2 — F123 Grow the settings safety corpus beyond the current 38 safe rules
   Why: the corpus holds 38 Safe, 6 Review and 14 Blocked rules against a hardware-measured 271-key applicable diff, so most real keys resolve to Unknown and are skipped unless the user passes `--include-uncatalogued-settings`, which gives up the safety gate wholesale.
   Evidence: rule counts in `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`; the 1,062 vs 967 key snapshot and 271 applicable figure recorded for v0.3.0 in CLAUDE.md.
@@ -34,13 +27,6 @@ Added 2026-09-04. Evidence and full reasoning in RESEARCH.md. IDs continue the e
   Touches: new `tests/PhoneFork.App.Tests/`, new `tests/PhoneFork.Cli.Tests/`, a shared fake `IAdbClient`, `PhoneFork.slnx`
   Acceptance: a fake `IAdbClient` replays recorded shell output; tests cover the apps migrate, settings apply and debloat apply view-model flows including a cancellation case, and cover CLI exit codes for at least the apps, settings, debloat and helper branches; the suite runs with no device attached.
   Complexity: L
-
-- [ ] P2 — F125 Validate against One UI 8.5 and One UI 9 / Android 17
-  Why: the hardware validation matrix is Android 16 / One UI 8 only. One UI 8.5 shipped with the Galaxy S26 in early 2026 and One UI 9 on Android 17 is in beta, and `assets/debloat/overrides.json` already carries `oneUi: ">=8.5"` rules that have never been exercised.
-  Evidence: CLAUDE.md hardware-validated list; https://www.sammobile.com/news/samsung-one-ui-8-5-everything-to-know/; https://9to5google.com/2026/05/12/samsung-galaxy-one-ui-9-beta-android-17/
-  Touches: `docs/release-readiness.md`, `src/PhoneFork.Core/Services/CscDiffService.cs`, `src/PhoneFork.Core/Services/SamsungSettingsCorpus.cs`
-  Acceptance: a documented compatibility matrix records, per One UI version tested, whether `cmd wifi list-networks`, `cmd role get-role-holders`, `settings list`, `pm disable-user` and `pm install-create` behave as PhoneFork expects; any divergence is either handled in code or named as a known limitation in README.md. Note: this overlaps the physical-hardware gate already tracked in Roadmap_Blocked.md and inherits that constraint for anything needing a second device.
-  Complexity: M
 
 ### P3
 
