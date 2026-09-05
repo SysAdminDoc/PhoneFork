@@ -32,6 +32,9 @@ public final class Agent {
                 case "ping":
                     System.out.println(ping());
                     break;
+                case "wifi-psk":
+                    System.out.println(WifiPsk.export());
+                    break;
                 case "":
                     System.out.println(error("missing-op", "Request must be JSON containing an \"op\" field."));
                     break;
