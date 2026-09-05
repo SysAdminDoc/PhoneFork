@@ -1,5 +1,9 @@
 # PhoneFork — Community Signal Research
 
+> **Historical snapshot.** The evidence below was gathered on the date in this document's header and
+> has not been re-verified since. Current findings live in `RESEARCH.md` at the repository root;
+> where the two disagree, RESEARCH.md wins. Known drift as of 2026-09-05 is noted inline.
+
 Research snapshot 2026-05-14. Mining of Reddit, XDA, Samsung Community, Hacker News, Android Central, GitHub Discussions, Stack Overflow, and tech-blog comments for pain points with existing Android phone-migration tooling (Samsung Smart Switch primarily, plus UAD-NG / Shizuku / Canta / Google Restore). Pattern threshold: complaints in 3+ independent threads = strong signal.
 
 Source for the full agent transcript that produced this file: PhoneFork session 2026-05-14, Phase 1 community-signal research.

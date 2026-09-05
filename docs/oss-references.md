@@ -1,5 +1,9 @@
 # PhoneFork — OSS Reference Implementations
 
+> **Historical snapshot.** The evidence below was gathered on the date in this document's header and
+> has not been re-verified since. Current findings live in `RESEARCH.md` at the repository root;
+> where the two disagree, RESEARCH.md wins. Known drift as of 2026-09-05 is noted inline.
+
 Research notes for the dual-Samsung Galaxy ADB migration tool. Lead is the **insight** that changes how PhoneFork should be built; links and licenses are supporting evidence.
 
 ---
@@ -30,7 +34,7 @@ Research notes for the dual-Samsung Galaxy ADB migration tool. Lead is the **ins
 ## 3. scrcpy — `Genymobile/scrcpy`
 
 - **URL:** https://github.com/Genymobile/scrcpy
-- **License:** Apache-2.0 · **Last release:** v4.0 (2026-05-12) · 141 k stars
+- **License:** Apache-2.0 · **Last release:** v4.1 (2026-07-12) · 148.9 k stars *(refreshed 2026-09-05)*
 - **Relevance:** The reference implementation of "push a JAR, run it via `app_process`, no install."
 
 **INSIGHT — this is the "no APK left behind" pattern PhoneFork should default to for read-only operations.** [`app/src/server.c`](https://github.com/Genymobile/scrcpy/blob/master/app/src/server.c) hard-codes `SC_DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"` and the launch line: `CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server <args>`. The JAR is pushed via `adb push`, run from shell UID, and on disconnect `/data/local/tmp` retains the JAR but no Settings/Apps entry exists. For PhoneFork, this means: build a `phonefork-helper.jar` for read-side ops (Wi-Fi scan, ringtone URI lookup, role-holder query) and only fall back to the installed APK for write-side ops that need a manifest permission (SMS provider, wallpaper write).
@@ -78,7 +82,7 @@ Research notes for the dual-Samsung Galaxy ADB migration tool. Lead is the **ins
 ## 7. AppManager — `MuntashirAkon/AppManager`
 
 - **URL:** https://github.com/MuntashirAkon/AppManager
-- **License:** GPL-3.0 · **Last release:** v4.0.5 (2025-07-28) · 8 k stars
+- **License:** GPL-3.0 · **Last release:** v4.1.1 (2026-09-04) · 8.9 k stars *(refreshed 2026-09-05)*
 - **Backup format docs:** `docs/raw/en/guide/backup-restore.tex`
 
 **INSIGHT — AppManager's backup is split across N files with a metadata sidecar and `checksums.txt`. PhoneFork should *adopt this layout wholesale*.** Structure per [the docs](https://github.com/MuntashirAkon/AppManager/blob/master/docs/raw/en/guide/backup-restore.tex): `<pkg>/<timestamp>/{base.apk, split_*.apk, data.tar.gz.0, ext_data.tar.gz.0, obb.tar.gz.0, meta.am.v5, checksums.txt, rules.am.tsv, permissions.am.tsv}`. Why this matters: a PhoneFork backup is restorable in AppManager and vice-versa. Two ecosystems, one on-disk format = massive credibility win in r/androidroot, XDA, etc. License is GPL-3.0 — schema reuse is fine, code copy would viralize.

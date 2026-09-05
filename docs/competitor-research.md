@@ -1,5 +1,9 @@
 # PhoneFork Competitor Research — Commercial Android Migration Tools (2025-2026)
 
+> **Historical snapshot.** The evidence below was gathered on the date in this document's header and
+> has not been re-verified since. Current findings live in `RESEARCH.md` at the repository root;
+> where the two disagree, RESEARCH.md wins. Known drift as of 2026-09-05 is noted inline.
+
 Surveys the closed-source / paid landscape PhoneFork competes with and supplements. PhoneFork's moat: dual-phone simultaneous USB control, NEW→OLD direction, debloat-as-part-of-migration, MIT license, no cloud, no Samsung-account required.
 
 ---
