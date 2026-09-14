@@ -5,6 +5,16 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue.svg)](#)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
 
+<p align="center">
+  <a href="https://ko-fi.com/X8K126YVER">
+    <img height="42" src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" alt="Buy me a coffee on Ko-fi" />
+  </a>
+</p>
+
+<p align="center">
+  <sub><em>If this project helps you, a coffee helps me keep working on it.</em></sub>
+</p>
+
 **Dual-Samsung Android migration tool for Windows.** Drives two USB-connected Galaxy phones at the same time and copies apps, media, settings, Wi-Fi, default app roles, and applies a debloat profile when moving from a new device to a freshly-reset old one. No root, no Samsung account, no cloud.
 
 Built because Samsung Smart Switch is sequential (one phone at a time), one-direction-blessed (old→new), and refuses to debloat.
