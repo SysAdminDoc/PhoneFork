@@ -185,7 +185,7 @@ Optional polish: `Microsoft.Xaml.Behaviors.Wpf` 1.1.135 (MIT) for `EventTrigger`
 
 - WinUI 3 packaging is still painful in 2026: MSIX-only by default, self-contained unpackaged works but `Microsoft.UI.Xaml.dll` won't resolve without WindowsAppRuntime installer or a Win10 LTSC-incompatible self-contained bundle. Real friction on the LTSC IoT boxes PhoneFork's users (sysadmins migrating fleet phones) will run it on.
 - WPF on .NET 10 picked up Grid shorthand syntax + Roslyn 5.0 source-gen + IL trimming improvements; the gap to WinUI 3 is mostly the Fluent control library, which MaterialDesign/HandyControl/WPF-UI fill.
-- Every recent C# project — a private app (now C++, but the WPF v0.3 ran fine), FileOrganizer.UI, OrganizeContacts, Snapture, Devicer, TeamStation — picked WPF and shipped without packaging drama.
+- Every recent C# project — FileOrganizer.UI, OrganizeContacts, Snapture, Devicer, TeamStation — picked WPF and shipped without packaging drama.
 - WinForms is a non-starter for a Catppuccin Mocha custom-themed shell.
 
 If a future PhoneFork v2 wants drag-to-MAUI for macOS reach, the WPF→Avalonia port is ~4× easier than WPF→WinUI 3.
